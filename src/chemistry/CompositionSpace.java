@@ -78,7 +78,7 @@ public class CompositionSpace implements Serializable {
 		for (int i = 0; i < linearComp.getDimension(); i++)
 			m.put(elements.get(i), linearComp.getCartesianComponents().get(i));
 		
-		return new Composition(m);
+		return new Composition(m); stewart
 	} */
 	
 	// return a random integer-coefficient composition from this space
