@@ -258,8 +258,8 @@ public class UnitsSOCreator implements StructureOrgCreator {
 
 
 		// For testing only: creates directory for pre-relaxation structures
-		File outDir = new File("/home/skw57/structures");
-		outDir.mkdir();
+//		File outDir = new File("/home/skw57/structures");
+//		outDir.mkdir();
 		
 		// List of locations of previously placed units
 		refLoc = new LinkedList<Vect>();
@@ -359,7 +359,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		Cell optimizedStructure = optimizeDensity(newStructure);
 		
 		// For testing purposes only: writes pre-relaxation structure to file
-		Utility.writeStringToFile(optimizedStructure.getCIF(), "/home/skw57/structures/struct" + m +".cif");
+//		Utility.writeStringToFile(optimizedStructure.getCIF(), "/home/skw57/structures/struct" + m +".cif");
 		m++;
 
 		return new StructureOrg(optimizedStructure);
@@ -541,7 +541,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			
 			c++;
 			
-			System.out.println("Density attempt: " + density + ". Target density: " + target);
+//			System.out.println("Density attempt: " + density + ". Target density: " + target);
 		}
 		
 		if (c == 0) {
