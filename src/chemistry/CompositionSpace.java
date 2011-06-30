@@ -30,7 +30,7 @@ public class CompositionSpace implements Serializable {
 		List<Element> elements = new LinkedList<Element>();
 		for (int i = 0; i < numElems; i++)
 			elements.add(Element.getElemFromSymbol(compStrs.next()));
-		// read of the compositions
+		// read off the compositions
 		List<Composition> endpoints = new LinkedList<Composition>();
 		while (compStrs.hasNext()) {
 			Map<Element,Integer> compMap = new HashMap<Element,Integer>();
@@ -175,8 +175,9 @@ public class CompositionSpace implements Serializable {
 	public List<Element> getElements() {
 		return elements;
 	}
+	
+	public String toString() {
+		return "Elements " + elements + " with endpoints " + endpoints;
+	}
 
 }
-
-
-// git test

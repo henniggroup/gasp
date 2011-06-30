@@ -11,7 +11,7 @@ public abstract class Organism implements Serializable {
 	static final long serialversionUID = 1l;
 	
 	// fitness is normalized to fall between 0 and 1, where 1 is the best.
-	// we initialize to null to know we havent' computed the fitness yet. similarly
+	// we initialize to null to know we haven't computed the fitness yet. similarly
 	// for the energy
 	protected Double fitness = null;
 	

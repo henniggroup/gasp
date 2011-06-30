@@ -130,6 +130,7 @@ public class GAParameters implements Serializable {
 	private String[] redundancyGuardArgs = null;
 	private boolean useSurrogate = false;
 	private String[] surrogateArgs = null;
+//	private static boolean unitsOnly = false;
 	
 	// constituents holds key-value pairs of the form (Atomic symbol, quantity) where the
 	// quantity is the relative stoichiometry
@@ -202,12 +203,12 @@ public class GAParameters implements Serializable {
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
 		System.out.println("Initial Population");
-		System.out.println("   --initialPopulation1 <num> random givenVol <volumeperatom>");
-		System.out.println("   --initialPopulation2 <num> random randomVol");
-//		System.out.println("   --initialPopulation3 <num> resume <directory> <recalculate energies?>");
-		System.out.println("   --initialPopulation4 <num> fromCifs <directory>");
-		System.out.println("   --initialPopulation5 <num> manual");
-		System.out.println("   --initialPopulation6 <num> database <prototype string>");
+		System.out.println("   --initialPopulation <num> random givenVol <volumeperatom>");
+		System.out.println("   --initialPopulation <num> random randomVol");
+//		System.out.println("   --initialPopulation <num> resume <directory> <recalculate energies?>");
+		System.out.println("   --initialPopulation <num> fromCifs <directory>");
+		System.out.println("   --initialPopulation <num> manual");
+		System.out.println("   --initialPopulation <num> units <symbol 1> <x 1> <y 1> <z 1> ... <true|false> <numUnits> <targetDensity> <densityTol>");
 		System.out.println("Objective Functions");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
@@ -269,8 +270,7 @@ public class GAParameters implements Serializable {
 			usage("", true);
 		
 		// TODO: switch everything to use aParser
-		if (!isSet("--compositionSpace")) 
-			usage("No --compositionSpace option passed.",true);
+
 		
 		// parse the combined set of arguments
 		for (Pair<String,String[]> p: argmap) {
@@ -374,7 +374,7 @@ public class GAParameters implements Serializable {
 				else 
 					usage("Unknown variation function " + variation, true);
 			}
-			// similiar to the variation handling above
+			// similar to the variation handling above
 			else if (flag.toLowerCase().startsWith("--convergencecriterion")) {
 				String[] values = getValues(flag);
 				if (values[0].equalsIgnoreCase("maxFunctionEvals"))
@@ -407,6 +407,9 @@ public class GAParameters implements Serializable {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new ManualSOCreator(GAUtils.subArray(values, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("fromCifs")) {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new FromCifsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+				} else if (creatorType.equalsIgnoreCase("units")) {
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+//					unitsOnly = Boolean.parseBoolean(values[values.length-2]);
 				} else {
 					usage("Unrecognized population type " + creatorType, true);
 				}					
@@ -420,6 +423,7 @@ public class GAParameters implements Serializable {
 		//		for (int j = 1; j < values.length; j = j + 2) {
 		//			constituents.put(values[j], Integer.parseInt(values[j+1]));
 		//		}
+// && !unitsOnly
 			} else if (flag.equalsIgnoreCase("--compositionSpace")) {
 				List<String> csArgs = new LinkedList<String>();
 				for (String s : p.getSecond())
@@ -430,6 +434,10 @@ public class GAParameters implements Serializable {
 			else if (!flag.equalsIgnoreCase("--f") && verbosity >= 1)
 				System.out.println("Ignoring unrecognized flag " + flag);
 		}
+		
+// && !unitsOnly
+		if (!isSet("--compositionSpace")) 
+			usage("No --compositionSpace option passed.",true);
 		
 		// make the development object
 		dev = new StructureDev();
@@ -455,6 +463,7 @@ public class GAParameters implements Serializable {
 		if (objFcnArgs == null || objFcnArgs.length < 2)
 			usage("ERROR: Need an objective function.", true);
 		String objFcnType = objFcnArgs[0];
+// && !unitsOnly
 		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getElements().size() < 2)
 			usage("ERROR: Can't use pd objFun w/ < 2 elements.", true);
 	}
@@ -602,8 +611,10 @@ public class GAParameters implements Serializable {
 		}
 		result.append(newline);
 		*/
+//		if (!unitsOnly) {
 		result.append("Composition space: \n");
 		result.append(compSpace.toString() + "\n");
+//		}
 		
 		result.append("StructureOrgCreators: " + newline);
 		for (Pair<StructureOrgCreator,Integer> soc : initialOrgCreators)
@@ -635,9 +646,16 @@ public class GAParameters implements Serializable {
 	
 	private PDBuilder makePDBuilder() {
 		Map<Element, Double> cps = new HashMap<Element,Double>();
-		for (Element e : compSpace.getElements())
-			cps.put(e, 0.0);
-		return new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
+//		if (unitsOnly) {
+//			for (Element e : UnitsSOCreator.getElements())
+//				cps.put(e, 0.0);
+//				return new PDBuilder(new LinkedList<IComputedEntry>(), UnitsSOCreator.getElements(), cps );
+//		}
+//		else {
+			for (Element e : compSpace.getElements())
+				cps.put(e, 0.0);
+				return new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
+//		}
 	}
 	
 	public ObjectiveFunction getObjectiveFunctionInstance(Organism o) {
@@ -1098,6 +1116,10 @@ public class GAParameters implements Serializable {
 			return bestDenEstimate;
 		}
 		
+/*		public boolean getUnitsOnly() {
+			return unitsOnly;
+		}
+*/		
 		public void cleanup() {	
 			if(!GAParameters.getParams().getKeepTempFiles()) {
 				// delete temporary files

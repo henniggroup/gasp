@@ -1,8 +1,9 @@
 package utility;
 
+import ga.UnitsSOCreator;
+
 import java.io.Serializable;
 import java.util.*;
-
 
 import Jama.*;
 /*  Represents a vector.
@@ -110,6 +111,20 @@ public class Vect implements Serializable {
 		for (int i = 0; i < vComps.size(); i++)
 			newComps.add(vComps.get(i) + ourComps.get(i));
 
+		return new Vect(newComps);
+	}
+	
+	public Vect subtract(Vect v) {
+		List<Double> vComps = v.getCartesianComponents();
+		List<Double> ourComps = getCartesianComponents();
+		List<Double> newComps = new LinkedList<Double>();
+		
+		if (vComps.size() != ourComps.size())
+			throw new RuntimeException("Vector: trying to subtract vectors of different lengths");
+		
+		for (int i = 0; i < vComps.size(); i++)
+			newComps.add(vComps.get(i) - ourComps.get(i));
+		
 		return new Vect(newComps);
 	}
 	
@@ -260,6 +275,23 @@ public class Vect implements Serializable {
 		for (Double c : cartComps)
 			resultSquared += c*c;
 		return Math.sqrt(resultSquared);
+	}
+	
+	// Magnitude of projection of w onto given vector
+	public Double projection(Vect w) {
+		double dotprod = Math.abs(this.dot(w));
+		double l = this.length();
+		
+		return dotprod/l;
+	}
+	
+	public Vect getNormalized() {
+		List<Double> cartComps = this.getCartesianComponents();
+		Double l = this.length();
+		for (int i=0; i<Constants.numDimensions; i++)
+			cartComps.set(i, cartComps.get(i)/l);
+		
+		return new Vect(cartComps.get(0), cartComps.get(1), cartComps.get(2));
 	}
 	
 	public Vect getSumNormalized(Double n) {

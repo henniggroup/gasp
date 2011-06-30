@@ -30,7 +30,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 		newGenType = args[0];
 		
 		if (newGenType.equalsIgnoreCase("randomVol")) {
-			// nothin
+			// nothing
 		} else if (newGenType.equalsIgnoreCase("givenVol")) {
 			if (args.length != 2)
 				GAParameters.usage("Incorrect number of parameters given to RandomSOCreator", true);
@@ -45,12 +45,12 @@ public class RandomSOCreator implements StructureOrgCreator {
 	}
 
 	// makes a basis which is random except that it satisfies the hard constraints
-	private List<Vect> makeRandomLattice() {
+	static List<Vect> makeRandomLattice() {
 		GAParameters params = GAParameters.getParams();
 		
 		if (params.getMaxLatticeAngle() == -1 || params.getMinLatticeAngle() == -1
 				|| params.getMaxLatticeLength() == -1 || params.getMinLatticeLength() == -1)
-			GAParameters.usage("Error: Must set lattice parameter constraints to use RandomSOCreator.", true);
+			GAParameters.usage("Error: Must set lattice parameter constraints to use makeRandomLattice().", true);
 		
 		double maxll = params.getMaxLatticeLength();
 		double minll = params.getMinLatticeLength();

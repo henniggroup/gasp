@@ -176,6 +176,10 @@ public final class StructureDev implements Development, Serializable {
 						System.out.println("Organism " + s.getID() + " failed minimum interatomic distance constraint.");
 					return false;
 				}
+/*				else {
+					System.out.println("Sites: " + structure.getSites());
+				}
+*/				
 			}	
 		
 		// check the stoichiometry
@@ -202,11 +206,13 @@ public final class StructureDev implements Development, Serializable {
 			}
 		}*/
 		// make sure composition is in compSpace
-		if (!params.getCompSpace().contains(s.getCell().getComposition())) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed stoichiometry constraint.");
-			return false;
-		}
+//		if (!UnitsSOCreator.getUnitsOnly()) {
+			if (!params.getCompSpace().contains(s.getCell().getComposition())) {
+				if (verbosity >= 3)
+					System.out.println("Organism " + s.getID() + " failed stoichiometry constraint.");
+				return false;
+			}
+//		}
 		
 		// check nearest neighbors
 		if (params.getMaxNearestNeighborLength() != 0) {
