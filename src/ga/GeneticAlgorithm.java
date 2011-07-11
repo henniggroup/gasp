@@ -54,7 +54,8 @@ public class GeneticAlgorithm {
 						System.out.println(newOrg);
 					
 					// start the energy computation
-					threads.add(params.getObjectiveFunctionInstance(newOrg).evaluate());
+					if (!newOrg.knowsValue())
+						threads.add(params.getObjectiveFunctionInstance(newOrg).evaluate());
 				}
 				
 				// wait for the energy computations

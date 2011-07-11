@@ -183,7 +183,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 
 		final int maxFails = 100;
 		int failCount = 0;
-		
 
 		int totNum = 0;
 		for (int r=0; r<difUnits; r++) {

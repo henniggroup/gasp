@@ -221,6 +221,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --variation2 <percentage> <percentage> structureMut <rate> <sigmaAtoms> <sigmaLattice>");
 		System.out.println("   --variation3 <percentage> <percentage> permutation <meanSwaps> <sigmaSwaps> <pairsToSwap (e.g. Mn-O)>");
 		System.out.println("   --variation4 <percentage> <percentage> numStoichsMut <meanNumAtoms> <sigmaNumAtoms>");
+		System.out.println("   --variation5 <percentage> <percentage> supercell");
 		System.out.println("Selection Algorithms");
 		System.out.println("   --selection probDist <numParents> <selectionPower>");
 		System.out.println("Convergence Criteria");
@@ -371,6 +372,8 @@ public class GAParameters implements Serializable {
 					vars.add(new Permutation(GAUtils.subArray(values, 3)));
 				else if (variation.equalsIgnoreCase("numStoichsMut")) 
 					vars.add(new NumStoichsMut(GAUtils.subArray(values, 3)));
+				else if (variation.equalsIgnoreCase("supercell")) 
+					vars.add(new SupercellVariation(GAUtils.subArray(values, 3)));
 				else 
 					usage("Unknown variation function " + variation, true);
 			}
