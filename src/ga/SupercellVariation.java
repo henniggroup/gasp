@@ -9,7 +9,10 @@ import crystallography.Cell;
 public class SupercellVariation  implements Variation {
 	
 	static final long serialVersionUID = 1l;
-
+	
+	final int scaleFactor = 2;
+	final int maxAttempts = 20; 
+	
 	public SupercellVariation(String[] args) {
 		if (args == null || args.length != 0)
 			GAParameters.usage("Wrong parameters given to SupercellVariation", true);
@@ -30,8 +33,19 @@ public class SupercellVariation  implements Variation {
 		int verbosity = params.getVerbosity();
 		
 		// pick a parent randomly 
-		StructureOrg p = (StructureOrg)(sel.doSelection(parents, 1)[0]);
-		Cell pStruct = p.getCell();
+		// but make sure it's going to work; i.e. it has less than maxnumatoms/2 atoms
+		StructureOrg p = null;
+		Cell pStruct = null;
+		for (int i = 0; i < maxAttempts; i++) { 
+			p = (StructureOrg)(sel.doSelection(parents, 1)[0]);
+			if (p.getCell().getNumSites() * scaleFactor >= GAParameters.getParams().getMaxNumAtoms())
+				continue;
+			
+			pStruct = p.getCell();
+			break;
+		}
+		if (pStruct == null)
+			return null;
 		
 		// make identity matrix
 		List<List<Integer>> coefs = new ArrayList<List<Integer>>();
@@ -43,7 +57,6 @@ public class SupercellVariation  implements Variation {
 		}
 		
 		// double one of the dimensions
-		final int scaleFactor = 2;
 		int doubleDim = (int)(Math.random() * Constants.numDimensions);
 		for (int i = 0; i < Constants.numDimensions; i++)
 			coefs.get(doubleDim).set(i, coefs.get(doubleDim).get(i) * scaleFactor);

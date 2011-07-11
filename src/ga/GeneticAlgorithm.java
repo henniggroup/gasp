@@ -211,6 +211,8 @@ public class GeneticAlgorithm {
 				System.out.println("Starting variation " + v + " (done " + offspring.getNumOrganisms()
 						+ " of " + params.getPopSize() + ").");
 			newOrg = v.doVariation(parents, offspring, sel);
+			if (newOrg == null) // if the chosen variation can't make a child, try another variation
+				return makeOffspringOrg(parents, offspring, sel);
 		} while (dev != null && !dev.doDevelop(offspring, newOrg));
 		
 		return newOrg;
