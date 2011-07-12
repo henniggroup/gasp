@@ -271,7 +271,8 @@ public class GAParameters implements Serializable {
 			usage("", true);
 		
 		// TODO: switch everything to use aParser
-
+		if (!isSet("--compositionSpace")) 
+			usage("No --compositionSpace option passed.",true);
 		
 		// parse the combined set of arguments
 		for (Pair<String,String[]> p: argmap) {
@@ -412,7 +413,6 @@ public class GAParameters implements Serializable {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new FromCifsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("units")) {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
-//					unitsOnly = Boolean.parseBoolean(values[values.length-2]);
 				} else {
 					usage("Unrecognized population type " + creatorType, true);
 				}					
@@ -426,7 +426,6 @@ public class GAParameters implements Serializable {
 		//		for (int j = 1; j < values.length; j = j + 2) {
 		//			constituents.put(values[j], Integer.parseInt(values[j+1]));
 		//		}
-// && !unitsOnly
 			} else if (flag.equalsIgnoreCase("--compositionSpace")) {
 				List<String> csArgs = new LinkedList<String>();
 				for (String s : p.getSecond())
@@ -437,10 +436,6 @@ public class GAParameters implements Serializable {
 			else if (!flag.equalsIgnoreCase("--f") && verbosity >= 1)
 				System.out.println("Ignoring unrecognized flag " + flag);
 		}
-		
-// && !unitsOnly
-		if (!isSet("--compositionSpace")) 
-			usage("No --compositionSpace option passed.",true);
 		
 		// make the development object
 		dev = new StructureDev();
@@ -466,7 +461,6 @@ public class GAParameters implements Serializable {
 		if (objFcnArgs == null || objFcnArgs.length < 2)
 			usage("ERROR: Need an objective function.", true);
 		String objFcnType = objFcnArgs[0];
-// && !unitsOnly
 		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getElements().size() < 2)
 			usage("ERROR: Can't use pd objFun w/ < 2 elements.", true);
 	}
@@ -614,10 +608,8 @@ public class GAParameters implements Serializable {
 		}
 		result.append(newline);
 		*/
-//		if (!unitsOnly) {
 		result.append("Composition space: \n");
 		result.append(compSpace.toString() + "\n");
-//		}
 		
 		result.append("StructureOrgCreators: " + newline);
 		for (Pair<StructureOrgCreator,Integer> soc : initialOrgCreators)
@@ -649,16 +641,9 @@ public class GAParameters implements Serializable {
 	
 	private PDBuilder makePDBuilder() {
 		Map<Element, Double> cps = new HashMap<Element,Double>();
-//		if (unitsOnly) {
-//			for (Element e : UnitsSOCreator.getElements())
-//				cps.put(e, 0.0);
-//				return new PDBuilder(new LinkedList<IComputedEntry>(), UnitsSOCreator.getElements(), cps );
-//		}
-//		else {
-			for (Element e : compSpace.getElements())
-				cps.put(e, 0.0);
-				return new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
-//		}
+		for (Element e : compSpace.getElements())
+			cps.put(e, 0.0);
+			return new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
 	}
 	
 	public ObjectiveFunction getObjectiveFunctionInstance(Organism o) {
@@ -1118,11 +1103,7 @@ public class GAParameters implements Serializable {
 		public double getBestDensityEstimate() {
 			return bestDenEstimate;
 		}
-		
-/*		public boolean getUnitsOnly() {
-			return unitsOnly;
-		}
-*/		
+	
 		public void cleanup() {	
 			if(!GAParameters.getParams().getKeepTempFiles()) {
 				// delete temporary files
