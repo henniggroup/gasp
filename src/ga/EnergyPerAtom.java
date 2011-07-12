@@ -2,6 +2,7 @@
 
 package ga;
 
+import avogadro.AvogadroEnergy;
 import castep.CastepEnergy;
 import gulp.GulpEnergy;
 import vasp.VaspEnergy;
@@ -30,6 +31,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 			energyFcn = new LammpsEnergy(GAUtils.subArray(args, 1));
 		else if (energyType.equalsIgnoreCase("castep"))
 			energyFcn = new CastepEnergy(GAUtils.subArray(args, 1));
+		else if (energyType.equalsIgnoreCase("avogadro"))
+			energyFcn = new AvogadroEnergy(GAUtils.subArray(args, 1));
 		else
 			throw new RuntimeException("Unknown energy function in EnergyPerAtom: " + energyType);
 		

@@ -28,7 +28,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	private static boolean unitsOnly;
 	private List<Site> sites;
 	private List<Vect> refLoc;
-	private int m = 1; //For testing only
 	private int[] units;
 	private double targetDensity;
 	private double densityTol;
@@ -104,55 +103,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		}
 		
 	}
-
-/*
-	// TODO: make this work for multiple units (giant pain in the ass)
-	public String toString() {
-		boolean u = unitsOnly;
-		
-		String a = ""; String c = ""; String n = ""; String d = ""; String f = "";
-		
-		for (int i=0; i<numAtoms; i++) {
-			if (i<numAtoms-1) {
-				a = a + atoms[i] + ", ";
-			}
-			else {
-				a = a + atoms[i];
-			}
-			if (i<numAtoms-1) {
-				c = c + "(" + coords[i][0] + "," + coords[i][1] + "," + coords[i][2] + "), ";
-			}
-			else {
-				c = c + "(" + coords[i][0] + "," + coords[i][1] + "," + coords[i][2] + ")";
-			}
-		}
-		
-		if (numUnits == 0) {
-			n = n + "random";
-		}
-		else {
-			n = n + numUnits;
-		}
-		
-		if (targetDensity == 0) {
-			d = d + "generated";
-		}
-		else {
-			d = d + targetDensity + " g/cm^3";
-		}
-		
-		if (densityTol == 0) {
-			f = f + "20%";
-		}
-		else {
-			double perc = densityTol*100;
-			f = f + perc + "%";
-		}
-		
-		return "UnitsSOCreator: atoms " + a + " with coordinates " + c + " and unitsOnly " + u + ", # molecules = " + n + ", target density " + d + " and tolerance " + f;
-	}
-
-*/
 	
 	// Fills up the population with unit organisms (provided they satisfy the
 	// hard constraints)
@@ -160,19 +110,22 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		GAParameters params = GAParameters.getParams();
 		Random rand = params.getRandom();
 		
-/*		// Checks interatomic distances within molecule
-		for (int n=0; n<numAtoms; n++) {
-			for (int m=0; m<numAtoms; m++) {
-				if (n!=m) {
-					Vect nvect = sites.get(n).getCoords(); Vect mvect = sites.get(m).getCoords();
-					Vect dif = nvect.subtract(mvect);
-					if (dif.length() < params.getMinInteratomicDistance()) {
-						GAParameters.usage("Minimum interatomic distance is greater than distances within molecule", true);
+		// TODO: see if this works
+		// Checks interatomic distances within molecule
+		for (int k=0; k<difUnits; k++) {
+			for (int n=0; n<numAtoms[k]; n++) {
+				for (int m=0; m<numAtoms[k]; m++) {
+					if (n!=m) {
+						Vect nvect = sites.get(n).getCoords(); Vect mvect = sites.get(m).getCoords();
+						Vect dif = nvect.subtract(mvect);
+						if (dif.length() < params.getMinInteratomicDistance()) {
+							GAParameters.usage("Minimum interatomic distance is greater than distances within molecule", true);
+						}
 					}
 				}
 			}
 		}
-*/	
+	
 		
 		// make random lattice parameters satisfying hard constraints
 		// the Basis for our new organism
@@ -214,51 +167,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 				totAtoms = totAtoms + target[y]*numAtoms[y];
 			}
 		}
-		
-/*		units = new int[difUnits]; int[] target = new int[difUnits]; int totAtoms = 0;
-		while (totAtoms==0 || totAtoms > params.getMaxNumAtoms()) {
-			for (int y=0; y<difUnits; y++) {
-				if (numUnits[y] != 0) {
-					target[y] = numUnits[y];
-					units[y] = target[y];
-					totAtoms = totAtoms + numUnits[y]*numAtoms[y];
-				}
-				else {
-				target[y] = RandomNumbers.getUniformIntBetween(1, params.getMaxNumAtoms());
-				units[y] = target[y];
-				totAtoms = totAtoms + target[y]*numAtoms[y];
-				}
-			}
-		}
-*/
-		
-/*		int totAtoms = 0; units = new int[difUnits]; int[] target = new int[difUnits];
-		for (int i=0; i<difUnits; i++) {
-			if (numUnits[i] != 0) {
-				target[i] = numUnits[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + numUnits[i]*numAtoms[i];
-			}
-			else {
-				int maxAtoms = params.getMaxNumAtoms(); int minAtoms = params.getMinNumAtoms();
-				int randInt = RandomNumbers.getUniformIntBetween(numAtoms[i], (maxAtoms - totAtoms));
-				target[i] = randInt/numAtoms[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + target[i]*numAtoms[i];
-			}
-			if (target[i] == 0 && (params.getMaxNumAtoms() - totAtoms) >= numAtoms[i]) {
-				int randInt = RandomNumbers.getUniformIntBetween(numAtoms[i], params.getMaxNumAtoms() - totAtoms);
-				target[i] = randInt/numAtoms[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + target[i]*numAtoms[i];				
-			}			
-		}
-*/
-
-
-		// For testing only: creates directory for pre-relaxation structures
-//		File outDir = new File("/home/skw57/structures");
-//		outDir.mkdir();
 		
 		// List of locations of previously placed units
 		refLoc = new LinkedList<Vect>();
@@ -356,10 +264,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		
 		// Optimizes cell density
 		Cell optimizedStructure = optimizeDensity(newStructure);
-		
-		// For testing purposes only: writes pre-relaxation structure to file
-//		Utility.writeStringToFile(optimizedStructure.getCIF(), "/home/skw57/structures/struct" + m +".cif");
-		m++;
 
 		return new StructureOrg(optimizedStructure);
 	}
@@ -513,7 +417,11 @@ public class UnitsSOCreator implements StructureOrgCreator {
 						Site newSite = new Site(e,vNew);
 						sites.set(currentSite+k, newSite);
 					}
+					
 					currentSite = currentSite + numAtoms[u];
+					if (currentSite == sites.size()) {
+						break;
+					}
 				}
 			}
 			
@@ -552,6 +460,48 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		
 	}
 	
+	public String toString() {
+		boolean u = unitsOnly;
+		
+		String a = ""; String d = ""; String f = "";
+		
+		int loc = 0;
+		for (int k=0; k<difUnits; k++) {
+			if (numUnits[k] != 0) {
+				a = a + "mol" + (k+1) + "- " + numUnits[k] + " units ";
+			}
+			else {
+				a = a + "mol" + (k+1) + "- random number of units ";
+			}
+			for (int l=0; l<numAtoms[k]; l++) {
+				if (l > 9) {
+					a = a + "...";
+					loc = loc + (numAtoms[k] - l);
+					break;
+				}
+				a = a + sites.get(loc) + ", ";
+				loc++;
+			}
+			a = a + "\n";
+		}
+		
+		if (targetDensity == 0) {
+			d = d + "generated";
+		}
+		else {
+			d = d + targetDensity + " g/cm^3";
+		}
+		
+		if (densityTol == 0) {
+			f = f + "20%";
+		}
+		else {
+			double perc = densityTol*100;
+			f = f + perc + "%";
+		}
+		
+		return "UnitsSOCreator: \n" + a + "target density " + d + " and tolerance " + f + ", unitsOnly " + u;
+	}
 	
 /*	public static void main(String[] args) {
 		String[] params = { "--minInteratomicDistance", "0.8", "--maxLatticeLength", "35", "--minLatticeLength", "1", "--maxLatticeAngle", "140", "--minLatticeAngle", "40", "--maxNumAtoms", "20", "minNumAtoms", "1", "doNonnegativityConstraint", "false", "--compositionSpace", "2", "H", "O", "0", "1", "1", "0", "--ObjectiveFunction", "epa", "gulp", ""};
@@ -562,19 +512,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 //		Utility.writeStringToFile(will.makeUnitOrg().getCell().getCIF(), "/home/skw57/stew.cif");
 	}
 */	
-	
-// -----------------------------GETTERS------------------------------
-	
-	public String[] getAtoms() {
-		return atoms;
-	}
-	
-	public double[][] getCoords() {
-		return coords;
-	}
-	
-	public static boolean getUnitsOnly() {
-		return unitsOnly;
-	}
-	
+
+
 }

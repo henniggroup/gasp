@@ -205,6 +205,7 @@ public class GulpEnergy implements Energy {
 			// update c to be the structure in GULP's output
 			String cifFileName = inputFile + ".cif";
 			Cell a = Cell.parseCif(new File(cifFileName));
+			a.writeCIF("/home/skw57/outputhopefulblowup" + c.getID() + ".cif");
 			if (a == null) {
 				if (verbosity >= 3)
 					System.out.println("Warning: bad GULP CIF.  Not updating structure.");
@@ -265,7 +266,7 @@ public class GulpEnergy implements Energy {
 		
 		if (line == null)
 			return Double.POSITIVE_INFINITY;
-		
+
 		// the final gNorm should be on the next line:
 		StringTokenizer t = new StringTokenizer(line);
 		t.nextToken();
