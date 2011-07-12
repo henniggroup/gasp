@@ -45,10 +45,11 @@ public class NumStoichsMut implements Variation {
 		Random rand = params.getRandom();
 		// remove atoms n times
 		for (int i = 0; i < numAtoms; i++) {
-			newSites.remove(RandomNumbers.getUniformIntBetween(0, newSites.size()));
+			newSites.remove(RandomNumbers.getUniformIntBetweenInclusive(0, newSites.size() - 1));
 		}
 	}
 	
+	/*
 	private Boolean hasAStoich(List<Site> speciesList, Map<Element,Double> constituents) {
 		Set<Element> elements = constituents.keySet();
 		Iterator<Element> i = elements.iterator();
@@ -65,7 +66,7 @@ public class NumStoichsMut implements Variation {
 				return false;
 		}
 		return true;
-	}
+	}*/
 
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();

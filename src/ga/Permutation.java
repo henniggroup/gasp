@@ -21,7 +21,7 @@ public class Permutation implements Variation {
 	private double meanExchanges;
 	private double sigmaExchanges;
 	String[] pairStrings;
-	private List<Set<String>> pairs = null;;
+	private List<Set<String>> pairs = null;
 	
 	public Permutation(String[] args) {
 		if (args.length < 3)
@@ -29,6 +29,9 @@ public class Permutation implements Variation {
 		
 		meanExchanges = Double.parseDouble(args[0]);
 		sigmaExchanges = Double.parseDouble(args[1]);
+		
+		if (meanExchanges == 0 && sigmaExchanges == 0)
+			GAParameters.usage("Bad mean/sigma given to Permutation", true);
 		
 		pairStrings = GAUtils.subArray(args, 2);
 	}
@@ -62,7 +65,6 @@ public class Permutation implements Variation {
 		for (Site s : pStruct.getSites()) 
 			newSites.add(s);
 		
-		
 		// find a (nonzero) number of exchanges to do (mean meanExchanges, standard dev. sigmaExchanges)
 		int numExchanges;
 		do {
@@ -76,7 +78,11 @@ public class Permutation implements Variation {
 			Iterator<String> j = pair.iterator();
 			String firstSymbol = j.next();
 			String secondSymbol = j.next();
-			// find one site of each symbol at random
+			
+			// find one site of each symbol at random. make sure we can first
+			if (pStruct.getNumSitesWithElement(Element.getElemFromSymbol(firstSymbol)) == 0 
+					|| pStruct.getNumSitesWithElement(Element.getElemFromSymbol(secondSymbol)) == 0)
+				continue;
 			int indexA, indexB;
 			do {
 				indexA = rand.nextInt(newSites.size());
@@ -84,6 +90,7 @@ public class Permutation implements Variation {
 			do {
 				indexB = rand.nextInt(newSites.size());
 			} while (!newSites.get(indexB).getElement().getSymbol().startsWith(secondSymbol));
+			
 			// swap the species (but not the points)
 			Element elemA = newSites.get(indexA).getElement();
 			Element elemB = newSites.get(indexB).getElement();

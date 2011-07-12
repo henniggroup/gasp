@@ -16,7 +16,7 @@ public class RandomNumbers {
 		return lesser + GAParameters.getParams().getRandom().nextDouble() * (greater - lesser);
 	}
 	
-	public static int getUniformIntBetween(int a, int b) {
+	public static int getUniformIntBetweenInclusive(int a, int b) {
 		
 		// TODO: wait does this work?
 		int lesser, greater;
@@ -27,7 +27,13 @@ public class RandomNumbers {
 			greater = b;
 			lesser = a;
 		}
-		return lesser + Math.round(Math.round(GAParameters.getParams().getRandom().nextDouble() * (greater - lesser)));
+		return lesser + GAParameters.getParams().getRandom().nextInt(greater - lesser + 1);
+	//	return lesser + Math.round(Math.round(GAParameters.getParams().getRandom().nextDouble() * (greater - lesser)));
+	}
+	
+	public static void main(String args[]) {
+		for(int i = 0; i < 10; i++)
+			System.out.println(getUniformIntBetweenInclusive(0,4));
 	}
 
 }

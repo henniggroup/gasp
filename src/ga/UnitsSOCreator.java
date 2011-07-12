@@ -193,7 +193,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		}	
 		
 		// Parse or generate target number of molecules of each type, ensuring total # atoms is within constraint
-		int targetAtoms = RandomNumbers.getUniformIntBetween(numSites,params.getMaxNumAtoms()); int totAtoms = 0;
+		int targetAtoms = RandomNumbers.getUniformIntBetweenInclusive(numSites,params.getMaxNumAtoms()); int totAtoms = 0;
 		double[] fracValues = new double[difUnits]; double fracTotal = 0.0; int[] target = new int[difUnits]; units = new int[difUnits];
 		if (numUnits[0] != 0) {
 			for (int t=0; t<difUnits; t++) {
