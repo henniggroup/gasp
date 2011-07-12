@@ -837,13 +837,6 @@ public class GAParameters implements Serializable {
 			return outDirName + "/temp";
 	}
 	
-	public String getDirName() {
-		if (outDirName == null)
-			return "/tmp";
-		else
-			return outDirName;
-	}
-	
 	public int getEndGameNumGens() {
 		return endGameNumGens;
 	}
