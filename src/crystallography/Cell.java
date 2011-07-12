@@ -1066,7 +1066,7 @@ public class Cell implements Serializable {
 					double y = Double.parseDouble(t.nextToken());
 					double z = Double.parseDouble(t.nextToken());
 					// String occupancy = t.nextToken();
-					sites.add(new Site(Element.getElemFromSymbol(symbol), new Vect(x,y,z, latVects)));
+					sites.add(new Site(Element.getElemFromSymbol(symbol), new Vect(x,y,z)));
 				} else {
 					String firstWord = t.nextToken();
 					if (firstWord.equals("_cell_length_a"))

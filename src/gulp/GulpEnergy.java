@@ -266,7 +266,7 @@ public class GulpEnergy implements Energy {
 		
 		if (line == null)
 			return Double.POSITIVE_INFINITY;
-		
+
 		// the final gNorm should be on the next line:
 		StringTokenizer t = new StringTokenizer(line);
 		t.nextToken();

@@ -28,7 +28,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	private static boolean unitsOnly;
 	private List<Site> sites;
 	private List<Vect> refLoc;
-	private int m = 1; //For testing only
 	private int[] units;
 	private double targetDensity;
 	private double densityTol;
@@ -169,54 +168,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			}
 		}
 		
-		// TODO: garbage this
-/*		units = new int[difUnits]; int[] target = new int[difUnits]; int totAtoms = 0;
-		while (totAtoms==0 || totAtoms > params.getMaxNumAtoms()) {
-			for (int y=0; y<difUnits; y++) {
-				if (numUnits[y] != 0) {
-					target[y] = numUnits[y];
-					units[y] = target[y];
-					totAtoms = totAtoms + numUnits[y]*numAtoms[y];
-				}
-				else {
-				target[y] = RandomNumbers.getUniformIntBetween(1, params.getMaxNumAtoms());
-				units[y] = target[y];
-				totAtoms = totAtoms + target[y]*numAtoms[y];
-				}
-			}
-		}
-*/
-		
-/*		int totAtoms = 0; units = new int[difUnits]; int[] target = new int[difUnits];
-		for (int i=0; i<difUnits; i++) {
-			if (numUnits[i] != 0) {
-				target[i] = numUnits[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + numUnits[i]*numAtoms[i];
-			}
-			else {
-				int maxAtoms = params.getMaxNumAtoms(); int minAtoms = params.getMinNumAtoms();
-				int randInt = RandomNumbers.getUniformIntBetween(numAtoms[i], (maxAtoms - totAtoms));
-				target[i] = randInt/numAtoms[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + target[i]*numAtoms[i];
-			}
-			if (target[i] == 0 && (params.getMaxNumAtoms() - totAtoms) >= numAtoms[i]) {
-				int randInt = RandomNumbers.getUniformIntBetween(numAtoms[i], params.getMaxNumAtoms() - totAtoms);
-				target[i] = randInt/numAtoms[i];
-				units[i] = target[i];
-				totAtoms = totAtoms + target[i]*numAtoms[i];				
-			}			
-		}
-*/
-
-
-		// For avogadro only: creates directory for pre-relaxation structures
-//		if (EnergyPerAtom.getEnergyNum() == 1) {
-//			File outDir = new File(params.getTempDirName() + "/cifs");
-//			outDir.mkdir();
-//		}
-		
 		// List of locations of previously placed units
 		refLoc = new LinkedList<Vect>();
 		
@@ -313,12 +264,6 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		
 		// Optimizes cell density
 		Cell optimizedStructure = optimizeDensity(newStructure);
-		
-		// For avogadro calculations only
-//		if (EnergyPerAtom.getEnergyNum() == 1) {
-//			Utility.writeStringToFile(optimizedStructure.getCIF(), params.getTempDirName() + "/orig" + m +".cif");
-//		}
-		m++;
 
 		return new StructureOrg(optimizedStructure);
 	}
@@ -503,7 +448,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			
 			c++;
 			
-			System.out.println("Density attempt: " + density + ". Target density: " + target);
+//			System.out.println("Density attempt: " + density + ". Target density: " + target);
 		}
 		
 		if (c == 0) {
@@ -568,21 +513,5 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	}
 */	
 
-	
-//TODO: Are all these necessary?	
-// -----------------------------GETTERS------------------------------
-/*	
-	public String[] getAtoms() {
-		return atoms;
-	}
-	
-	public double[][] getCoords() {
-		return coords;
-	}
-	
-	public static boolean getUnitsOnly() {
-		return unitsOnly;
-	}
-*/	
 
 }

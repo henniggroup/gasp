@@ -233,7 +233,7 @@ public class GeneticAlgorithm {
 		} else {	
 			// only use the minimum population size option if we're doing parallel energy calculations
 			if (params.getNumCalcsInParallel() != 1)
-				return offspring.getNumOrganisms() >= params.getMinPopSize();
+				return offspring.getNumOrganisms() >= Math.min(params.getMinPopSize(),params.getPopSize());
 			else
 				return offspring.getNumOrganisms() >= params.getPopSize();
 		}
