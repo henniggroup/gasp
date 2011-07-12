@@ -1,7 +1,5 @@
 package utility;
 
-import ga.UnitsSOCreator;
-
 import java.io.Serializable;
 import java.util.*;
 

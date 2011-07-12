@@ -45,7 +45,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 	}
 
 	// makes a basis which is random except that it satisfies the hard constraints
-	static List<Vect> makeRandomLattice() {
+	public static List<Vect> makeRandomLattice() {
 		GAParameters params = GAParameters.getParams();
 		
 		if (params.getMaxLatticeAngle() == -1 || params.getMinLatticeAngle() == -1

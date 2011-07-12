@@ -300,12 +300,16 @@ public class GulpEnergy implements Energy {
 	
 	// just for testing:
 	public static void main(String[] args) {
-		String[] geArgs = {"gulppotl_mno2", "true"};
+		String[] geArgs = {"/home/wtipton/projects/ga_for_crystals/gulp_header", "/home/wtipton/projects/ga_for_crystals/gulppotls/gulppotl_alcu", "true"};
 		GulpEnergy bob = new GulpEnergy(geArgs);
-		String output = GulpEnergy.runGULP("mno2_poly.gin");
-		System.out.println(output);
-		System.out.println(GulpEnergy.parseFinalEnergy(output, bob.cautious));
-		System.out.println(output.contains("failed"));
+		Cell c = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif"));
+		
+		System.out.println(bob.getEnergy(new StructureOrg(c)));
+		
+	//	String output = GulpEnergy.runGULP("mno2_poly.gin");
+	//	System.out.println(output);
+	//	System.out.println(GulpEnergy.parseFinalEnergy(output, bob.cautious));
+	//	System.out.println(output.contains("failed"));
 	}
 }
 

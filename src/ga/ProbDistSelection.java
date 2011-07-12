@@ -23,7 +23,7 @@ public final class ProbDistSelection implements Selection, Serializable {
 
 	public ProbDistSelection(String[] args) {
 		if (args.length < 2)
-			GAParameters.usage("Not enough parameters given to Tournament", true);
+			GAParameters.usage("Not enough parameters given to ProbDistSelection", true);
 		numSurvivors = Integer.parseInt(args[0]);
 		power = Double.parseDouble(args[1]);	
 	}
@@ -31,12 +31,13 @@ public final class ProbDistSelection implements Selection, Serializable {
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		
-		result.append("Elitist selection");
+		result.append("ProbDistSelection selection");
 		result.append("(numParents = " + numSurvivors + ", power = " + power + ")");
 		
 		return result.toString();
 	}
 	
+	/*
 	// set the selection probability of the worst individuals to 0, 
 	// the worst being all but the top numSurvivors.  renormalizes the
 	// fitnesses of the remaining organisms
@@ -66,6 +67,7 @@ public final class ProbDistSelection implements Selection, Serializable {
 		
 		return renormFitnesses;
 	}
+	 
 	
 	// we let the selection probability have a nth power dependence on the fitness
 	// by setting an organism's selection probability to
@@ -95,6 +97,40 @@ public final class ProbDistSelection implements Selection, Serializable {
 		}	
 		
 		return probMap;
+	} */
+	
+	private HashMap<Organism, Double> findProbabilities(Generation g) {	
+		HashMap<Organism, Double> result = new HashMap<Organism, Double>();
+		
+		// make a list of all the organisms
+		int numOrgs = g.getNumOrganisms();
+		List<Organism> orgs = new ArrayList<Organism>();
+		for (int i = 0; i < numOrgs; i++)
+			orgs.add(g.getOrganism(i));
+		
+		// get unnormalized non-zero probabilities for top numSurvivor organisms
+		// and 0 probabilities for the rest
+		for (int i = 0; i < numOrgs; i++) {
+			// get best organism in list by fitness
+			Organism bestOrg = orgs.get(0);
+			for (int j = 1; j < orgs.size(); j++) 
+				if (orgs.get(j).getFitness() > bestOrg.getFitness()) 
+					bestOrg = orgs.get(j);
+			// remove it from the list and add it to the result
+			orgs.remove(bestOrg);
+			double unnormalizedProb = Math.max(numSurvivors - i, 0);
+			result.put(bestOrg, unnormalizedProb);
+		}
+		
+		// normalize stuffs 
+		double sum = 0.0;
+		for (Organism o : result.keySet())
+			sum += Math.pow(result.get(o), power);
+		
+		for (Organism o : result.keySet())
+			result.put(o, Math.pow(result.get(o), power) / sum);
+		
+		return result;
 	}
 	
 	public Organism[] doSelection(Generation g, int n) {
@@ -142,17 +178,20 @@ public final class ProbDistSelection implements Selection, Serializable {
 	}
 	
 	public static void main(String[] args) {
-		String[] elitistArgs = {"3", "1"};
+		String[] elitistArgs = {"5", "1"};
 		ProbDistSelection bob = new ProbDistSelection(elitistArgs);
 		
 		Structures g = new Structures();
-		for (double x = 0.0; x <= 1.0; x += 0.2) {
+		for (double x = -0.2; x <= 1.0; x += 0.05) {
 			StructureOrg s = new StructureOrg(null);
-			s.setFitness(x);
+			s.setFitness(0.7);
 			g.addOrganism(s);
 		}
+		StructureOrg s = new StructureOrg(null);
+		s.setFitness(1.0);
+		g.addOrganism(s);
 		
-		for (int i = 0; i < 1000; i++)
+		for (int i = 0; i < 10; i++)
 			System.out.println(bob.doSelection(g, 1)[0].getID());
 	}
 }

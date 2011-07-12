@@ -160,7 +160,7 @@ public final class Slicer implements Variation {
 		for (int j = 0; j < a.getNumSites(); j++) {
 			Site s = new Site(a.getSite(j).getElement(), a.getSite(j).getCoords().plusWRT(new Vect(shiftA), basis));
 			if (isAbove(s)) 
-			newSites.add(s);
+				newSites.add(s);
 		}
 		// parent b's contribution
 		for (int j = 0; j < b.getNumSites(); j++) {
