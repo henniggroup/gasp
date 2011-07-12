@@ -206,13 +206,11 @@ public final class StructureDev implements Development, Serializable {
 			}
 		}*/
 		// make sure composition is in compSpace
-//		if (!UnitsSOCreator.getUnitsOnly()) {
-			if (!params.getCompSpace().contains(s.getCell().getComposition())) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed stoichiometry constraint.");
-				return false;
-			}
-//		}
+		if (!params.getCompSpace().contains(s.getCell().getComposition())) {
+			if (verbosity >= 3)
+				System.out.println("Organism " + s.getID() + " failed stoichiometry constraint.");
+			return false;
+		}
 		
 		// check nearest neighbors
 		if (params.getMaxNearestNeighborLength() != 0) {
