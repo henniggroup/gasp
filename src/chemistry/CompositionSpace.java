@@ -123,7 +123,7 @@ public class CompositionSpace implements Serializable {
 			}
 		}
 		
-		int targetNumAtoms = RandomNumbers.getUniformIntBetween(minNumAtoms, maxNumAtoms);
+		int targetNumAtoms = RandomNumbers.getUniformIntBetweenInclusive(minNumAtoms, maxNumAtoms);
 		
 		Map<Element, Integer> c = new HashMap<Element,Integer>();
 
