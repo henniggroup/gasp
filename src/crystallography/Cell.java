@@ -1040,6 +1040,80 @@ public class Cell implements Serializable {
 		return answer;
 	}
 	
+	// parses a CIF file (of the format written by openbabel)
+	// and returns a structure
+	public static Cell parseAvogCif(File cifFile) {
+		String line = null;
+		double la = 0, lb = 0, lc = 0, a = 0, b = 0, g = 0;
+
+
+		List<Vect> latVects = null;
+		List<Site> sites = new LinkedList<Site>();
+
+		Boolean readingInAtoms = false;
+
+		try {
+			BufferedReader r = new BufferedReader(new FileReader(cifFile));
+			while ((line = r.readLine()) != null) {
+				StringTokenizer t = new StringTokenizer(line);
+				// skip empty lines:
+				if (!t.hasMoreTokens())
+					continue;
+				if (readingInAtoms) {
+					String symbol = t.nextToken();
+					t.nextToken();
+					double x = Double.parseDouble(t.nextToken());
+					double y = Double.parseDouble(t.nextToken());
+					double z = Double.parseDouble(t.nextToken());
+					// String occupancy = t.nextToken();
+					sites.add(new Site(Element.getElemFromSymbol(symbol), new Vect(x,y,z, latVects)));
+				} else {
+					String firstWord = t.nextToken();
+					if (firstWord.equals("_cell_length_a"))
+						la = Double.parseDouble(t.nextToken());
+					else if (firstWord.equals("_cell_length_b"))
+						lb = Double.parseDouble(t.nextToken());
+					else if (firstWord.equals("_cell_length_c"))
+						lc = Double.parseDouble(t.nextToken());
+					else if (firstWord.equals("_cell_angle_alpha"))
+						a = Math.toRadians(Double.parseDouble(t.nextToken()));
+					else if (firstWord.equals("_cell_angle_beta"))
+						b = Math.toRadians(Double.parseDouble(t.nextToken()));
+					else if (firstWord.equals("_cell_angle_gamma"))
+						g = Math.toRadians(Double.parseDouble(t.nextToken()));
+					else if (firstWord.equals("_atom_site_Cartn_z")) {
+						readingInAtoms = true;
+						latVects = (new Cell(la,lb,lc,a,b,g,null,null)).getLatticeVectors();
+					}
+				}
+			}
+		} catch (FileNotFoundException x) {
+			System.out.println("parseAvogCif: CIF file not found: " + cifFile.getAbsolutePath());
+			return null;
+		} catch (IOException y) {
+			System.out.println("parseAvogCif: problem reading CIF file(?)" + cifFile.getAbsolutePath());
+		}
+		
+	//	List<Vect> stBasis = new LinkedList<Vect>();
+	//	Vect x = new Vect(1.0,0.0,0.0); Vect y = new Vect(0.0,1.0,0.0); Vect z = 
+		
+	/*	for (Site s: sites) {
+			Element e = s.getElement();
+			List<Double> coords = s.getCoords().getComponentsWRTBasis(latVects);
+			Vect v = new Vect(coords);
+			s = new Site(e,v);
+		}
+	*/	
+		// maybe openbabel died before spitting out a CIF
+		if (sites.size() == 0)
+			return null;
+
+		Cell answer = new Cell(latVects, sites);
+		
+		return answer;
+		
+	}
+	
 	 // just for testing
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));

@@ -215,6 +215,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> ohmms <header> <footer> <cautious?>");
 		System.out.println("   --objectiveFunction <epa/pd> lammps <potlFile>");
 		System.out.println("   --objectiveFunction <epa/pd> castep <cautious?> <kpointSpacing> <pressure> <paramFile> <element potcar>+ ");
+		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file> <cautious?>");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
 		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?>");
@@ -841,6 +842,13 @@ public class GAParameters implements Serializable {
 			return "/tmp";
 		else
 			return outDirName + "/temp";
+	}
+	
+	public String getDirName() {
+		if (outDirName == null)
+			return "/tmp";
+		else
+			return outDirName;
 	}
 	
 	public int getEndGameNumGens() {
