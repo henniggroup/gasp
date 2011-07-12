@@ -276,12 +276,12 @@ public class Vect implements Serializable {
 	}
 	
 	// Magnitude of projection of w onto given vector
-	public Double projection(Vect w) {
+/*	public Double projection(Vect w) {
 		double dotprod = Math.abs(this.dot(w));
 		double l = this.length();
 		
 		return dotprod/l;
-	}
+	} */
 	
 	public Vect getNormalized() {
 		List<Double> cartComps = this.getCartesianComponents();

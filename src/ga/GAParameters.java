@@ -359,7 +359,7 @@ public class GAParameters implements Serializable {
 				else 
 					usage("Unknown selection function " + values[0], true);
 			}
-			// kind of a hack. (it's because java collections don't support multiple keys)
+			// kind of a hack. (it's because java collections don't support multiple identical keys)
 			else if (flag.toLowerCase().startsWith("--variation")) {
 				String[] values = getValues(flag, 3);
 				String variation = values[2];
@@ -444,6 +444,11 @@ public class GAParameters implements Serializable {
 		if (outDirName == null)
 			outDirName = new String("garun_" + runTitle);
 		
+		
+		checkInputs();
+	}
+	
+	public void checkInputs() {
 		// some sanity checks, not systematic
 		if (minLatticeLength > maxLatticeLength)
 			usage("Error: minLatticeLength > maxLatticeLength.", true);
@@ -461,8 +466,8 @@ public class GAParameters implements Serializable {
 		if (objFcnArgs == null || objFcnArgs.length < 2)
 			usage("ERROR: Need an objective function.", true);
 		String objFcnType = objFcnArgs[0];
-		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getElements().size() < 2)
-			usage("ERROR: Can't use pd objFun w/ < 2 elements.", true);
+		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getNumDimensions() < 2)
+			usage("ERROR: Can't use pd objFun w/ < 2 dimensions.", true);
 	}
 	
 	public void setSeedGeneration(Cell[] initialPop) {
@@ -1015,8 +1020,7 @@ public class GAParameters implements Serializable {
 				info.append(makeCIFPath(s) + newline);
 				GAUtils.writeStringToFile(info.toString(), outFile, true);
 				// save the cif
-				File outCIF = new File(makeCIFPath(s));
-				GAUtils.writeStringToFile(s.getCell().getCIF(), outCIF, false);
+				s.getCell().writeCIF(makeCIFPath(s));
 				// save the findsym output
 				File outFindSym = new File(makeFindSymPath(s));
 				GAUtils.writeStringToFile(Isotropy.getFindsymOutput(s.getCell()), outFindSym, false);

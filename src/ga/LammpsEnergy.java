@@ -203,7 +203,7 @@ Atoms
 		outDir.mkdir();
 		
 		// write unrelaxed cell to disk
-		Utility.writeStringToFile(c.getCell().getCIF(), outDirPath + "/" + c.getID() + ".unrelaxed.cif");
+		c.getCell().writeCIF(outDirPath + "/" + c.getID() + ".unrelaxed.cif");
 		
 		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(getLammpsDataFile(c), outDirPath + "/" + dataFileName);

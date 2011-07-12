@@ -221,7 +221,7 @@ public class OhmmsEnergy implements Energy {
 		}
 		
 		// write cell to disk
-		Utility.writeStringToFile(c.getCell().getCIF(), outDir.getAbsolutePath() + "/" + c.getID() + ".relaxed.cif");
+		c.getCell().writeCIF(outDir.getAbsolutePath() + "/" + c.getID() + ".relaxed.cif");
 
 		finalEnergy = parseFinalEnergy(ohmmsOutput);
 		
@@ -310,7 +310,8 @@ public class OhmmsEnergy implements Energy {
 		String[] geArgs = {"header", "footer", "true"};
 		OhmmsEnergy bob = new OhmmsEnergy(geArgs);
 		StructureOrg c = new StructureOrg(Cell.parseCif(new File("in.cif")));
-		Utility.writeStringToFile(c.getCell().getCIF(), "bob.cif");
+		c.getCell().writeCIF("bob.cif");
+	//	Utility.writeStringToFile(c.getCell().getCIF(), "bob.cif");
 		double energy = bob.getEnergy(c);
 		System.out.println(energy);
 		System.out.println(c.getCell());
