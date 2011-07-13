@@ -30,22 +30,19 @@ import crystallography.Site;
 public class AvogadroEnergy implements Energy {
 	
 	private String headerStr;
-	private Boolean cautious;
-	private String unrelaxed_cifpath;
+	private static String unrelaxed_cifpath;
 	private String logpath;
+	private static String errorpath;
 
 	public AvogadroEnergy(String[] args)
 	{		
 		
-		if (args == null || args.length < 2)
+		if (args == null || args.length < 1)
 			GAParameters.usage("Not enough parameters given to AvogadroEnergy", true);
 		
 		// read in the Avogadro header to use
 		File headerFile = new File(args[0]);
-		headerStr = GAUtils.readStringFromFile(headerFile);
-		
-		cautious = Boolean.parseBoolean(args[1]);		
-		
+		headerStr = GAUtils.readStringFromFile(headerFile);		
 
 	}
 
@@ -61,8 +58,13 @@ public class AvogadroEnergy implements Energy {
 	public double getEnergy(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
 		
+		// creates file paths for cleaner coding
 		unrelaxed_cifpath = params.getTempDirName() + "/orig." + c.getID() + ".cif";
 		logpath = params.getTempDirName() + "/log." + c.getID();
+		errorpath = params.getTempDirName() + "/errors/error." + c.getID() + ".cif";
+		// creates directory for "bad" CIFs
+		File errorDir = new File(params.getTempDirName() + "/errors");
+		errorDir.mkdir();
 
 		return avogadroRun(c);
 	}
@@ -91,18 +93,18 @@ public class AvogadroEnergy implements Energy {
 			out.write("log = open('" + logpath + "','w')");
 			out.write(newline);
 			out.write(newline);
-			out.write("pFF = openbabel.OBForceField.FindForceField(\"UFF\")");
+			out.write("uff = openbabel.OBForceField.FindForceField(\"UFF\")");
 			out.write(newline);
-			out.write("pFF.Setup(mol)");
+			out.write("uff.Setup(mol)");
 			out.write(newline);
-			out.write("e = pFF.Energy()");
+			out.write("e = uff.Energy()");
 			out.write(newline);
 			out.write(newline);
-			out.write("pFF.ConjugateGradients(1000)");
+			out.write("uff.ConjugateGradients(1000)");
 			out.write(newline);
-			out.write("pFF.GetCoordinates(mol)");
+			out.write("uff.GetCoordinates(mol)");
 			out.write(newline);
-			out.write("e = pFF.Energy()");
+			out.write("e = uff.Energy()");
 			out.write(newline);
 			out.write("log.write('Final energy = ' + str(e))");
 			out.write(newline);
@@ -119,7 +121,8 @@ public class AvogadroEnergy implements Energy {
 
 	// runs Avogadro on the input file given and prints out any errors
 	public static void runAvogadro(String inputFile) {		
-		int verbosity = GAParameters.getParams().getVerbosity();
+		GAParameters params = GAParameters.getParams();
+		int verbosity = params.getVerbosity();
 		StringBuilder avogadroOutput = new StringBuilder();
 
 		String s = null;
@@ -134,11 +137,18 @@ public class AvogadroEnergy implements Energy {
 					p.getErrorStream()));
 
 			// print out any errors
+			// if error, kill process, copy bad CIF to errors directory
 			while ((s = stdError.readLine()) != null) {
 //			if (verbosity >= 5)	
+				if (s.contains("glibc")) {
+					System.out.println("python crashed. skipping calculation");
+					Process e = Runtime.getRuntime().exec("cp " + unrelaxed_cifpath + " " + errorpath);
+					p.destroy();
+					continue;
+				}
 				System.out.println(s);
 			}
-			
+			//TODO: change this once we find a fix
 			// read the output
 			while ((s = stdInput.readLine()) != null) {
 				avogadroOutput.append(s + GAUtils.newline());
@@ -166,6 +176,7 @@ public class AvogadroEnergy implements Energy {
 			System.out.println("Starting Avogadro computation on organism "
 					+ c.getID());
 		
+		// Execute the python script
 		runAvogadro(inputFile);
 
 		// update c to be the structure in Avogadro's output
@@ -180,22 +191,11 @@ public class AvogadroEnergy implements Energy {
 			c.setCell(a);
 		}
 
+		// reads string from log
 		String line = Utility.readStringFromFile(logpath);
-	/*	File file = new File(logpath);
-		String line = null;
-        try {
-            Scanner scan = new Scanner(file);
-            while (scan.hasNextLine()) {
-                line = scan.nextLine();
-//              System.out.println(line);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-		
-//		System.out.println(line);
-*/        
-		finalEnergy = parseFinalEnergy(line, cautious);
+	
+		// parse energy from log
+		finalEnergy = parseFinalEnergy(line);
 		
 		if (verbosity >= 3)
 			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
@@ -203,7 +203,7 @@ public class AvogadroEnergy implements Energy {
 		return finalEnergy;
 	}
 	
-	public static double parseFinalEnergy(String avogadroOutput, boolean cautious) {
+	public static double parseFinalEnergy(String avogadroOutput) {
 		Double finalEnergy = Double.POSITIVE_INFINITY;
 		int verbosity = GAParameters.getParams().getVerbosity();
 		
@@ -218,9 +218,8 @@ public class AvogadroEnergy implements Energy {
 				// when we find the final energy line, store the final energy
 				// and exit the loop
 				if (energyMatcher.find()) {
-					// the energy should be the 4th string on the line which
-					// looks like, e.g.:
-					// Final energy = -9571.00691982 eV
+					// the energy should be the only line, looks like:
+					// Final energy = -9571.00691982
 					StringTokenizer t = new StringTokenizer(energyMatcher.group());
 					t.nextToken();
 					t.nextToken();
