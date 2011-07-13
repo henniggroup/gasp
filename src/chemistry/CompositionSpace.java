@@ -174,6 +174,10 @@ public class CompositionSpace implements Serializable {
 		*/
 	}
 	
+	public int getNumDimensions() {
+		return endpoints.size();
+	}
+	
 	public List<Element> getElements() {
 		return elements;
 	}

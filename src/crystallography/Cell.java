@@ -268,43 +268,46 @@ public class Cell implements Serializable {
 		//TODO: option to write cartesian as opposed to fractional coords
 		
 		/* Write the output */
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
-			/* Write header stuff */
-			writer.write("data_cif\n\n");
-			writer.write("_audit_creation_method 'Autocreated by VaspOut'\n\n"); //TODO: something better from VaspData
-			writer.write("_symmetry_space_group_name_H-M 'P 1'\n");
-			writer.write("_symmetry_Int_Tables_number 1\n");
-			writer.write("_symmetry_cell_setting triclinic\n\n");
-			/* Write lattice params */
-			List<Double> latticeParams = getLatticeParameters();
-			writer.write("_cell_length_a " + latticeParams.get(0) + "\n");
-			writer.write("_cell_length_b " + latticeParams.get(1) + "\n");
-			writer.write("_cell_length_c " + latticeParams.get(2) + "\n");
-			writer.write("_cell_angle_alpha " + latticeParams.get(3)*180/Math.PI + "\n");
-			writer.write("_cell_angle_beta " + latticeParams.get(4)*180/Math.PI + "\n");
-			writer.write("_cell_angle_gamma " + latticeParams.get(5)*180/Math.PI + "\n\n");
-			/* Write sites */
-			writer.write("loop_\n");
-			writer.write("_atom_site_label\n");
-			writer.write("_atom_site_fract_x\n");
-			writer.write("_atom_site_fract_y\n");
-			writer.write("_atom_site_fract_z\n");
-			writer.write("_atom_site_occupancy\n");
-			List<Site> basis = getSites();
-			for (Site s : basis) {
-				writer.write(s.getElement().getSymbol() + " ");	
-				List<Double> coords = s.getCoords().getComponentsWRTBasis(getLatticeVectors());
-				for (int i = 0; i < Constants.numDimensions; i++)
-					writer.write(coords.get(i) + " ");
-				writer.write("1.0000"); /* TODO: fixme: real occupancy */
-				writer.write("\n");
-			}
-			writer.flush();
-			writer.close();
-		} catch (IOException x) {
-			System.out.println("IOException in VaspOut.writePoscar(): " + x.getMessage());
+		Utility.writeStringToFile(getCIF(), outFile);
+	}
+	
+	public String getCIF() {		
+		//TODO: option to write cartesian as opposed to fractional coords
+		
+		StringBuilder result = new StringBuilder();
+		
+		/* Write header stuff */
+		result.append("data_cif\n\n");
+		result.append("_audit_creation_method 'Autocreated by VaspOut'\n\n"); //TODO: something better from VaspData
+		result.append("_symmetry_space_group_name_H-M 'P 1'\n");
+		result.append("_symmetry_Int_Tables_number 1\n");
+		result.append("_symmetry_cell_setting triclinic\n\n");
+		/* Write lattice params */
+		List<Double> latticeParams = getLatticeParameters();
+		result.append("_cell_length_a " + latticeParams.get(0) + "\n");
+		result.append("_cell_length_b " + latticeParams.get(1) + "\n");
+		result.append("_cell_length_c " + latticeParams.get(2) + "\n");
+		result.append("_cell_angle_alpha " + latticeParams.get(3)*180/Math.PI + "\n");
+		result.append("_cell_angle_beta " + latticeParams.get(4)*180/Math.PI + "\n");
+		result.append("_cell_angle_gamma " + latticeParams.get(5)*180/Math.PI + "\n\n");
+		/* Write sites */
+		result.append("loop_\n");
+		result.append("_atom_site_label\n");
+		result.append("_atom_site_fract_x\n");
+		result.append("_atom_site_fract_y\n");
+		result.append("_atom_site_fract_z\n");
+		result.append("_atom_site_occupancy\n");
+		List<Site> basis = getSites();
+		for (Site s : basis) {
+			result.append(s.getElement().getSymbol() + " ");	
+			List<Double> coords = s.getCoords().getComponentsWRTBasis(getLatticeVectors());
+			for (int i = 0; i < Constants.numDimensions; i++)
+				result.append(coords.get(i) + " ");
+			result.append("1.0000"); /* TODO: fixme: real occupancy */
+			result.append("\n");
 		}
+		
+		return result.toString();
 	}
 	
 	public String toStringJustVectors() {
@@ -938,6 +941,8 @@ public class Cell implements Serializable {
 		
 		return result;
 	}
+	
+	/*
 	public String getCIF() {
 		StringBuilder result = new StringBuilder();
 		String newline = GAUtils.newline();
@@ -972,7 +977,7 @@ public class Cell implements Serializable {
 		}
 		
 		return result.toString();
-	}
+	} */
 
 	// parses a CIF file (of the format written by both this file and by GULP)
 	// and returns a structure
@@ -980,10 +985,8 @@ public class Cell implements Serializable {
 		String line = null;
 		double la = 0, lb = 0, lc = 0, a = 0, b = 0, g = 0;
 
-
 		List<Vect> latVects = null;
 		List<Site> sites = new LinkedList<Site>();
-
 
 		// We're going to assume that every line we see after the
 		// _atom_site_occupancy
@@ -1117,9 +1120,13 @@ public class Cell implements Serializable {
 	 // just for testing
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
-		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
+		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 		
+		c.writeCIF("/home/wtipton/cifs/1.cif");
+		c.writeCIF("/home/wtipton/cifs/2.cif");
+		
+		/*
 		Generation g = new Structures();
 		GAParameters.getParams().setMaxNumAtoms(10);
 		GAParameters.getParams().setMinNumAtoms(1);
@@ -1143,6 +1150,7 @@ public class Cell implements Serializable {
 			s.getCell().getNigliReducedCell();
 			s.getCell().getCellWithSiteIShiftedToOrigin(0).getNigliReducedCell();
 		}
+		*/
 		
 /*		for (Site s : c.getAtomsInSphereSorted(new Vect(2.0,0.0,0.0), 3))
 			System.out.println(s);

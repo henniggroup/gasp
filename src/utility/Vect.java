@@ -276,7 +276,7 @@ public class Vect implements Serializable {
 	}
 	
 	// Magnitude of projection of w onto given vector
-	public Double projection(Vect w) {
+	public Double magnitudeOfProjection(Vect w) {
 		double dotprod = Math.abs(this.dot(w));
 		double l = this.length();
 		

@@ -374,7 +374,7 @@ public class GulpSurrogate implements Serializable {
 		for (int i = 0; i < 30; i++) {
 			StructureOrg cell = soc.makeOrganism(g);
 			cell.setTotalEnergy(energy.getEnergy(cell));
-			Utility.writeStringToFile(cell.getCell().getCIF(), "/home/wtipton/structs/" + i + ".cif");
+			cell.getCell().writeCIF("/home/wtipton/structs/" + i + ".cif");
 			s.addEntry(cell);
 			entries.add(cell);
 		}
