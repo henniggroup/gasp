@@ -129,8 +129,6 @@ public class CompositionSpace implements Serializable {
 
 		for (Element e : m.keySet()) 
 			c.put(e, Math.round(Math.round(m.get(e) * targetNumAtoms / sumAtoms)));
-		
-		System.out.println("composition: " + c);
 
 		return new Composition(c, false);
 	}
