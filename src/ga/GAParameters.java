@@ -215,7 +215,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> ohmms <header> <footer> <cautious?>");
 		System.out.println("   --objectiveFunction <epa/pd> lammps <potlFile>");
 		System.out.println("   --objectiveFunction <epa/pd> castep <cautious?> <kpointSpacing> <pressure> <paramFile> <element potcar>+ ");
-		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file> <cautious?>");
+		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file>");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
 		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?>");
@@ -914,10 +914,12 @@ public class GAParameters implements Serializable {
 		private String outFileName = "index";
 		private String paramFileName = "parameters";
 		private String tempDirName;
+		private String energySorted = "index_sorted";
 		private File outFile;
 		private File tempDir;
 		private File outDir;
 		private File paramFile;
+		private File energyFile;
 		
 		private int currentGenNum = 0;
 		private Generation currentGen = null;
@@ -939,8 +941,9 @@ public class GAParameters implements Serializable {
 			if (!params.getDryRun() && !outDir.mkdir()) 
 				GAParameters.usage("Can't create directory " + outDirName, true);
 			
-			// make the output file
+			// make the output files
 			outFile = new File(outDir, outFileName);
+			energyFile = new File(outDir, energySorted);
 			
 			// make the temp directory
 			tempDir = new File(tempDirName);
@@ -1026,6 +1029,32 @@ public class GAParameters implements Serializable {
 				File outFindSym = new File(makeFindSymPath(s));
 				GAUtils.writeStringToFile(Isotropy.getFindsymOutput(s.getCell()), outFindSym, false);
 			}
+			
+			// write energy-sorted list (i.e. lowest to highest)
+			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, energyFile, true);
+			List<Integer> energyList = new LinkedList<Integer>();
+			for (int k=0; k<g.getNumOrganisms(); k++) {
+				double lowest = Double.POSITIVE_INFINITY;
+				int index = 0;
+				for (Organism r: g) {
+					double thisEnergy = r.getValue();
+					if (thisEnergy < lowest && !energyList.contains(r.getID())) {
+						index = r.getID();
+						lowest = thisEnergy;						
+					}
+				}
+				energyList.add(k,index);
+			}			
+			for (Integer p: energyList) {
+				Organism m = g.getOrgByID(p);
+				StructureOrg s = (StructureOrg)(m);
+				StringBuilder info = new StringBuilder();
+				info.append(Integer.toString(s.getID()) + " ");
+				info.append(Double.toString(s.getValue()) + " ");
+				info.append(makeCIFPath(s) + newline);
+				GAUtils.writeStringToFile(info.toString(), energyFile, true);
+			}
+			
 			
 			// update the best density info
 			int nAdapt = params.getNumDenAdapt();
