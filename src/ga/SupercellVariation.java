@@ -13,16 +13,19 @@ public class SupercellVariation  implements Variation {
 	final int scaleFactor = 2;
 	final int maxAttempts = 20; 
 	
+	private boolean relaxChildren;
+	
 	public SupercellVariation(String[] args) {
-		if (args == null || args.length != 0)
+		if (args == null || args.length != 1)
 			GAParameters.usage("Wrong parameters given to SupercellVariation", true);
-
+		
+		relaxChildren = Boolean.parseBoolean(args[0]);
 	}
 	
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		
-		result.append("SupercellVariation variation");
+		result.append("SupercellVariation");
 		
 		return result.toString();
 	}
@@ -64,10 +67,12 @@ public class SupercellVariation  implements Variation {
 		// make the new offspring
 		StructureOrg result = new StructureOrg(Cell.getSupercell(pStruct, coefs));
 		
-		// we dont need to recalculate energy or value
+		// we dont need to recalculate energy or value if relaxChildren is false
 		// note that im gonna assume energy is extensive and value is intensive here!!
-		result.setTotalEnergy(p.getTotalEnergy() * scaleFactor);
-		result.setValue(p.getValue());
+		if (! relaxChildren) {
+			result.setTotalEnergy(p.getTotalEnergy() * scaleFactor);
+			result.setValue(p.getValue());
+		}
 		
 		if (verbosity >= 5) {
 			System.out.println("SupercellVariation created new StructureOrg:");

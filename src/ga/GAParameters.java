@@ -222,7 +222,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --variation2 <percentage> <percentage> structureMut <rate> <sigmaAtoms> <sigmaLattice>");
 		System.out.println("   --variation3 <percentage> <percentage> permutation <meanSwaps> <sigmaSwaps> <pairsToSwap (e.g. Mn-O)>");
 		System.out.println("   --variation4 <percentage> <percentage> numStoichsMut <meanNumAtoms> <sigmaNumAtoms>");
-		System.out.println("   --variation5 <percentage> <percentage> supercell");
+		System.out.println("   --variation5 <percentage> <percentage> supercell <re-relax children?>");
 		System.out.println("Selection Algorithms");
 		System.out.println("   --selection probDist <numParents> <selectionPower>");
 		System.out.println("Convergence Criteria");
@@ -835,13 +835,6 @@ public class GAParameters implements Serializable {
 			return "/tmp";
 		else
 			return outDirName + "/temp";
-	}
-	
-	public String getDirName() {
-		if (outDirName == null)
-			return "/tmp";
-		else
-			return outDirName;
 	}
 	
 	public int getEndGameNumGens() {
