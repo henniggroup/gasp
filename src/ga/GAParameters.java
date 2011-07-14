@@ -914,12 +914,10 @@ public class GAParameters implements Serializable {
 		private String outFileName = "index";
 		private String paramFileName = "parameters";
 		private String tempDirName;
-		private String energySorted = "index_sorted";
 		private File outFile;
 		private File tempDir;
 		private File outDir;
 		private File paramFile;
-		private File energyFile;
 		
 		private int currentGenNum = 0;
 		private Generation currentGen = null;
@@ -943,7 +941,6 @@ public class GAParameters implements Serializable {
 			
 			// make the output files
 			outFile = new File(outDir, outFileName);
-			energyFile = new File(outDir, energySorted);
 			
 			// make the temp directory
 			tempDir = new File(tempDirName);
@@ -1012,17 +1009,10 @@ public class GAParameters implements Serializable {
 			// write the generation header (generation x N)
 			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, outFile, true);
 			
-			// write info on all the members of the population and save their CIFs
-			Iterator<Organism> i = g.iterator();
-			while (i.hasNext()) {
+			// save structures' cifs and findsym outputs
+			for (Organism o : g) {
 				// assume here that our organisms are StructureOrgs
-				StructureOrg s = (StructureOrg)(i.next());
-				// build and write the index info
-				StringBuilder info = new StringBuilder();
-				info.append(Integer.toString(s.getID()) + " ");
-				info.append(Double.toString(s.getValue()) + " ");
-				info.append(makeCIFPath(s) + newline);
-				GAUtils.writeStringToFile(info.toString(), outFile, true);
+				StructureOrg s = (StructureOrg)(o);
 				// save the cif
 				s.getCell().writeCIF(makeCIFPath(s));
 				// save the findsym output
@@ -1030,8 +1020,8 @@ public class GAParameters implements Serializable {
 				GAUtils.writeStringToFile(Isotropy.getFindsymOutput(s.getCell()), outFindSym, false);
 			}
 			
-			// write energy-sorted list (i.e. lowest to highest)
-			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, energyFile, true);
+			// write energy-sorted index (i.e. lowest to highest)
+			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, outFile, true);
 			List<Integer> energyList = new LinkedList<Integer>();
 			for (int k=0; k<g.getNumOrganisms(); k++) {
 				double lowest = Double.POSITIVE_INFINITY;
@@ -1052,7 +1042,7 @@ public class GAParameters implements Serializable {
 				info.append(Integer.toString(s.getID()) + " ");
 				info.append(Double.toString(s.getValue()) + " ");
 				info.append(makeCIFPath(s) + newline);
-				GAUtils.writeStringToFile(info.toString(), energyFile, true);
+				GAUtils.writeStringToFile(info.toString(), outFile, true);
 			}
 			
 			
