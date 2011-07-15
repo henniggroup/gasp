@@ -53,7 +53,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		// Marks location of coordinates
 		int cStart = difUnits + 1;
 		
-		numAtoms = new int[difUnits]; numUnits = new int[difUnits];
+		numAtoms = new int[difUnits];
 		
 		// Parse in number of atoms per molecule
 		numSites = 0;
@@ -65,10 +65,22 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		
 		// Marks location after coordinates end
 		int eStart = cStart + 4*numSites;
+		// Marks location after numUnits ends
+		int dStart = length - 2;
 		
 		// Parse number of each molecule to be added
-		for (int i=0; i<difUnits; i++) {
-			numUnits[i] = Integer.parseInt(args[eStart+i]);
+		if (dStart - eStart == difUnits) {
+			numUnits = new int[difUnits];
+			for (int i=0; i<difUnits; i++) {
+				numUnits[i] = Integer.parseInt(args[eStart+i]);
+			}
+		}
+			// if given a range of targets
+		else {
+			numUnits = new int[difUnits*2];
+			for (int i=0; i<difUnits*2; i++) {
+				numUnits[i] = Integer.parseInt(args[eStart+i]);
+			}
 		}
 		
 		// String array of all atoms
@@ -149,9 +161,17 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		int targetAtoms = RandomNumbers.getUniformIntBetweenInclusive(numSites,params.getMaxNumAtoms()); int totAtoms = 0;
 		double[] fracValues = new double[difUnits]; double fracTotal = 0.0; int[] target = new int[difUnits]; units = new int[difUnits];
 		if (numUnits[0] != 0) {
-			for (int t=0; t<difUnits; t++) {
-				target[t] = numUnits[t];
-				units[t] = target[t];
+			if (numUnits.length == difUnits) {	
+				for (int t=0; t<difUnits; t++) {
+					target[t] = numUnits[t];
+					units[t] = target[t];
+				}
+			}
+			else {
+				for (int t=0; t<difUnits; t++) {
+					target[t] = RandomNumbers.getUniformIntBetweenInclusive(numUnits[t*difUnits],numUnits[t*difUnits + 1]);
+					units[t] = target[t];
+				}
 			}
 		}
 		else {
@@ -167,6 +187,13 @@ public class UnitsSOCreator implements StructureOrgCreator {
 				totAtoms = totAtoms + target[y]*numAtoms[y];
 			}
 		}
+		
+		String t = "";
+		for (int x=0; x<difUnits; x++) {
+			t = t + target[x] + " ";
+		}
+		
+		System.out.println("Target numbers: " + t);
 		
 		// List of locations of previously placed units
 		refLoc = new LinkedList<Vect>();
