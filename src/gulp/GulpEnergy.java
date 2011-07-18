@@ -15,6 +15,8 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import utility.Utility;
+
 import crystallography.Cell;
 import crystallography.Site;
 
@@ -117,32 +119,28 @@ public class GulpEnergy implements Energy {
 	// optimize the structure or not.
 	private String gulpInputFile(StructureOrg c, String potlStr) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		String ans = new String("Maybe file creation failed.");
 		String newline = GAUtils.newline();
 		
-		try {
-			// create the GULP input file
-			//File f = File.createTempFile(params.getRunTitle() + "." + c.getID() + ".", ".gin",new File(params.getTempDirName()));
-			File f = new File(params.getTempDirName(),params.getRunTitle() + "." + c.getID() + ".gin");
-			// store the filename
-			ans = f.getPath();
+		StringBuilder out = new StringBuilder();
+		
+		// create the GULP input file
+		//File f = File.createTempFile(params.getRunTitle() + "." + c.getID() + ".", ".gin",new File(params.getTempDirName()));
+		File f = new File(params.getTempDirName(),params.getRunTitle() + "." + c.getID() + ".gin");
+		// store the filename
+		ans = f.getPath();
 
-			// write the file
-			BufferedWriter out = new BufferedWriter(new FileWriter(f));
-			// only output a cif if we're optimizing the structure
-			out.write(headerStr + newline);		
-			out.write(newline);
-			out.write("output cif " + ans + ".cif");
-			out.write(newline);
-			out.write(structureToString(c.getCell()));
-			out.write(newline);
-			out.write(potlStr);
-			out.close();
-		} catch (IOException e) {
-			if (verbosity >= 2)
-				System.out.println("GulpEnergy IOException: " + e.getMessage());
-		}
+		// only output a cif if we're optimizing the structure
+		out.append(headerStr + newline);		
+		out.append(newline);
+		out.append("output cif " + ans + ".cif");
+		out.append(newline);
+		out.append(structureToString(c.getCell()));
+		out.append(newline);
+		out.append(potlStr);
+
+		// write the file
+		Utility.writeStringToFile(out.toString(), f.getPath());
 
 		return ans;
 	}
@@ -153,6 +151,8 @@ public class GulpEnergy implements Energy {
 		StringBuilder gulpOutput = new StringBuilder();
 
 		String s = null;
+		BufferedReader stdInput = null;
+		BufferedReader stdError = null;
 		try {
 			// run the gulp command. GULP will only take input from it's stdin,
 			// not from a file. in order to avoid having
@@ -160,9 +160,9 @@ public class GulpEnergy implements Energy {
 			// callgulp, which basically is just gulp <$1 .
 			Process p = Runtime.getRuntime().exec("callgulp " + inputFile);
 
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
+			stdInput = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(
+			stdError = new BufferedReader(new InputStreamReader(
 					p.getErrorStream()));
 
 			// read the output
@@ -180,6 +180,11 @@ public class GulpEnergy implements Energy {
 		} catch (IOException e) {
 			System.out.println("IOException in GulpEnergy.runGulp: " + e.getMessage());
 			System.exit(-1);
+		} finally {
+			if (stdInput != null) 
+				try{ stdInput.close(); } catch (Exception x) { } //ignore
+			if (stdError != null) 
+				try{ stdError.close(); } catch (Exception x) { } //ignore
 		}
 
 		return gulpOutput.toString();

@@ -17,6 +17,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import org.openbabel.OBAtom;
+import org.openbabel.OBBase;
+import org.openbabel.OBConversion;
+import org.openbabel.OBMol;
+import org.openbabel.OBUnitCell;
+import org.openbabel.openbabel_java;
+import org.openbabel.openbabel_javaConstants;
+import org.openbabel.vector3;
+import org.openbabel.vectorVector3;
+
 import Jama.Matrix;
 
 import utility.*;
@@ -38,6 +48,10 @@ public class Cell implements Serializable {
 	private List<Vect> latticeVectors;
 	private List<Site> basis;
 	private String label;
+	
+	static {
+		System.loadLibrary("openbabel_java");
+	}
 	
 	public Cell (Double _a, Double _b, Double _c, Double _alpha, Double _beta, Double _gamma, List<Site> _basis, String _label){
 		this(getVectorsfromLParams(_a, _b, _c, _alpha, _beta, _gamma), _basis, _label);
@@ -261,28 +275,29 @@ public class Cell implements Serializable {
 		       - a[2]*a[4]*a[6] - a[1]*a[3]*a[8] - a[0]*a[5]*a[7];
 	}
 	
+	
 	public void writeCIF(String outFile) {
-		/* Note that this will overwrite outFile. If this is not desired behavior,
-		 * the calling routine should check if the output file already exists */
+		// Note that this will overwrite outFile. If this is not desired behavior,
+		// the calling routine should check if the output file already exists 
 		
 		//TODO: option to write cartesian as opposed to fractional coords
 		
-		/* Write the output */
+		// Write the output 
 		Utility.writeStringToFile(getCIF(), outFile);
 	}
 	
 	public String getCIF() {		
-		//TODO: option to write cartesian as opposed to fractional coords
+		//TODO: option to write cartesian as opposed to fractional coords?
 		
 		StringBuilder result = new StringBuilder();
 		
-		/* Write header stuff */
+		// Write header stuff 
 		result.append("data_cif\n\n");
 		result.append("_audit_creation_method 'Autocreated by VaspOut'\n\n"); //TODO: something better from VaspData
 		result.append("_symmetry_space_group_name_H-M 'P 1'\n");
 		result.append("_symmetry_Int_Tables_number 1\n");
 		result.append("_symmetry_cell_setting triclinic\n\n");
-		/* Write lattice params */
+		// Write lattice params 
 		List<Double> latticeParams = getLatticeParameters();
 		result.append("_cell_length_a " + latticeParams.get(0) + "\n");
 		result.append("_cell_length_b " + latticeParams.get(1) + "\n");
@@ -290,7 +305,7 @@ public class Cell implements Serializable {
 		result.append("_cell_angle_alpha " + latticeParams.get(3)*180/Math.PI + "\n");
 		result.append("_cell_angle_beta " + latticeParams.get(4)*180/Math.PI + "\n");
 		result.append("_cell_angle_gamma " + latticeParams.get(5)*180/Math.PI + "\n\n");
-		/* Write sites */
+		// Write sites 
 		result.append("loop_\n");
 		result.append("_atom_site_label\n");
 		result.append("_atom_site_fract_x\n");
@@ -303,12 +318,13 @@ public class Cell implements Serializable {
 			List<Double> coords = s.getCoords().getComponentsWRTBasis(getLatticeVectors());
 			for (int i = 0; i < Constants.numDimensions; i++)
 				result.append(coords.get(i) + " ");
-			result.append("1.0000"); /* TODO: fixme: real occupancy */
+			result.append("1.0000"); // TODO: fixme: real occupancy 
 			result.append("\n");
 		}
 		
 		return result.toString();
 	}
+	
 	
 	public String toStringJustVectors() {
 		StringBuilder output = new StringBuilder();
@@ -707,7 +723,6 @@ public class Cell implements Serializable {
 		else
 			n2 = other.getNigliReducedCell().getWyckoffCell().getCellWithSiteIShiftedToOrigin(0);
 		
-		
 		if (n1 == null || n2 == null)
 			return false;
 		
@@ -722,7 +737,7 @@ public class Cell implements Serializable {
 				return false;
 		
 		//for (each of the choices of others lattice vectors being considered a, b, and c)
-		for (Cell n1rotated : getCellWithAlternateAxesLabeling()) { 
+		for (Cell n1rotated : n1.getCellWithAlternateAxesLabeling()) { 
 			List<Double> parms1 = n1rotated.getLatticeParameters();
 			List<Double> parms2 = n2.getLatticeParameters();
 			//	if (lattices dont match up to tolerance), continue
@@ -978,6 +993,59 @@ public class Cell implements Serializable {
 		
 		return result.toString();
 	} */
+	
+	public static Cell parseCell(String fName, String format) {
+		OBMol mol = new OBMol();
+		OBConversion conv = new OBConversion();
+		conv.SetInFormat(format);
+		if (!conv.ReadFile(mol, fName))
+			System.out.println("Cell.parseCell failed to read " + fName + " with format " + format + ".");
+		
+		OBUnitCell c = openbabel_java.toUnitCell((mol.GetData(openbabel_javaConstants.UnitCell)));
+		
+		List<Site> sites = new ArrayList<Site>();
+		for (int i = 1; i <= mol.NumAtoms(); i++) {
+			Element e = Element.getElemFromZ((int) mol.GetAtom(i).GetAtomicNum());
+			sites.add(new Site(e, new Vect( mol.GetAtom(i).GetX(), 
+											mol.GetAtom(i).GetY(),
+											mol.GetAtom(i).GetZ())));
+		}
+		
+		// convert format of vectors
+		List<Vect> vs = new ArrayList<Vect>();
+		vectorVector3 vects = c.GetCellVectors();
+		for (int i = 0; i < Constants.numDimensions; i++) 
+			vs.add(new Vect(vects.get(i).GetX(), vects.get(i).GetY(), vects.get(i).GetZ()));
+		
+		String label = "Parsed by parseCif.";
+		return new Cell(vs, sites, label);
+	}
+	
+	public String getFormattedCell(String format) {
+		OBMol mol = new OBMol();
+		OBConversion conv = new OBConversion();
+		conv.SetOutFormat(format);
+		
+		// make the unit cell
+		OBUnitCell c = new OBUnitCell();
+		vector3 v1 = new vector3(this.latticeVectors.get(0).getCartesianComponents().get(0),
+								 this.latticeVectors.get(0).getCartesianComponents().get(1),
+								 this.latticeVectors.get(0).getCartesianComponents().get(2));
+		vector3 v2 = new vector3(this.latticeVectors.get(1).getCartesianComponents().get(0),
+								 this.latticeVectors.get(1).getCartesianComponents().get(1),
+								 this.latticeVectors.get(1).getCartesianComponents().get(2));
+		vector3 v3 = new vector3(this.latticeVectors.get(2).getCartesianComponents().get(0),
+								 this.latticeVectors.get(2).getCartesianComponents().get(1),
+								 this.latticeVectors.get(2).getCartesianComponents().get(2));
+		c.SetData(v1, v2, v3);
+		/*
+		openbabel_javaConstants.SetData;
+		openbabel_java.SetData(mol, c);
+		mol.SetData(c); */
+		
+		return "TODO";
+		// add a
+	}
 
 	// parses a CIF file (of the format written by both this file and by GULP)
 	// and returns a structure
@@ -1048,7 +1116,6 @@ public class Cell implements Serializable {
 	public static Cell parseAvogCif(File cifFile) {
 		String line = null;
 		double la = 0, lb = 0, lc = 0, a = 0, b = 0, g = 0;
-
 
 		List<Vect> latVects = null;
 		List<Site> sites = new LinkedList<Site>();
@@ -1122,9 +1189,13 @@ public class Cell implements Serializable {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
 		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		
-		c.writeCIF("/home/wtipton/cifs/1.cif");
-		c.writeCIF("/home/wtipton/cifs/2.cif");
+		Cell a = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif"));
+		Cell b = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif", "cif");
+		System.out.println(b);
+		System.out.println(a);
+		System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+	//	c.writeCIF("/home/wtipton/cifs/1.cif");
+	//	c.writeCIF("/home/wtipton/cifs/2.cif");
 		
 		/*
 		Generation g = new Structures();

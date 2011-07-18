@@ -11,15 +11,20 @@ import java.util.*;
 public class Utility {
 	
 	public static void writeStringToFile(String s, String path) {
+		FileWriter fwriter = null;
+		BufferedWriter writer = null;
 		try {
-			FileWriter fwriter = new FileWriter(path);
-			BufferedWriter writer = new BufferedWriter(fwriter);
+			fwriter = new FileWriter(path);
+			writer = new BufferedWriter(fwriter);
 			writer.write(s);
 			writer.flush();
 			fwriter.close();
 			writer.close();
 		} catch (IOException x) {
 			System.out.println("IOException in writeStringToFile(): " + x.getMessage());
+		} finally {
+			if (fwriter != null)
+				try { fwriter.close(); } catch (IOException e) {  }//ignore
 		}
 	}
 	
@@ -191,38 +196,44 @@ public class Utility {
 	// see http://java.sun.com/developer/technicalArticles/Programming/compression/
 	public static void writeSerializable(Serializable s, String fName) {
       // serialize the objects 
+		FileOutputStream fos = null;
 		try {
-	      FileOutputStream fos = new FileOutputStream(fName);
+	      fos = new FileOutputStream(fName);
 	      GZIPOutputStream gz = new GZIPOutputStream(fos);
 	      ObjectOutputStream oos = new ObjectOutputStream(gz);
 	      oos.writeObject(s);
 	      oos.flush();
 	      oos.close();
-	      fos.close();
 		} catch (FileNotFoundException x) {
 		  System.out.println("FileNotFoundException in writeSerializable:" + x.getMessage());
 		  x.printStackTrace();
 		} catch (IOException x) {
 		  System.out.println("IOException in writeSerializable:" + x.getMessage());
 		  x.printStackTrace();
+		} finally {
+			if (fos != null)
+				try { fos.close(); } catch (IOException e) {  }//ignore
 		}
 	}
 	
 	public static Serializable readSerializable(String fName) {
 		Serializable result = null;
+		FileInputStream fis = null;
 		try {
-	      FileInputStream fis = new FileInputStream(fName);
+	      fis = new FileInputStream(fName);
 	      GZIPInputStream gs = new GZIPInputStream(fis);
 	      ObjectInputStream ois = new ObjectInputStream(gs);
 	      result = (Serializable) ois.readObject();
 	      ois.close();
-	      fis.close();
 		} catch (FileNotFoundException x) {
 			  System.out.println(x.getMessage());
 		} catch (IOException x) {
 		  System.out.println(x.getMessage());
 		} catch (ClassNotFoundException x) {
 		  System.out.println(x.getMessage());
+		} finally {
+			if (fis != null)
+				try { fis.close(); } catch (Exception x) { } // ignore
 		}
 	
 		return result;
