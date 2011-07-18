@@ -10,6 +10,7 @@ import java.util.Random;
 import Jama.Matrix;
 
 import utility.Constants;
+import utility.RandomNumbers;
 import utility.Vect;
 
 import crystallography.Cell;
@@ -111,7 +112,7 @@ public final class StructureMut implements Variation {
 		}			
 		
 		return result;
-	}
+	}	
 	
 	// just for testing
 	public static void main(String[] args) {

@@ -12,7 +12,7 @@ import utility.Pair;
 // CrystalGA.crystalGA() 
 
 public class GeneticAlgorithm {
-		
+
 	// Performs a generic genetic optimization procedure according to the inputed parameters
 	// and returns the best Organism found.
 	public static Organism doGeneticAlgorithm() {

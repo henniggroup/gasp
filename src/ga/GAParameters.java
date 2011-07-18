@@ -1021,7 +1021,6 @@ public class GAParameters implements Serializable {
 			}
 			
 			// write energy-sorted index (i.e. lowest to highest)
-			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, outFile, true);
 			List<Integer> energyList = new LinkedList<Integer>();
 			for (int k=0; k<g.getNumOrganisms(); k++) {
 				double lowest = Double.POSITIVE_INFINITY;

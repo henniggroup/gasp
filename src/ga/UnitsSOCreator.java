@@ -32,6 +32,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	private double targetDensity;
 	private double densityTol;
 	private int numSites;
+	private Boolean range;
 	
 // ------------------------------------------------------------
 	
@@ -70,6 +71,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		
 		// Parse number of each molecule to be added
 		if (dStart - eStart == difUnits) {
+			range = false;
 			numUnits = new int[difUnits];
 			for (int i=0; i<difUnits; i++) {
 				numUnits[i] = Integer.parseInt(args[eStart+i]);
@@ -77,6 +79,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		}
 			// if given a range of targets
 		else {
+			range = true;
 			numUnits = new int[difUnits*2];
 			for (int i=0; i<difUnits*2; i++) {
 				numUnits[i] = Integer.parseInt(args[eStart+i]);
@@ -105,7 +108,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			}
 		}
 		
-		// Creates list of sites and list of (unique) elements involved
+		// Creates list of sites
 		sites = new LinkedList<Site>();
 		for (int i=0; i<numSites; i++) {
 			Vect v = new Vect(coords[i][0],coords[i][1],coords[i][2]);
@@ -193,7 +196,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			t = t + target[x] + " ";
 		}
 		
-		System.out.println("Target numbers: " + t);
+//		System.out.println("Target numbers: " + t);
 		
 		// List of locations of previously placed units
 		refLoc = new LinkedList<Vect>();
@@ -495,7 +498,12 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		int loc = 0;
 		for (int k=0; k<difUnits; k++) {
 			if (numUnits[k] != 0) {
+				if (!range) {
 				a = a + "mol" + (k+1) + "- " + numUnits[k] + " units ";
+				}
+				else {
+					a = a + "mol" + (k+1) + "- " + (numUnits[difUnits*k]) + " to " + numUnits[(difUnits*k)+1] + " units ";
+				}
 			}
 			else {
 				a = a + "mol" + (k+1) + "- random number of units ";
