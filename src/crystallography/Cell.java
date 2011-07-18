@@ -52,7 +52,7 @@ public class Cell implements Serializable {
 	private String label;
 	
 	static {
-		System.loadLibrary("openbabel_java");
+//		System.loadLibrary("openbabel_java");
 	}
 	
 	public Cell (Double _a, Double _b, Double _c, Double _alpha, Double _beta, Double _gamma, List<Site> _basis, String _label){
