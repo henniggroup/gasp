@@ -21,6 +21,8 @@ import utility.Utility;
 import crystallography.Cell;
 import crystallography.Site;
 
+import org.openbabel.*;
+
 
 // AvogadroEnergy computes the total energy of a StructureOrg using Avogadro and the given potential.
 // It contains all of the methods and utilities that are specific to Avogadro.
@@ -120,8 +122,11 @@ public class AvogadroEnergy implements Energy {
 	}
 
 	// runs Avogadro on the input file given and prints out any errors
-	public static void runAvogadro(String inputFile) {		
+	public static Boolean runAvogadro(String inputFile) {		
 		GAParameters params = GAParameters.getParams();
+		
+		Boolean status = true;
+		
 		int verbosity = params.getVerbosity();
 		StringBuilder avogadroOutput = new StringBuilder();
 
@@ -144,6 +149,7 @@ public class AvogadroEnergy implements Energy {
 					System.out.println("python crashed. skipping calculation");
 					Process e = Runtime.getRuntime().exec("cp " + unrelaxed_cifpath + " " + errorpath);
 					p.destroy();
+					status = false;
 					continue;
 				}
 				System.out.println(s);
@@ -159,6 +165,8 @@ public class AvogadroEnergy implements Energy {
 			System.out.println("IOException in AvogadroEnergy.runAvogadro: " + e.getMessage());
 //			System.exit(-1);
 		}
+		
+		return status;
 		
 	}
 
@@ -177,30 +185,35 @@ public class AvogadroEnergy implements Energy {
 					+ c.getID());
 		
 		// Execute the python script
-		runAvogadro(inputFile);
+		Boolean status = runAvogadro(inputFile);
 
-		// update c to be the structure in Avogadro's output
-		String cifFileName = inputFile + ".cif";
-		Cell a = Cell.parseAvogCif(new File(cifFileName));
+		if (status) {
+			// update c to be the structure in Avogadro's output
+			String cifFileName = inputFile + ".cif";
+			Cell a = Cell.parseAvogCif(new File(cifFileName));
 //		a.writeCIF(unrelaxed_cifpath);
-		if (a == null) {
-			if (verbosity >= 3) {
-				System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
+			if (a == null) {
+				if (verbosity >= 3) {
+					System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
+				}
+			} else {
+				c.setCell(a);
 			}
-		} else {
-			c.setCell(a);
-		}
 
-		// reads string from log
-		String line = Utility.readStringFromFile(logpath);
+			// reads string from log
+			String line = Utility.readStringFromFile(logpath);
 	
-		// parse energy from log
-		finalEnergy = parseFinalEnergy(line);
+			// parse energy from log
+			finalEnergy = parseFinalEnergy(line);
+			
+			if (verbosity >= 3)
+				System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
-
-		return finalEnergy;
+			return finalEnergy;
+		}
+		
+		else
+			return Double.POSITIVE_INFINITY;
 	}
 	
 	public static double parseFinalEnergy(String avogadroOutput) {
@@ -248,4 +261,5 @@ public class AvogadroEnergy implements Energy {
 		
 		return finalEnergy;
 	}
+
 }

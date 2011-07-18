@@ -32,6 +32,8 @@ import Jama.Matrix;
 import utility.*;
 import vasp.VaspOut;
 import chemistry.*;
+
+import org.openbabel.*;
 /* Represents a crystallographic cell: lattice parameters and a basis.
  * IS IMMUTABLE!
  * 
@@ -417,7 +419,7 @@ public class Cell implements Serializable {
     	if (niggliReducedCell != null)
     		return niggliReducedCell;
     	    	
-        double TOL = 1e-10;
+        double TOL = 1e-8;
 
         // Initialize matrices for tranformations (3x3).
         double[][] m1 = new double[3][3];
@@ -1184,7 +1186,25 @@ public class Cell implements Serializable {
 		
 	}
 	
-	 // just for testing
+	
+	// Convert from one type of file to another
+	// Can be used to standardize CIF files (i.e. CIF to CIF conversion)
+	public static void convertCell(String input, String formatIn, String output, String formatOut) {
+		// Initialize
+		System.loadLibrary("openbabel_java");
+		OBConversion conv = new OBConversion();
+		OBMol mol = new OBMol();
+		
+		// Set formats
+		conv.SetInFormat(formatIn);
+		conv.SetOutFormat(formatOut);
+		
+		conv.ReadFile(mol, input);
+		conv.WriteFile(mol, output);
+	}
+	
+	
+	// just for testing
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
 		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
