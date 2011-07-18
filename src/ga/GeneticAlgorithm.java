@@ -12,17 +12,12 @@ import utility.Pair;
 // CrystalGA.crystalGA() 
 
 public class GeneticAlgorithm {
-	
-	private static double lowest = Double.POSITIVE_INFINITY;
-	
+		
 	// Performs a generic genetic optimization procedure according to the inputed parameters
 	// and returns the best Organism found.
 	public static Organism doGeneticAlgorithm() {
 		GAParameters params = GAParameters.getParams();
 		int verbosity = params.getVerbosity();
-			
-		// File that stores best current organism
-		File bestFile = new File(params.getOutDirName(), "bestOrg");
 		
 		// Create the objects for the algorithms
 		Selection sel = params.getSelection();
@@ -88,18 +83,7 @@ public class GeneticAlgorithm {
 						decrementSOCUsageCount(soc);
 						// get rid of the references to SoC's once theyre no longer needed so we dont serialize them
 						s.setSOCreator(null);
-					}
-					
-					// appends bestFile if value is lowest energy
-					//TODO: write to file rather than append? is a list of successively better organisms useful?
-					if (o.getValue() < lowest) {
-						StringBuilder info = new StringBuilder();
-						info.append(Integer.toString(o.getID()));
-						info.append(Double.toString(o.getValue()));
-						GAUtils.writeStringToFile(info.toString() + "\n", bestFile, true);
-						lowest = o.getValue();
-					}
-					
+					}					
 				}
 			}
 			

@@ -1186,7 +1186,6 @@ public class Cell implements Serializable {
 		
 	}
 	
-	
 	// Convert from one type of file to another
 	// Can be used to standardize CIF files (i.e. CIF to CIF conversion)
 	public static void convertCell(String input, String formatIn, String output, String formatOut) {
@@ -1202,7 +1201,6 @@ public class Cell implements Serializable {
 		conv.ReadFile(mol, input);
 		conv.WriteFile(mol, output);
 	}
-	
 	
 	// just for testing
 	public static void main(String args[]) {

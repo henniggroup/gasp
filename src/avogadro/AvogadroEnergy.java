@@ -175,8 +175,6 @@ public class AvogadroEnergy implements Energy {
 	public double avogadroRun(StructureOrg c) {
 		double finalEnergy = Double.POSITIVE_INFINITY;
 		int verbosity = GAParameters.getParams().getVerbosity();
-
-		GAParameters params = GAParameters.getParams();
 		
 		String inputFile = avogadroInputFile(c);
 		Utility.writeStringToFile(c.getCell().getCIF(), unrelaxed_cifpath);
@@ -185,35 +183,30 @@ public class AvogadroEnergy implements Energy {
 					+ c.getID());
 		
 		// Execute the python script
-		Boolean status = runAvogadro(inputFile);
-
-		if (status) {
-			// update c to be the structure in Avogadro's output
-			String cifFileName = inputFile + ".cif";
-			Cell a = Cell.parseAvogCif(new File(cifFileName));
-//		a.writeCIF(unrelaxed_cifpath);
-			if (a == null) {
-				if (verbosity >= 3) {
-					System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
-				}
-			} else {
-				c.setCell(a);
-			}
-
-			// reads string from log
-			String line = Utility.readStringFromFile(logpath);
-	
-			// parse energy from log
-			finalEnergy = parseFinalEnergy(line);
-			
-			if (verbosity >= 3)
-				System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
-		
-			return finalEnergy;
-		}
-		
-		else
+		if (!runAvogadro(inputFile))
 			return Double.POSITIVE_INFINITY;
+
+		// update c to be the structure in Avogadro's output
+		String cifFileName = inputFile + ".cif";
+		Cell a = Cell.parseAvogCif(new File(cifFileName));
+		if (a == null) {
+			if (verbosity >= 3) {
+				System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
+			}
+		} else {
+			c.setCell(a);
+		}
+
+		// reads string from log
+		String line = Utility.readStringFromFile(logpath);
+
+		// parse energy from log
+		finalEnergy = parseFinalEnergy(line);
+		
+		if (verbosity >= 3)
+			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+	
+		return finalEnergy;			
 	}
 	
 	public static double parseFinalEnergy(String avogadroOutput) {
