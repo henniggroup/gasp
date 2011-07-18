@@ -209,7 +209,7 @@ public class GulpEnergy implements Energy {
 		if (relax) {
 			// update c to be the structure in GULP's output
 			String cifFileName = inputFile + ".cif";
-			Cell a = Cell.parseCif(new File(cifFileName));
+			Cell a = Cell.parseCell(cifFileName, "cif");
 			if (a == null) {
 				if (verbosity >= 3)
 					System.out.println("Warning: bad GULP CIF.  Not updating structure.");
@@ -306,7 +306,7 @@ public class GulpEnergy implements Energy {
 	public static void main(String[] args) {
 		String[] geArgs = {"/home/wtipton/projects/ga_for_crystals/gulp_header", "/home/wtipton/projects/ga_for_crystals/gulppotls/gulppotl_alcu", "true"};
 		GulpEnergy bob = new GulpEnergy(geArgs);
-		Cell c = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif"));
+		Cell c = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif", "cif");
 		
 		System.out.println(bob.getEnergy(new StructureOrg(c)));
 		

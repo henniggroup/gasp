@@ -43,7 +43,7 @@ public class FromCifsSOCreator implements StructureOrgCreator {
 			if (cifFiles[i] != null) {
 				if (verbosity >= 3)
 					System.out.println("Making new StructureOrg from " + cifFiles[i].getPath());
-				StructureOrg result = new StructureOrg(Cell.parseCif(cifFiles[i]));
+				StructureOrg result = new StructureOrg(Cell.parseCell(cifFiles[i].getAbsolutePath(), "cif"));
 				cifFiles[i] = null;
 				return result;
 			}

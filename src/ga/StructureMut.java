@@ -115,7 +115,7 @@ public final class StructureMut implements Variation {
 	
 	// just for testing
 	public static void main(String[] args) {
-		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
+		StructureOrg s1 = new StructureOrg(Cell.parseCell("/home/wtipton/cifs/143.cif", "cif"));
 		s1.setFitness(-1);
 		
 		String[] smArgs = {"0.5", "0.5", "0.5"};

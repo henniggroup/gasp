@@ -10,7 +10,7 @@ public class CastepTest {
 	
 	public static void main(String args[]) {
 		
-		Cell c = Cell.parseCif(new File("/home/wtipton/castepTests/test.cif"));
+		Cell c = Cell.parseCell("/home/wtipton/castepTests/test.cif", "cif");
 		
 		String ceArgs[] = {"true", "0.1", "5.0", "/home/wtipton/castepTests/castepParam", "H", "/home/wtipton/castepTests/H_00PBE.usp", "O", "home/wtipton/castepTests/O_00PBE.usp"};
 		

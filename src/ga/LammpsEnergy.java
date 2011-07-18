@@ -329,7 +329,7 @@ Atoms
 	public static void main(String[] args) {
 		String[] geArgs = {"/home/wtipton/temp/lammpspot"};
 		LammpsEnergy bob = new LammpsEnergy(geArgs);
-		StructureOrg c = new StructureOrg(Cell.parseCif(new File("/home/wtipton/POSCAR4.cif")));
+		StructureOrg c = new StructureOrg(Cell.parseCell("/home/wtipton/POSCAR4.cif", "cif"));
 //		Utility.writeStringToFile(c.getCIF(), "bob.cif");
 		double energy = bob.getEnergy(c);
 		System.out.println(energy);

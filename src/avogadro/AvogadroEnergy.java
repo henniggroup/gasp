@@ -188,7 +188,7 @@ public class AvogadroEnergy implements Energy {
 
 		// update c to be the structure in Avogadro's output
 		String cifFileName = inputFile + ".cif";
-		Cell a = Cell.parseAvogCif(new File(cifFileName));
+		Cell a = Cell.parseCell(cifFileName, "cif");
 		if (a == null) {
 			if (verbosity >= 3) {
 				System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
