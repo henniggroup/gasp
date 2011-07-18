@@ -217,6 +217,15 @@ public class Cell implements Serializable {
 		return result;
 	}
 	
+	public List<Site> getSitesWithElement(Element e) {
+		List<Site> result = new ArrayList<Site>();
+		for (Site s : basis) {
+			if (s.getElement().equals(e))
+				result.add(s);
+		}
+		return result;
+	}
+	
 	public double[] getLatticeVectorsArray() {
 		double result[] = new double[9];
 		result[0] = latticeVectors.get(0).getCartesianComponents().get(0);
@@ -315,13 +324,17 @@ public class Cell implements Serializable {
 		result.append("_atom_site_fract_z\n");
 		result.append("_atom_site_occupancy\n");
 		List<Site> basis = getSites();
-		for (Site s : basis) {
-			result.append(s.getElement().getSymbol() + " ");	
-			List<Double> coords = s.getCoords().getComponentsWRTBasis(getLatticeVectors());
-			for (int i = 0; i < Constants.numDimensions; i++)
-				result.append(coords.get(i) + " ");
-			result.append("1.0000"); // TODO: fixme: real occupancy 
-			result.append("\n");
+		for (Element e : this.getComposition().getElements()) {
+			int counter = 1;
+			for (Site s : this.getSitesWithElement(e)) {
+				result.append(s.getElement().getSymbol() + counter + " ");	
+				List<Double> coords = s.getCoords().getComponentsWRTBasis(getLatticeVectors());
+				for (int i = 0; i < Constants.numDimensions; i++)
+					result.append(coords.get(i) + " ");
+				result.append("1.0000"); // TODO: fixme: real occupancy 
+				result.append("\n");
+				counter ++;
+			}
 		}
 		
 		return result.toString();
@@ -1019,7 +1032,7 @@ public class Cell implements Serializable {
 		for (int i = 0; i < Constants.numDimensions; i++) 
 			vs.add(new Vect(vects.get(i).GetX(), vects.get(i).GetY(), vects.get(i).GetZ()));
 		
-		String label = "Parsed by parseCif.";
+		String label = "Parsed by parseCell.";
 		return new Cell(vs, sites, label);
 	}
 	
@@ -1051,6 +1064,7 @@ public class Cell implements Serializable {
 
 	// parses a CIF file (of the format written by both this file and by GULP)
 	// and returns a structure
+	/*
 	public static Cell parseCif(File cifFile) {
 		String line = null;
 		double la = 0, lb = 0, lc = 0, a = 0, b = 0, g = 0;
@@ -1111,7 +1125,7 @@ public class Cell implements Serializable {
 		Cell answer = new Cell(latVects, sites);
 		
 		return answer;
-	}
+	} 
 	
 	// parses a CIF file (of the format written by openbabel)
 	// and returns a structure
@@ -1169,13 +1183,6 @@ public class Cell implements Serializable {
 	//	List<Vect> stBasis = new LinkedList<Vect>();
 	//	Vect x = new Vect(1.0,0.0,0.0); Vect y = new Vect(0.0,1.0,0.0); Vect z = 
 		
-	/*	for (Site s: sites) {
-			Element e = s.getElement();
-			List<Double> coords = s.getCoords().getComponentsWRTBasis(latVects);
-			Vect v = new Vect(coords);
-			s = new Site(e,v);
-		}
-	*/	
 		// maybe openbabel died before spitting out a CIF
 		if (sites.size() == 0)
 			return null;
@@ -1184,7 +1191,7 @@ public class Cell implements Serializable {
 		
 		return answer;
 		
-	}
+	} */
 	
 	// Convert from one type of file to another
 	// Can be used to standardize CIF files (i.e. CIF to CIF conversion)
@@ -1207,11 +1214,13 @@ public class Cell implements Serializable {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
 		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell a = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif"));
-		Cell b = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif", "cif");
-		System.out.println(b);
+		Cell a = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif", "cif");
+	//	System.out.println(b);
 		System.out.println(a);
-		System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+	//	System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+		
+		a.writeCIF("test");
+		System.out.println(Cell.parseCell("test", "cif").toString());
 	//	c.writeCIF("/home/wtipton/cifs/1.cif");
 	//	c.writeCIF("/home/wtipton/cifs/2.cif");
 		
