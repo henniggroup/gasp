@@ -230,7 +230,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --convergenceCriterion2 maxNumGens <n>");
 		System.out.println("   --convergenceCriterion3 maxNumGensWOImpr <n> <dValue>");
 		System.out.println("   --convergenceCriterion4 valueAchieved <maximum acceptable energy>");
-		System.out.println("   --convergenceCriterion5 foundStructure <CIF filename>");
+		System.out.println("   --convergenceCriterion5 foundStructure <CIF filename> <rGuard misfits>");
 		System.out.println("Hard Constraints");
 		System.out.println("   --minInteratomicDistance d : minimum interatomic distance (Angstroms)");
 		System.out.println("   --maxLatticeLength d : maximum lattice vector length (Angstroms)");

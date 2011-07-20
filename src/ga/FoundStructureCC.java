@@ -24,8 +24,8 @@ public class FoundStructureCC implements ConvergenceCriterion {
 		StructureOrg targetSOrg = new StructureOrg(Cell.parseCell(targetFilename, "cif"));
 		
 		// initialize the target
-		String[] rgArgs = {"1.0", "0.001"};
-		target = new RedundancyGuard(rgArgs);
+		//String[] rgArgs = {"1.0", "0.001"};
+		target = new RedundancyGuard(GAUtils.subArray(args,1));
 		
 		target.addStructureOrg(targetSOrg);
 	}
