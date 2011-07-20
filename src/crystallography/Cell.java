@@ -51,10 +51,10 @@ public class Cell implements Serializable {
 	private List<Site> basis;
 	private String label;
 	
-	static {
+/*	static {
 		System.loadLibrary("openbabel_java");
 	}
-	
+*/	
 	public Cell (Double _a, Double _b, Double _c, Double _alpha, Double _beta, Double _gamma, List<Site> _basis, String _label){
 		this(getVectorsfromLParams(_a, _b, _c, _alpha, _beta, _gamma), _basis, _label);
 	}
@@ -1009,12 +1009,15 @@ public class Cell implements Serializable {
 		return result.toString();
 	} */
 	
+/*
 	public static Cell parseCell(String fName, String format) {
 		OBMol mol = new OBMol();
 		OBConversion conv = new OBConversion();
 		conv.SetInFormat(format);
-		if (!conv.ReadFile(mol, fName))
+		if (!conv.ReadFile(mol, fName)) {
 			System.out.println("Cell.parseCell failed to read " + fName + " with format " + format + ".");
+			return null;
+		}
 		
 		OBUnitCell c = openbabel_java.toUnitCell((mol.GetData(openbabel_javaConstants.UnitCell)));
 		
@@ -1056,15 +1059,17 @@ public class Cell implements Serializable {
 		/*
 		openbabel_javaConstants.SetData;
 		openbabel_java.SetData(mol, c);
-		mol.SetData(c); */
+		mol.SetData(c); 
 		
 		return "TODO";
 		// add a
 	}
+	
+*/
 
 	// parses a CIF file (of the format written by both this file and by GULP)
 	// and returns a structure
-	/*
+	
 	public static Cell parseCif(File cifFile) {
 		String line = null;
 		double la = 0, lb = 0, lc = 0, a = 0, b = 0, g = 0;
@@ -1191,8 +1196,9 @@ public class Cell implements Serializable {
 		
 		return answer;
 		
-	} */
+	} 
 	
+/*
 	// Convert from one type of file to another
 	// Can be used to standardize CIF files (i.e. CIF to CIF conversion)
 	public static void convertCell(String input, String formatIn, String output, String formatOut) {
@@ -1208,19 +1214,20 @@ public class Cell implements Serializable {
 		conv.ReadFile(mol, input);
 		conv.WriteFile(mol, output);
 	}
+*/
 	
 	// just for testing
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
-		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
+	//	Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell a = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/oldruns/garun_mno2_071107/27931.cif", "cif");
+//		Cell a = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/test_runs/lammps_lj/garun_lj/40.cif", "cif");
 	//	System.out.println(b);
-		System.out.println(a);
+//		System.out.println(a);
 	//	System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
 		
-		a.writeCIF("test");
-		System.out.println(Cell.parseCell("test", "cif").toString());
+//		a.writeCIF("test");
+//		System.out.println(Cell.parseCell("test", "cif").toString());
 	//	c.writeCIF("/home/wtipton/cifs/1.cif");
 	//	c.writeCIF("/home/wtipton/cifs/2.cif");
 		

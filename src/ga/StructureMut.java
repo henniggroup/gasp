@@ -114,9 +114,58 @@ public final class StructureMut implements Variation {
 		return result;
 	}	
 	
+/*
+	public double strainCell(File input, File output) {
+		Cell p = Cell.parseAvogCif(input);
+		
+		List<Site> origSites = p.getSites();
+		List<Site> newSites = new LinkedList<Site>();
+		
+		double[][] strain = new double[Constants.numDimensions][Constants.numDimensions];
+		for (int i=0; i<Constants.numDimensions; i++) {
+			for (int j=0; j<Constants.numDimensions; j++) {
+				int n = RandomNumbers.getUniformIntBetweenInclusive(1, 2);
+				double ep = 0;
+				if (n==1)
+					ep = RandomNumbers.getUniformDoubleBetween(0.003, 0.01);
+				else
+					ep = RandomNumbers.getUniformDoubleBetween(-0.01, -0.003);
+				strain[i][j] = ep;
+				if (i==j)
+					strain[i][j] += 1;
+			}
+		}
+		
+		// modify the basis to make newBasis
+		double[][] newVectsD = new double[Constants.numDimensions][Constants.numDimensions];
+		for (int i = 0; i < Constants.numDimensions; i++)
+			for (int j = 0; j < Constants.numDimensions; j++)
+				newVectsD[i][j] = p.getLatticeVectors().get(i).getCartesianComponents().get(j);
+		//newVects = MatrixMath.SquareMatrixMult(strain, newVects);
+		newVectsD = (new Matrix(strain)).times(new Matrix(newVectsD)).getArray();
+		
+		List<Vect> newVects = new LinkedList<Vect>();
+		for (int i = 0; i < Constants.numDimensions; i++)
+				newVects.add(new Vect(newVectsD[i]));
+		
+		// perturb atomic positions
+		for (int i = 0; i < origSites.size(); i++) {
+			// perturb each site's location with probability mutRate
+			List<Double> fracCoords = origSites.get(i).getCoords().getComponentsWRTBasis(p.getLatticeVectors());
+			if (rand.nextDouble() < mutRate) {
+				// perturb by a Gaussian of stddev mutRadius along each axis
+				for (int k = 0; k < Constants.numDimensions; k++) 
+					fracCoords.set(k, GAUtils.renormZeroOne(fracCoords.get(k) + rand.nextGaussian() * sigmaAtoms));
+			} 
+			newSites.add(new Site(origSites.get(i).getElement(), new Vect(fracCoords, newVects)));
+		}
+		
+	}
+	*/
+	
 	// just for testing
 	public static void main(String[] args) {
-		StructureOrg s1 = new StructureOrg(Cell.parseCell("/home/wtipton/cifs/143.cif", "cif"));
+		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
 		s1.setFitness(-1);
 		
 		String[] smArgs = {"0.5", "0.5", "0.5"};
