@@ -309,7 +309,7 @@ public class OhmmsEnergy implements Energy {
 	public static void main(String[] args) {
 		String[] geArgs = {"header", "footer", "true"};
 		OhmmsEnergy bob = new OhmmsEnergy(geArgs);
-		StructureOrg c = new StructureOrg(Cell.parseCell("in.cif", "cif"));
+		StructureOrg c = new StructureOrg(Cell.parseCif(new File("in.cif")));
 		c.getCell().writeCIF("bob.cif");
 	//	Utility.writeStringToFile(c.getCell().getCIF(), "bob.cif");
 		double energy = bob.getEnergy(c);

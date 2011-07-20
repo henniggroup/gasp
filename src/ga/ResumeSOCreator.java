@@ -67,7 +67,7 @@ public class ResumeSOCreator implements StructureOrgCreator {
 		Iterator<Double> d = values.iterator();
 		while (i.hasNext()) {
 			String filename = i.next();
-			StructureOrg s = new StructureOrg(Cell.parseCell(dirName + "/" + filename, "cif"));
+			StructureOrg s = new StructureOrg(Cell.parseCif(new File(dirName + "/" + filename)));
 			s.setID(j.next());
 			if (!recalcEnergies)
 				s.setValue(d.next());

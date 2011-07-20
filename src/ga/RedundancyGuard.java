@@ -166,8 +166,8 @@ public class RedundancyGuard implements Serializable {
 		
 		RedundancyGuard bob = new RedundancyGuard(rdArgs);
 		
-		StructureOrg temp1 = new StructureOrg(Cell.parseCell("/home/wtipton/POSCAR4.cif", "cif"));
-		StructureOrg temp2 = new StructureOrg(Cell.parseCell("/home/wtipton/POSCAR3.cif", "cif"));	
+		StructureOrg temp1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/POSCAR4.cif")));
+		StructureOrg temp2 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/POSCAR3.cif")));	
 		temp1.setTotalEnergy(1 * temp1.getCell().getBasisSize());
 		temp2.setTotalEnergy(1 * temp2.getCell().getBasisSize());
 //		System.out.println(bob.sOrgToString(temp1));

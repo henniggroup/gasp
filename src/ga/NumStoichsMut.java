@@ -106,7 +106,7 @@ public class NumStoichsMut implements Variation {
 
 	// just for testing
 	public static void main(String[] args) {
-		StructureOrg s1 = new StructureOrg(Cell.parseCell("/home/wtipton/cifs/143.cif", "cif"));
+		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
 		GAParameters params = GAParameters.getParams();
 		s1.setFitness(1);
 		

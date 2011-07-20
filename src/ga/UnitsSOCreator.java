@@ -22,9 +22,9 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	
 	private String[] atoms;
 	private double[][] coords;
-	private int[] numAtoms;
-	private int[] numUnits;
-	private int difUnits;
+	private static int[] numAtoms;
+	private static int[] numUnits;
+	private static int difUnits;
 	private static boolean unitsOnly;
 	private List<Site> sites;
 	private List<Vect> refLoc;
@@ -67,7 +67,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		// Marks location after coordinates end
 		int eStart = cStart + 4*numSites;
 		// Marks location after numUnits ends
-		int dStart = length - 2;
+		int dStart = length - 3;
 		
 		// Parse number of each molecule to be added
 		if (dStart - eStart == difUnits) {
@@ -77,7 +77,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 				numUnits[i] = Integer.parseInt(args[eStart+i]);
 			}
 		}
-			// if given a range of targets
+		// if given a range of targets
 		else {
 			range = true;
 			numUnits = new int[difUnits*2];
@@ -548,5 +548,18 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	}
 */	
 
+	public static int[] getNumAtoms() {
+		return numAtoms;
+	}
+	
+	public static int[] getNumUnits() {
+		return numUnits;
+	}
+	
+	public static int getDifUnits() {
+		return difUnits;
+	}
+	
+	
 
 }

@@ -6,6 +6,7 @@ import ga.Energy;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.StructureOrg;
+import ga.UnitsSOCreator;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -228,7 +229,7 @@ public class GulpEnergy implements Energy {
 		if (relax) {
 			// update c to be the structure in GULP's output
 			String cifFileName = inputFile + ".cif";
-			Cell a = Cell.parseCell(cifFileName, "cif");
+			Cell a = Cell.parseCif(new File(cifFileName));
 			if (a == null) {
 				if (verbosity >= 3)
 					System.out.println("Warning: bad GULP CIF.  Not updating structure.");
@@ -328,8 +329,63 @@ public class GulpEnergy implements Energy {
 		List<Site> sites = c.getSites();
 		String[] newLabels = new String[sites.size()];
 		
+		int difUnits = UnitsSOCreator.getDifUnits();
+		int[] numUnits = UnitsSOCreator.getNumUnits();
+		int[] numAtoms = UnitsSOCreator.getNumAtoms();
+		
 		int loc = 0;
-		for (Site i: sites) {
+		for (int r=0; r<difUnits; r++) {
+			for (int s=0; s<numUnits[r]; s++) {
+				List<Site> subsites = sites.subList(loc, loc + numAtoms[r]);
+				for (Site k: subsites) {
+					Vect v1 = k.getCoords();
+					int counter = 0;
+					for (Site l: subsites) {
+						double dist = 0.0;
+						if (k != l) {
+							Vect v2 = l.getCoords();
+							dist = v1.getCartDistanceTo(v2);
+							if (dist <= 1.85) {
+								counter = counter + 1;
+							}
+						}
+					}
+					if (counter == 0 || counter > 6) {
+						if (k.getElement().getSymbol().length() == 2)
+							newLabels[loc] = k.getElement().getSymbol();
+						else
+							newLabels[loc] = k.getElement().getSymbol() + "_";
+					}
+					else if (counter == 1 || counter == 2) {
+						newLabels[loc] = k.getElement().getSymbol() + "_1";
+					}
+					else if (counter == 3) {
+						newLabels[loc] = k.getElement().getSymbol() + "_2";
+					}
+					else if (counter == 4) {
+						newLabels[loc] = k.getElement().getSymbol() + "_3";
+					}
+					else if (counter == 5) {
+						newLabels[loc] = k.getElement().getSymbol() + "_5";
+					}
+					else if (counter == 6) {
+						newLabels[loc] = k.getElement().getSymbol() + "_6";
+					}
+					if (k.getElement().getSymbol().equals("H")) {
+						newLabels[loc] = k.getElement().getSymbol() + "_";
+					}
+					loc = loc + 1;
+				}
+			}
+		}
+		return newLabels;
+		
+				
+				
+				
+				
+/*				
+			for (Site i: sites) {
 			Vect v1 = i.getCoords();
 			int counter = 0;
 			for (Site j: sites) {
@@ -369,13 +425,14 @@ public class GulpEnergy implements Energy {
 			loc = loc + 1;
 		}
 		return newLabels;
+*/		
 	}
 	
 	// just for testing:
 	public static void main(String[] args) {
 		String[] geArgs = {"/home/wtipton/projects/ga_for_crystals/gulp_header", "/home/wtipton/projects/ga_for_crystals/gulppotls/gulppotl_alcu", "true"};
 		GulpEnergy bob = new GulpEnergy(geArgs);
-		Cell c = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif", "cif");
+		Cell c = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif"));
 		
 		System.out.println(bob.getEnergy(new StructureOrg(c)));
 		

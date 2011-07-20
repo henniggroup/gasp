@@ -138,7 +138,7 @@ public class SpgLib {
 		SpgLib s = SpgLib.getInstance();
 		
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/77.cif"));
-		Cell c = Cell.parseCell("/home/wtipton/POSCAR4.cif", "cif");
+		Cell c = Cell.parseCif(new File("/home/wtipton/POSCAR4.cif"));
 		
 		System.out.println(c);
 		

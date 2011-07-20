@@ -219,8 +219,8 @@ public final class Slicer implements Variation {
 	public static void main(String[] args) {
 		GAParameters params = GAParameters.getParams();
 		
-		StructureOrg s1 = new StructureOrg(Cell.parseCell("/home/wtipton/cifs/143.cif", "cif"));
-		StructureOrg s2 = new StructureOrg(Cell.parseCell("/home/wtipton/cifs/44.cif", "cif"));
+		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
+		StructureOrg s2 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/44.cif")));
 		s1.setFitness(-1);
 		s2.setFitness(-1);
 		
