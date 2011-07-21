@@ -28,7 +28,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	private static boolean unitsOnly;
 	private List<Site> sites;
 	private List<Vect> refLoc;
-	private int[] units;
+	private static int[] units;
 	private double targetDensity;
 	private double densityTol;
 	private int numSites;
@@ -558,6 +558,10 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	
 	public static int getDifUnits() {
 		return difUnits;
+	}
+	
+	public static int[] getTargets() {
+		return units;
 	}
 	
 	

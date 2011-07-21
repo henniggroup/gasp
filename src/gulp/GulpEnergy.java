@@ -323,14 +323,13 @@ public class GulpEnergy implements Energy {
 	}
 	
 	//TODO: currently ignores square planar -- how to identify? also when # bonds > 6 just leaves blank -- change to octahedral?
-	//TODO: change to cycle through individual units one by one, rather than including potential bonds between molecules
-			// i.e. for (int i=0; i<difUnits; i++) { for (int k=0; k<numAtoms[i]; k++) { etc...
+	//TODO: doesn't work when both given range and running in parallel, due to UnitsSOCreator.getTargets() being overwritten... how to fix?
 	public static String[] getGulpFormat(Cell c) {
 		List<Site> sites = c.getSites();
 		String[] newLabels = new String[sites.size()];
 		
 		int difUnits = UnitsSOCreator.getDifUnits();
-		int[] numUnits = UnitsSOCreator.getNumUnits();
+		int[] numUnits = UnitsSOCreator.getTargets();
 		int[] numAtoms = UnitsSOCreator.getNumAtoms();
 		
 		int loc = 0;
