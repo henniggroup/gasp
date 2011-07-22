@@ -469,6 +469,8 @@ public class GAParameters implements Serializable {
 		String objFcnType = objFcnArgs[0];
 		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getNumDimensions() < 2)
 			usage("ERROR: Can't use pd objFun w/ < 2 dimensions.", true);
+		if (vars == null || vars.size() == 0)
+			usage("ERROR: Given no variation operators.", true);
 	}
 	
 	public void setSeedGeneration(Cell[] initialPop) {
