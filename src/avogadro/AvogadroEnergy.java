@@ -36,8 +36,7 @@ public class AvogadroEnergy implements Energy {
 	private String logpath;
 	private static String errorpath;
 
-	public AvogadroEnergy(String[] args)
-	{		
+	public AvogadroEnergy(String[] args) {		
 		
 		if (args == null || args.length < 1)
 			GAParameters.usage("Not enough parameters given to AvogadroEnergy", true);
