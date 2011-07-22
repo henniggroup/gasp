@@ -96,12 +96,14 @@ public class GulpEnergy implements Energy {
 			result.append(df.format(lAngles[i]) + " ");
 		result.append(newline);
 
+		result.append("cart");
+		result.append(newline);
 		// atoms
 		// if UFF is being used (assuming potl file will include "uff" in file name or path)
-		if (potentialName.contains("uff") || potentialName.contains("Uff") || potentialName.contains("UFF")) {
+		// TODO: this is not a good assumption --Will
+	/*	if (potentialName.toLowerCase().contains("uff")) {
 			String[] newLabels = getGulpFormat(c);
-			result.append("cart");
-			result.append(newline);
+
 			for (int i = 0; i < c.getNumSites(); i++) {
 				Site s = c.getSite(i);
 				String symbol = newLabels[i];
@@ -111,9 +113,7 @@ public class GulpEnergy implements Energy {
 				result.append(newline);
 			}
 		}
-		else {
-			result.append("cart");
-			result.append(newline);
+		else { */
 			for (int i = 0; i < c.getNumSites(); i++) {
 				Site s = c.getSite(i);
 				String symbol = s.getElement().getSymbol();
@@ -129,7 +129,7 @@ public class GulpEnergy implements Energy {
 					result.append(newline);
 				}
 			}
-		}
+	//	}
 
 		return result.toString();
 	}
@@ -324,7 +324,7 @@ public class GulpEnergy implements Energy {
 	
 	//TODO: currently ignores square planar -- how to identify? also when # bonds > 6 just leaves blank -- change to octahedral?
 	//TODO: doesn't work when both given range and running in parallel, due to UnitsSOCreator.getTargets() being overwritten... how to fix?
-	public static String[] getGulpFormat(Cell c) {
+	public static String[] getUFFSiteStrings(Cell c) {
 		List<Site> sites = c.getSites();
 		String[] newLabels = new String[sites.size()];
 		
@@ -336,6 +336,8 @@ public class GulpEnergy implements Energy {
 		for (int r=0; r<difUnits; r++) {
 			for (int s=0; s<numUnits[r]; s++) {
 				List<Site> subsites = sites.subList(loc, loc + numAtoms[r]);
+				// TODO: this ignores periodic boundary conditions
+				//		 consider using Cell.getAtomsInSphereSorted() --Will
 				for (Site k: subsites) {
 					Vect v1 = k.getCoords();
 					int counter = 0;
