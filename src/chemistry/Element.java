@@ -22,14 +22,15 @@ public class Element implements Comparable, Serializable {
 	static int nameEntryLoc = 2;
 	static int symbolEntryLoc = 3;
 	static int densityEntryLoc = 4;
-	static String[][] elementData = {{"1","1.0079","Hydrogen","H","0.00008988","1","13.5984"},
+	static int chargeEntryLoc = 7;
+	static String[][] elementData = {{"1","1.0079","Hydrogen","H","0.00008988","1","13.5984","0.234"},
 		{"2","4.0026","Helium","He","0.0001785","18","24.5874"},
 		{"3","6.9410","Lithium","Li","0.530","1","5.3917"},
 		{"4","9.0122","Beryllium","Be","1.850","2","9.3227"},
 		{"5","10.8110","Boron","B","2.340","13","8.2980"},
 		{"6","12.0107","Carbon","C","2.260","14","11.2603"},
 		{"7","14.0067","Nitrogen","N","0.0012506","15","14.5341"},
-		{"8","15.9994","Oxygen","O","0.001429","16","13.6181"},
+		{"8","15.9994","Oxygen","O","0.001429","16","13.6181","-0.735"},
 		{"9","18.9984","Fluorine","F","0.001696","17","17.4228"},
 		{"10","20.1797","Neon","Ne","0.0008999","18","21.5645"},
 		{"11","22.9897","Sodium","Na","0.970","1","5.1391"},
@@ -162,6 +163,10 @@ public class Element implements Comparable, Serializable {
 	
 	public double getDensity() {
 		return Double.parseDouble(getEntryFromZ(Z)[densityEntryLoc]);
+	}
+	
+	public double getCharge() {
+		return Double.parseDouble(getEntryFromZ(Z)[chargeEntryLoc]);
 	}
 	
 	public String toString() {
