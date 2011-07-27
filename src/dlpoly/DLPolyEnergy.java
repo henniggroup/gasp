@@ -119,7 +119,9 @@ public class DLPolyEnergy implements Energy {
 		Vect z = c.getCell().getLatticeVectors().get(2);
 		Vect xy = x.cross(y); Vect xz = x.cross(z); Vect yz = y.cross(z);
 		Double one = yz.magnitudeOfProjection(x); Double two = xz.magnitudeOfProjection(y); Double three = xy.magnitudeOfProjection(z);
-		Double l = 0.5*Math.min(Math.min(one, two), Math.min(two,three)); l = 0.99*l;
+//		System.out.println("lengths: " + 0.5*one + " " + 0.5*two + " " + 0.5*three);
+		Double l = 0.5*Math.min(Math.min(one, two), Math.min(two,three)); l = 0.99*l; String m = l.toString().substring(0, 6); l = Double.parseDouble(m);
+//		System.out.println("cutoff: " + l);
 		
 		try {
 			File f = new File(params.getTempDirName() + "/" + c.getID(),"CONTROL");
@@ -130,23 +132,29 @@ public class DLPolyEnergy implements Energy {
 			out.write(params.getRunTitle() + newline + newline);
 			out.write("minimise        energy 1");
 			out.write(newline);
-			out.write("temperature          1");
+			out.write("ensemble nvt evans");
 			out.write(newline);
-			out.write("steps             10000");
+//			out.write("ewald precision");
+//			out.write(newline);
+			out.write("equilibration        5000");
 			out.write(newline);
-			out.write("print                50");
+			out.write("temperature            1");
 			out.write(newline);
-			out.write("stack               10");
+			out.write("steps               10000");
 			out.write(newline);
-			out.write("stats                50");
+			out.write("print                 50");
 			out.write(newline);
-			out.write("timestep         5.0E-7");
+			out.write("stack                 10");
+			out.write(newline);
+			out.write("stats                 50");
+			out.write(newline);
+			out.write("timestep          5.0E-7");
 			out.write(newline);
 			out.write("cutoff             " + l);
 			out.write(newline + newline);
-			out.write("job time     1000000.0");
+			out.write("job time       1000000.0");
 			out.write(newline);
-			out.write("close time       500.0");
+			out.write("close time         500.0");
 			out.write(newline + newline);
 			out.write("finish");
 			out.close();
@@ -195,8 +203,9 @@ public class DLPolyEnergy implements Energy {
 			loc = loc + numAtoms[k]*numUnits[k];
 		}
 		
-		String potl = "VDW 1 \nO     O     LJ    0.16    3.196 \n";
-//		String potl = "VDW 2 \nO     O     buck  22764   0.149  27.88 \nH     O     buck  311.97  0.25  0.0 \n";
+//		String potl = "VDW 1 \nO     O     LJ    0.16    3.196 \n";
+		String potl = "VDW 2 \nO     O     buck  15764   0.149  27.88 \nH     O     buck  311.97  0.25  0.0 \n";
+//		String potl = "VDW 3 \nAl    Al    LJ   0.392   1.4472 \nCu    Cu    LJ   0.415   2.277 \nAl    Cu    LJ   0.4   1.76 \n";
 		
 		
 		String total = title + units + num + molecules + potl + "CLOSE";
@@ -230,6 +239,7 @@ public class DLPolyEnergy implements Energy {
 		
 		
 		// Execute DL_Poly
+		String s = null;
 		BufferedReader stdInput = null;
 		BufferedReader stdError = null;
 		try {
@@ -240,6 +250,17 @@ public class DLPolyEnergy implements Energy {
 					p.getInputStream()));
 			stdError = new BufferedReader(new InputStreamReader(
 					p.getErrorStream()));
+			
+			// read the output
+			while ((s = stdInput.readLine()) != null) {
+				if (verbosity >= 5)
+					System.out.println(s);
+			}
+
+			// print out any errors
+			while ((s = stdError.readLine()) != null) {
+				System.out.println(s);
+			}			
 			
 		} catch (IOException e) {
 			System.out.println("IOException in DLPolyEnergy.runDLPoly: " + e.getMessage());
@@ -253,7 +274,7 @@ public class DLPolyEnergy implements Energy {
 		
 //		System.out.println("here's the path: " + params.getTempDirName() + "/REVCON");
 		
-		//TODO: code is trying to access files before they've been writte. how to wait more effectively?
+/*		//TODO: code is trying to access files before they've been written. how to wait more effectively?
 		// Wait to allow REVCON to be generated
 		try {
 		Thread.sleep(10000);
@@ -261,9 +282,9 @@ public class DLPolyEnergy implements Energy {
 		catch(InterruptedException e) {
 		e.printStackTrace();
 		}
+*/
 		
 		// Parse final structure, set as return structure
-		
 		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + "/REVCON") == null) {
 			if (verbosity >= 3) {
 				System.out.println("Warning: bad DLPoly CIF.  Not updating structure.");
@@ -334,6 +355,7 @@ public class DLPolyEnergy implements Energy {
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("DLPolyEnergy.parseStructure: REVCON not found");
+			return c.getCell();
 		}
 
 		
@@ -386,7 +408,7 @@ public class DLPolyEnergy implements Energy {
 					System.out.println("DLPolyEnergy: IOException.");
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("DLPolyEnergy.parseStructure: OUTPUT not found");
+			System.out.println("DLPolyEnergy.parseFinalEnergy: OUTPUT not found");
 		}
 		
 		return finalEnergy;
