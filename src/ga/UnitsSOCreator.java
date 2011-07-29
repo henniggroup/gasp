@@ -272,7 +272,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			}
 		}
 			
-		System.out.println("refLoc: " + refLoc.toString());
+//		System.out.println("refLoc: " + refLoc.toString());
 		
 			// Add in atoms to match composition space if applicable
 			if (!unitsOnly) {

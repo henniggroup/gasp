@@ -192,6 +192,8 @@ public class DLPolyEnergy implements Energy {
 					mass = mass + " ";
 				}
 				mass = mass + n.toString();
+				
+				// TODO: partial charge is necessary, and should probably be inputted
 				n = sites.get(loc+l).getElement().getCharge(); y = n.toString().length(); dif = 6 - y; String charge = "";
 				for (int m=0; m<dif; m++) {
 					charge = charge + " ";
