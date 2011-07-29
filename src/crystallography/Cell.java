@@ -1090,7 +1090,9 @@ public class Cell implements Serializable {
 				if (!t.hasMoreTokens())
 					continue;
 				if (readingInAtoms) {
-					String symbol = t.nextToken();
+					String siteStr = t.nextToken();
+					String symbol = siteStr.substring(1, 2).matches("[A-Za-z]") ? siteStr.substring(0, 2) : siteStr.substring(0, 1); 		
+					
 					double x = Double.parseDouble(t.nextToken());
 					double y = Double.parseDouble(t.nextToken());
 					double z = Double.parseDouble(t.nextToken());
@@ -1221,10 +1223,22 @@ public class Cell implements Serializable {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
 	//	Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-//		Cell a = Cell.parseCell("/home/wtipton/projects/ga_for_crystals/test_runs/lammps_lj/garun_lj/40.cif", "cif");
+		Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
+		Cell b = Cell.parseCif(new File("/home/wtipton/andysexamples/29.cif"));
+		Cell c = Cell.parseCif(new File("/home/wtipton/andysexamples/3851.cif"));
 	//	System.out.println(b);
 //		System.out.println(a);
-	//	System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+		System.out.println(a.matchesCell(b, 0.5, 0.5, 0.05));
+		System.out.println(b.matchesCell(a, 0.5, 0.5, 0.05));
+		System.out.println(a.matchesCell(c, 0.5, 0.5, 0.05));
+		System.out.println(c.matchesCell(a, 0.5, 0.5, 0.05));
+		System.out.println(c.matchesCell(b, 0.5, 0.5, 0.05));
+		System.out.println(b.matchesCell(c, 0.5, 0.5, 0.05));
+		
+		System.out.println(a.matchesCell(a, 0.1, 0.05, 0.05));
+		System.out.println(b.matchesCell(b, 0.1, 0.05, 0.05));
+		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05));
+
 		
 //		a.writeCIF("test");
 //		System.out.println(Cell.parseCell("test", "cif").toString());

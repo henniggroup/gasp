@@ -34,7 +34,6 @@ public class GulpEnergy implements Energy {
 	private String headerStr;
 	private ArrayList<String> speciesWithShell;
 	private Boolean cautious;
-	private static String potentialName;
 
 	public GulpEnergy(String[] args)
 	{
@@ -47,7 +46,6 @@ public class GulpEnergy implements Energy {
 
 		// read in the GULP potential to use
 		File potlFile = new File(args[1]);
-		potentialName = args[1];
 		potlStr = GAUtils.readStringFromFile(potlFile);
 		
 		cautious = Boolean.parseBoolean(args[2]);
@@ -62,8 +60,7 @@ public class GulpEnergy implements Energy {
 		
 		result.append("GULP total energy:" + GAUtils.newline());
 		result.append(headerStr + GAUtils.newline());
-		result.append(potlStr + GAUtils.newline());
-		
+		result.append(potlStr + GAUtils.newline());		
 		
 		return result.toString();
 	}
@@ -335,20 +332,20 @@ public class GulpEnergy implements Energy {
 		int loc = 0;
 		for (int r=0; r<difUnits; r++) {
 			for (int s=0; s<numUnits[r]; s++) {
+				// TODO: this makes some kind of sketchy assumptions about the order of the sites list --Will
 				List<Site> subsites = sites.subList(loc, loc + numAtoms[r]);
-				// TODO: this ignores periodic boundary conditions
-				//		 consider using Cell.getAtomsInSphereSorted() --Will
+
 				for (Site k: subsites) {
 					Vect v1 = k.getCoords();
 					int counter = 0;
 					for (Site l: subsites) {
-						double dist = 0.0;
 						if (k != l) {
+							// TODO: this ignores periodic boundary conditions
+							//		 consider using Cell.getAtomsInSphereSorted() 
+							//		 and then crossreferencing those results w/ those known to be in the same molecular unit --Will
 							Vect v2 = l.getCoords();
-							dist = v1.getCartDistanceTo(v2);
-							if (dist <= 1.85) {
-								counter = counter + 1;
-							}
+							if (v1.getCartDistanceTo(v2) <= 1.85) 	// TODO: this magic number needs to be configurable or documented
+								counter++;		//		 or something --Will
 						}
 					}
 					if (counter == 0 || counter > 6) {
