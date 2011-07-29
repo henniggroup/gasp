@@ -272,7 +272,8 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			}
 		}
 			
-
+		System.out.println("refLoc: " + refLoc.toString());
+		
 			// Add in atoms to match composition space if applicable
 			if (!unitsOnly) {
 				Composition comp = params.getCompSpace().getRandomIntegerCompInSpace(params.getMinNumAtoms(), (params.getMaxNumAtoms() - totAtoms));

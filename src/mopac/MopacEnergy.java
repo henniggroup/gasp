@@ -35,7 +35,17 @@ public class MopacEnergy implements Energy {
 		if (args == null || args.length < 1)
 			GAParameters.usage("Not enough parameters given to MopacEnergy", true);
 		
+		// read path to executable, ensure it points directly to the executable
 		execpath = args[0];
+		int length = execpath.length();
+		if (!execpath.substring(length-4).equals("exe")) {
+			if (execpath.substring(length-1).equals("/")) {
+				execpath = execpath + "MOPAC2009.exe";
+			}
+			else {
+				execpath = execpath + "/MOPAC2009.exe";
+			}
+		}
 	}
 	
 	public double getEnergy(StructureOrg c) {
@@ -44,9 +54,10 @@ public class MopacEnergy implements Energy {
 		// Copy original structure (for testing)
 		c.getCell().writeCIF(params.getTempDirName() + "/orig" + c.getID() + ".cif");
 		
+		// Run MOPAC
 		runMopac(c);
 		
-		//Parse final energy
+		// Parse final energy
 		Double energy = parseFinalEnergy(params.getTempDirName() + "/" + c.getID() + ".out");
 		
 		return energy;
@@ -56,13 +67,15 @@ public class MopacEnergy implements Energy {
 		GAParameters params = GAParameters.getParams();
 		
 		String outdir = params.getTempDirName() + "/" + c.getID() + ".mop";
-		// uses PM6, overrides interatomic distance check
-		String keywds = "PM6 GEO-OK \n";
+		//TODO: add "LET DDMIN=0.0"? will help with "NUMERICAL PROBLEMS IN BRACKETING LAMBDA" error
+		// uses PM6, overrides interatomic distance check, uses all cartesian coordinates
+		String keywds = "PM6 GEO-OK XYZ \n";
 		String title = "Structure " + c.getID() + "\n\n";
 		
 		List<Vect> latVects = c.getCell().getLatticeVectors();
 		List<Site> sites = c.getCell().getSites();
 		
+		// Creates list of atomic sites
 		String atoms = "";
 		for (Site s: sites) {
 			List<Double> coords = s.getCoords().getCartesianComponents();
@@ -73,6 +86,7 @@ public class MopacEnergy implements Energy {
 			atoms = atoms + "\n";
 		}
 		
+		// Creates list of lattice vectors
 		String lattice = "";
 		for (Vect v: latVects) {
 			List<Double> xyz = v.getCartesianComponents();
@@ -128,15 +142,7 @@ public class MopacEnergy implements Energy {
 			if (stdError != null) 
 				try{ stdError.close(); } catch (Exception x) { } //ignore
 		}
-		
-/*		// Wait to allow execution to finish
-		try {
-		Thread.sleep(30000);
-		}
-		catch(InterruptedException e) {
-		e.printStackTrace();
-		}
-*/		
+			
 		// Parse final structure, set as return structure
 		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out") == null) {
 			if (verbosity >= 3) {
@@ -157,8 +163,31 @@ public class MopacEnergy implements Energy {
 		List<Vect> newVects = new LinkedList<Vect>();
 		List<Site> newSites = new LinkedList<Site>();
 		
-		// parse the output to return a structure
+		// check for case where structure is already optimized
 		String line = null;
+		Pattern goodPattern = Pattern.compile("     GRADIENTS WERE INITIALLY ACCEPTABLY SMALL");
+		Matcher goodMatcher = goodPattern.matcher(output);
+		try {
+			BufferedReader t = new BufferedReader(new FileReader(output));
+			try {
+				while ((line = t.readLine()) != null) {
+					goodMatcher.reset(line);
+					if (goodMatcher.find()) {
+						System.out.println("Structure already optimized, returning original");
+						return c.getCell();
+					}
+				}
+			} catch (IOException x) {
+				if (verbosity >= 1)
+					System.out.println("MopacEnergy: IOException.");
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("MopacEnergy.parseStructure: .out not found");
+			return c.getCell();
+		}
+		
+		// parse the output to return a structure
+		line = null;
 		Pattern coordsPattern = Pattern.compile("       FINAL  POINT  AND  DERIVATIVES");
 		Matcher coordsMatcher = coordsPattern.matcher(output);
 		try {
@@ -171,12 +200,14 @@ public class MopacEnergy implements Energy {
 					if (coordsMatcher.find()) {
 //						System.out.println("here's the line: " + line);
 						r.readLine(); r.readLine();
+						//TODO: is this worth improving (i.e. not random-looking numbers)?
 						for (int e=0; e<(3*sites.size()+16); e++) {
 							r.readLine();
 						}
 						line = r.readLine();
 						coordsMatcher.reset(line);
 						try {
+							// read in atomic locations
 							for (Site s: sites) {
 								StringTokenizer t = new StringTokenizer(line);
 //								System.out.println("this is the token zone: " + line);
@@ -189,6 +220,7 @@ public class MopacEnergy implements Energy {
 								line = r.readLine();
 							}
 							
+							// read in lattice vectors
 							for (int k=0; k<Constants.numDimensions; k++) {
 								StringTokenizer m = new StringTokenizer(line);
 //								System.out.println("this is the lattice token zone: " + line);
@@ -230,6 +262,7 @@ public class MopacEnergy implements Energy {
 		return p;
 	}
 	
+	//TODO: parsing from the .arc file rather than .out might be cleaner, though not necessary
 	public static Double parseFinalEnergy(String output) {
 		GAParameters params = GAParameters.getParams();
 		int verbosity = params.getVerbosity();
