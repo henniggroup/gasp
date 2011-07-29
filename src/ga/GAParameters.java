@@ -208,7 +208,7 @@ public class GAParameters implements Serializable {
 //		System.out.println("   --initialPopulation <num> resume <directory> <recalculate energies?>");
 		System.out.println("   --initialPopulation <num> fromCifs <directory>");
 		System.out.println("   --initialPopulation <num> manual");
-		System.out.println("   --initialPopulation <num> units <symbol 1> <x 1> <y 1> <z 1> ... <true|false> <numUnits> <targetDensity> <densityTol>");
+		System.out.println("   --initialPopulation <num> units <numMols> <numAtoms_1>...<numAtoms_n> (<symbol_i> <x_i> <y_i> <z_i>)+ <numUnits_1>...<numUnits_n> <targetDensity> <densityTol> <unitsOnly?>");
 		System.out.println("Objective Functions");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
@@ -471,7 +471,7 @@ public class GAParameters implements Serializable {
 		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getNumDimensions() < 2)
 			usage("ERROR: Can't use pd objFun w/ < 2 dimensions.", true);
 		if (vars == null || vars.size() == 0)
-			usage("ERROR: Given no variation operators.", true);
+			System.out.println("WARNING: Given no variation operators.");
 	}
 	
 	public void setSeedGeneration(Cell[] initialPop) {
