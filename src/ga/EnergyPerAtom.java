@@ -2,6 +2,7 @@
 
 package ga;
 
+import mopac.MopacEnergy;
 import avogadro.AvogadroEnergy;
 import castep.CastepEnergy;
 import dlpoly.DLPolyEnergy;
@@ -36,6 +37,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 			energyFcn = new AvogadroEnergy(GAUtils.subArray(args, 1));
 		else if (energyType.equalsIgnoreCase("dlpoly"))
 			energyFcn = new DLPolyEnergy(GAUtils.subArray(args, 1));
+		else if (energyType.equalsIgnoreCase("mopac"))
+			energyFcn = new MopacEnergy(GAUtils.subArray(args, 1));
 		else
 			throw new RuntimeException("Unknown energy function in EnergyPerAtom: " + energyType);
 		
