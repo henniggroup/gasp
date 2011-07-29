@@ -22,7 +22,6 @@ public class Element implements Comparable, Serializable {
 	static int nameEntryLoc = 2;
 	static int symbolEntryLoc = 3;
 	static int densityEntryLoc = 4;
-	static int chargeEntryLoc = 7;
 	static String[][] elementData = {{"1","1.0079","Hydrogen","H","0.00008988","1","13.5984"},
 		{"2","4.0026","Helium","He","0.0001785","18","24.5874"},
 		{"3","6.9410","Lithium","Li","0.530","1","5.3917"},
@@ -163,10 +162,6 @@ public class Element implements Comparable, Serializable {
 	
 	public double getDensity() {
 		return Double.parseDouble(getEntryFromZ(Z)[densityEntryLoc]);
-	}
-	
-	public double getCharge() {
-		return Double.parseDouble(getEntryFromZ(Z)[chargeEntryLoc]);
 	}
 	
 	public String toString() {
