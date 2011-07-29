@@ -37,7 +37,7 @@ public class MopacEnergy implements Energy {
 		
 		// read path to executable, ensure it points directly to the executable
 		execpath = args[0];
-		int length = execpath.length();
+/*		int length = execpath.length();
 		if (!execpath.substring(length-4).equals("exe")) {
 			if (execpath.substring(length-1).equals("/")) {
 				execpath = execpath + "MOPAC2009.exe";
@@ -46,6 +46,7 @@ public class MopacEnergy implements Energy {
 				execpath = execpath + "/MOPAC2009.exe";
 			}
 		}
+*/		
 	}
 	
 	public double getEnergy(StructureOrg c) {
