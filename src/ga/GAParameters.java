@@ -99,6 +99,7 @@ public class GAParameters implements Serializable {
 	private List<Set<String>> notNearestNeighbors = null;
 	private double maxNearestNeighborLength = 0;
 	private boolean useNiggliReducedCell = false;
+	private boolean writeHartkeFile = false;
 	
 	// default output dir is set in setArgs after we know the runTitle
 	private String outDirName;
@@ -202,6 +203,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --useSurrogateModel <gulp header file> <potentials_specification file> <refit frequency>");
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
+		System.out.println("   --writeHartkeFile <boolean>");
 		System.out.println("Initial Population");
 		System.out.println("   --initialPopulation <num> random givenVol <volumeperatom>");
 		System.out.println("   --initialPopulation <num> random randomVol");
@@ -434,6 +436,9 @@ public class GAParameters implements Serializable {
 				for (String s : p.getSecond())
 					csArgs.add(s);
 				compSpace = new CompositionSpace(csArgs, false);
+			} else if (flag.equalsIgnoreCase("--writeHartkeFile")) {
+				String[] values = getValues(flag, 1);
+				writeHartkeFile = Boolean.parseBoolean(values[0]);
 			}
 			// we deal with the input file separately
 			else if (!flag.equalsIgnoreCase("--f") && verbosity >= 1)
@@ -1144,5 +1149,13 @@ public class GAParameters implements Serializable {
 			}
 		}
 
+	}
+
+	public boolean getWriteHartkeFile() {
+		return writeHartkeFile;
+	}
+
+	public String getHartkeOutFile() {
+		return outDirName + "/hartke.txt";
 	}
 }

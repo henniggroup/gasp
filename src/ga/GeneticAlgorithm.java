@@ -6,6 +6,7 @@ import java.io.File;
 import java.util.*;
 
 import utility.Pair;
+import utility.Utility;
 
 // This holds the main genetic algorithm.  It contains the evolutionary strategy
 // in abstract form.  For crystal structure prediction, client code should call
@@ -40,7 +41,7 @@ public class GeneticAlgorithm {
 			
 			// make the offspring generation
 			while (!madeEnough(offspring)) {
-				List<Organism> organisms = new ArrayList<Organism>();	
+				List<Pair<Organism, Integer>> organisms = new ArrayList<Pair<Organism,Integer>>();	
 				List<Thread> threads = new ArrayList<Thread>();
 				
 				for (int i = 0; i < params.getNumCalcsInParallel(); i++) {
@@ -48,7 +49,7 @@ public class GeneticAlgorithm {
 					Organism newOrg = getNewOrg(parents, offspring, sel);
 					if (newOrg == null)
 						continue;
-					organisms.add(newOrg);
+					organisms.add(new Pair<Organism,Integer>(newOrg, 1 + ObjectiveFunction.getNumCalculations()));
 					
 					// some status info
 					if (verbosity >= 5)
@@ -68,8 +69,8 @@ public class GeneticAlgorithm {
 						System.out.println("InterruptedException in energy calc thread: " + x.getMessage());
 				}
 				// re-develop each of the organisms and possibly add it to the offspring generation
-				for (Organism o : organisms) {
-					StructureOrg s = (StructureOrg)o;
+				for (Pair<Organism,Integer> o : organisms) {
+					StructureOrg s = (StructureOrg)o.getFirst();
 					if (dev != null && !dev.doDevelop(offspring, s)) {
 						s.setSOCreator(null);
 						continue;
@@ -83,7 +84,12 @@ public class GeneticAlgorithm {
 						decrementSOCUsageCount(soc);
 						// get rid of the references to SoC's once theyre no longer needed so we dont serialize them
 						s.setSOCreator(null);
-					}					
+					}		
+					// write Hartke output if required
+					if (GAParameters.getParams().getWriteHartkeFile()) {
+						String hLine = s.getID() + " " + o.getSecond() + " " + s.getTotalEnergy() + " " + s.getValue() + "\n";
+						Utility.writeStringToFile(hLine, GAParameters.getParams().getHartkeOutFile(), true);
+					}
 				}
 			}
 			

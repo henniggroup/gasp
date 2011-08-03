@@ -11,10 +11,14 @@ import java.util.*;
 public class Utility {
 	
 	public static void writeStringToFile(String s, String path) {
+		writeStringToFile(s, path, false);
+	}
+	
+	public static void writeStringToFile(String s, String path, boolean append) {
 		FileWriter fwriter = null;
 		BufferedWriter writer = null;
 		try {
-			fwriter = new FileWriter(path);
+			fwriter = new FileWriter(path, append);
 			writer = new BufferedWriter(fwriter);
 			writer.write(s);
 			writer.flush();
