@@ -143,6 +143,8 @@ Atoms
 		ans.append("dump_modify myDump sort 1 scale no" + newline);
 		ans.append("fix 1 all box/relax iso 1e4 vmax 0.001" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
+		ans.append("fix 1 all box/relax iso 0 vmax 0.001" + newline);
+		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		
 		return ans.toString();
 	}
@@ -317,7 +319,7 @@ Atoms
 			if (lines[i].matches(".*Step *Temp *E_pair *E_mol *TotEng *Press *Volume.*")) {
 				String energies[] = lines[i+2].trim().split("  *");
 				finalEnergy = Double.parseDouble(energies[4]);
-				break;
+			//	break;
 			}
 		}
 
