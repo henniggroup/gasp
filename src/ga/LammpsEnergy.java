@@ -306,10 +306,18 @@ Atoms
 		
 		String lines[] = lammpsOutput.split("\n");
 		int i;
+		/*
 		for (i = 0; i < lines.length; i++) {
 			if (lines[i].matches(".*Energy .* final.*")) {
 				String energies[] = lines[i+1].split("  *");
 				finalEnergy = Double.parseDouble(energies[2]);
+			}
+		} */
+		for (i = 0; i < lines.length; i++) {
+			if (lines[i].matches(".*Step *Temp *E_pair *E_mol *TotEng *Press *Volume.*")) {
+				String energies[] = lines[i+2].trim().split("  *");
+				finalEnergy = Double.parseDouble(energies[4]);
+				break;
 			}
 		}
 
