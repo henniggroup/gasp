@@ -13,8 +13,8 @@ import vasp.VaspOut;
 
 public class Isotropy {
 	
-	//  in case program bombs, try again w/ accuracy 0.01
-	public static double accuracy1 = 0.05; 
+	//  in case program bombs, try again w/ different accuracy
+	public static double accuracy1 = 0.04; 
 	public static double accuracy2 = 0.01; 
 	
 	public static String getFindsymInput(Cell c, double accuracy) {
@@ -195,15 +195,19 @@ public class Isotropy {
 	
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
+		Cell a = Cell.parseCif(new File("/home/wtipton/low-lying-states-Mo_lammps-no_growparents/2291.cif"));
+		Cell b = Cell.parseCif(new File("/home/wtipton/low-lying-states-Mo_lammps-no_growparents/1779.cif"));
 		
+		System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+
 		//String fsInput = utility.Utility.readStringFromFile("/home/wtipton/fstest");
 		
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
 		//System.out.println(runFindsym(getFindsymInput(c)));		
-	//	System.out.println(getFindsymOutput(c));	
-		System.out.println(getWyckoffCell(c));
+		System.out.println(getFindsymOutput(b));	
+	//	System.out.println(getWyckoffCell(c));
+		
 		//System.out.println(runFindsym(fsInput));
 	}
 

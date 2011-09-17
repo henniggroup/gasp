@@ -1030,22 +1030,8 @@ public class GAParameters implements Serializable {
 			}
 			
 			// write energy-sorted index (i.e. lowest to highest)
-			List<Integer> energyList = new LinkedList<Integer>();
-			for (int k=0; k<g.getNumOrganisms(); k++) {
-				double lowest = Double.POSITIVE_INFINITY;
-				int index = 0;
-				for (Organism r: g) {
-					double thisEnergy = r.getValue();
-					if (thisEnergy < lowest && !energyList.contains(r.getID())) {
-						index = r.getID();
-						lowest = thisEnergy;						
-					}
-				}
-				energyList.add(k,index);
-			}			
-			for (Integer p: energyList) {
-				Organism m = g.getOrgByID(p);
-				StructureOrg s = (StructureOrg)(m);
+			for (Organism o : g.getOrganismsSorted()) {
+				StructureOrg s = (StructureOrg) o;
 				StringBuilder info = new StringBuilder();
 				info.append(Integer.toString(s.getID()) + " ");
 				info.append(Double.toString(s.getValue()) + " ");

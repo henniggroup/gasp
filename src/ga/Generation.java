@@ -45,6 +45,20 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 		return organisms.get(i);
 	}
 	
+	public List<Organism> getOrganismsSorted() {
+		
+		class StructureEnergyComparator implements Comparator<Organism> {
+			public int compare(Organism a, Organism b) {
+				return a.getFitness() > b.getFitness() ? -1 : 1;
+			}
+		}
+		
+		List<Organism> sortedOrgs = new ArrayList<Organism>(organisms);
+		Collections.sort(organisms, new StructureEnergyComparator());
+		
+		return sortedOrgs;
+	}
+	
 	public Organism getOrgByID(int id) {
 		for (Organism o: organisms)
 			if (o.getID() == id)
@@ -92,6 +106,13 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 	}
 	
 	// returns the organism with the Nth highest fitness.
+	// make sure to return distinct organisms for distinct n even in the case
+	// that multiple structures have the same energy
+	// btw, the best org is at n==1, not n==0
+	public Organism getNthBestOrganism(int n) {
+		return getOrganismsSorted().get(n-1);
+	}
+	/*}
 	public Organism getNthBestOrganism(int n) {
 		ArrayList<Double> fitnesses = new ArrayList<Double>();
 		Iterator<Organism> i = organisms.iterator();
@@ -114,7 +135,7 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 		}	
 		
 		return null;
-	}
+	} */
 	
 	// assume values have already been calculated
 	public void findFitnesses() {

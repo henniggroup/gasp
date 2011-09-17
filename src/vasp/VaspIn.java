@@ -47,7 +47,7 @@ public class VaspIn {
 	public String getDescription()	{
 		return description;
 	}
-	
+		
 	public void writePoscar(String outPoscar, Boolean useCartesianCoords) {
 		/* Note that this will overwrite outPoscar. If this is not desired behavior,
 		 * the calling routine should check if the output file already exists */

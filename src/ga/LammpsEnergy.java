@@ -139,11 +139,11 @@ Atoms
 		ans.append(newline + potlStr + newline);
 
 		ans.append("minimize 0.0 1.0e-8 1 1" + newline);
+		ans.append("fix 1 all box/relax tri 1e4 vmax 0.001" + newline);
+		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		ans.append("dump myDump all atom 100000000000000 " + dumpFileName + newline);
 		ans.append("dump_modify myDump sort 1 scale no" + newline);
-		ans.append("fix 1 all box/relax iso 1e4 vmax 0.001" + newline);
-		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
-		ans.append("fix 1 all box/relax iso 0 vmax 0.001" + newline);
+		ans.append("fix 1 all box/relax tri 0 vmax 0.001" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		
 		return ans.toString();
@@ -268,17 +268,25 @@ Atoms
 		int numAtoms = Integer.parseInt(lines[3]);
 		
 		String xs[] = lines[5].split(" ");
-		double xlo = Double.parseDouble(xs[0]);
-		double xhi = Double.parseDouble(xs[1]);
+		double xlo_bound = Double.parseDouble(xs[0]);
+		double xhi_bound = Double.parseDouble(xs[1]);
 		double xy = Double.parseDouble(xs[2]);
 		String ys[] = lines[6].split(" ");
-		double ylo = Double.parseDouble(ys[0]);
-		double yhi = Double.parseDouble(ys[1]);
+		double ylo_bound = Double.parseDouble(ys[0]);
+		double yhi_bound = Double.parseDouble(ys[1]);
 		double xz = Double.parseDouble(ys[2]);
 		String zs[] = lines[7].split(" ");
-		double zlo = Double.parseDouble(zs[0]);
-		double zhi = Double.parseDouble(zs[1]);
+		double zlo_bound = Double.parseDouble(zs[0]);
+		double zhi_bound = Double.parseDouble(zs[1]);
 		double yz = Double.parseDouble(zs[2]);
+		
+		// invert according to http://lammps.sandia.gov/doc/Section_howto.html#howto_12
+		double xlo = xlo_bound - Math.min(Math.min(0.0, xy), Math.min(xz, xy+xz));
+		double xhi = xhi_bound - Math.max(Math.max(0.0, xy), Math.max(xz, xy+xz));
+		double ylo = ylo_bound - Math.min(0.0, yz);
+		double yhi = yhi_bound - Math.max(0.0, yz);
+		double zlo = zlo_bound;
+		double zhi = zhi_bound;
 		
 		basis.add(new Vect(xhi-xlo,0.0,0.0));
 		basis.add(new Vect(xy, yhi-ylo, 0.0));
