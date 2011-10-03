@@ -54,7 +54,7 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 		}
 		
 		List<Organism> sortedOrgs = new ArrayList<Organism>(organisms);
-		Collections.sort(organisms, new StructureEnergyComparator());
+		Collections.sort(sortedOrgs, new StructureEnergyComparator());
 		
 		return sortedOrgs;
 	}

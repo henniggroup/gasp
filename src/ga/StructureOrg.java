@@ -45,7 +45,7 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	}
 	
 	public void standardize() {
-		structure = structure.getNigliReducedCell();
+		structure = structure.getCellWithAllAtomsInCell().getNigliReducedCell();
 		reduced = true;
 	}
 	

@@ -4,6 +4,7 @@ import ga.GAParameters;
 import ga.StructureOrg;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,8 +15,7 @@ import vasp.VaspOut;
 public class Isotropy {
 	
 	//  in case program bombs, try again w/ different accuracy
-	public static double accuracy1 = 0.04; 
-	public static double accuracy2 = 0.01; 
+	public static double accuracies[] = {.1,0.04,0.01,0.005,0.001,0.0005};
 	
 	public static String getFindsymInput(Cell c, double accuracy) {
 		StringBuilder result = new StringBuilder();
@@ -98,14 +98,41 @@ public class Isotropy {
 	      return outBuilder.toString();
 	}
 	
-	public static String getFindsymOutput(Cell cell) {
-		String output = runFindsym(getFindsymInput(cell, accuracy1));
+	private static int getSpaceGroupIntFromFSOutput(String output) {
 		
-		if (output.contains("bombed")) {
-			output = runFindsym(getFindsymInput(cell, accuracy2));
+		String lines[] = output.split("\\r?\\n");
+
+		for (String line : lines) {
+			if (line.startsWith("_symmetry_Int_Tables_number")) {
+				return Integer.parseInt(line.split(" ")[1]);
+			}
 		}
 		
-		return output;
+		System.out.println("ERROR: couldn't gind spacegroup in findsym output: " + output);
+		return -1;
+	}
+	
+	public static String getFindsymOutput(Cell cell) {
+		
+		// the idea here is to run findsym w/ a variety of different tolerance parameters
+		// and use the result that finds the highest symmetry
+		String output = null;
+		int bestSG = 0;
+		String bestOutput = null;
+		for (int i = 0; i < accuracies.length; i++){
+			output = runFindsym(getFindsymInput(cell, accuracies[i]));
+			if (output.contains("bombed")) 
+				continue;
+			
+			int sg = getSpaceGroupIntFromFSOutput(output);
+			if (sg >= bestSG) {
+				bestSG = sg;
+				bestOutput = output;
+			}
+		}
+		
+		
+		return bestOutput;
 	}
 	
 	private static Cell parseWyckoffCell(String output, Cell origCell) throws Exception {
@@ -183,9 +210,10 @@ public class Isotropy {
 		} catch (Exception x) {
 			if (GAParameters.getParams().getVerbosity() >= 4) {
 				System.out.println(x.getLocalizedMessage());
-				System.out.println("Warning: Exception in parsing output from findsym for both accuracies tried for cell and input:");
+				System.out.println("Warning: Exception in parsing output from findsym for all accuracies tried for cell and input:");
 				System.out.println(cell);
-				System.out.println(getFindsymInput(cell, accuracy2));
+				System.out.println(getFindsymInput(cell, accuracies[0]));
+				(new Exception()).printStackTrace();
 			}
 			answer = cell;
 		}
@@ -195,8 +223,8 @@ public class Isotropy {
 	
 	public static void main(String args[]) {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell a = Cell.parseCif(new File("/home/wtipton/low-lying-states-Mo_lammps-no_growparents/2291.cif"));
-		Cell b = Cell.parseCif(new File("/home/wtipton/low-lying-states-Mo_lammps-no_growparents/1779.cif"));
+		Cell a = Cell.parseCif(new File("/home/wtipton/10631.cif"));
+		Cell b = Cell.parseCif(new File("/home/wtipton/11929.cif"));
 		
 		System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
 
@@ -205,7 +233,8 @@ public class Isotropy {
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
 		//System.out.println(runFindsym(getFindsymInput(c)));		
-		System.out.println(getFindsymOutput(b));	
+		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
+	//	b.getNigliReducedCell().writeCIF("/home/wtipton/11134.nig.cif");
 	//	System.out.println(getWyckoffCell(c));
 		
 		//System.out.println(runFindsym(fsInput));

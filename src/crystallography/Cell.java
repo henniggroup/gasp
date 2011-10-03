@@ -157,7 +157,6 @@ public class Cell implements Serializable {
 		/* Strategy for finding all the sites to make the basis of the supercell
 		 * TODO:document me :)
 		 */
-		List<Site> newBasis = new LinkedList<Site>();
 		int minx = 0, maxx = 0, miny = 0, maxy = 0, minz = 0, maxz = 0;
 	//	int minx = -1, maxx = 1, miny = -1, maxy = 1, minz = -1, maxz = 1;
 		for (int i = 0; i <= 1; i++)
@@ -175,7 +174,7 @@ public class Cell implements Serializable {
 				}
 		
 	//	System.out.println("minx " + minx + " maxx " + maxx + " miny " + miny + " maxy " + maxy + " minz " + minz + " maxz " + maxz);
-
+		List<Site> newBasisCandidates = new LinkedList<Site>();
 		for (Site s : cell.basis) {
 			for(int i = minx; i <= maxx; i++) {
 				for(int j = miny; j <= maxy; j++) {
@@ -183,23 +182,32 @@ public class Cell implements Serializable {
 						Vect candidateSiteLoc = s.getCoords().plus(new Vect(new Double(i),new Double(j),new Double(k),cell.latticeVectors));
 						List<Double> newFracCoords = candidateSiteLoc.getComponentsWRTBasis(newVectors);
 						// if (candidate is for-real in the new cell)
-						if (newFracCoords.get(0) > -Constants.epsilon && newFracCoords.get(0) <= 1 - Constants.epsilon
-								&& newFracCoords.get(1) > -Constants.epsilon && newFracCoords.get(1) <= 1 - Constants.epsilon
-								&& newFracCoords.get(2) > -Constants.epsilon && newFracCoords.get(2) <= 1 - Constants.epsilon)
+				//		if (newFracCoords.get(0) > -Constants.epsilon && newFracCoords.get(0) <= 1 - Constants.epsilon
+				//				&& newFracCoords.get(1) > -Constants.epsilon && newFracCoords.get(1) <= 1 - Constants.epsilon
+				//				&& newFracCoords.get(2) > -Constants.epsilon && newFracCoords.get(2) <= 1 - Constants.epsilon)
 				//		if (newFracCoords.get(0) >= 0  && newFracCoords.get(0) < 1
 				//				&& newFracCoords.get(1) >= 0 && newFracCoords.get(1) < 1 
 				//				&& newFracCoords.get(2) >= 0 && newFracCoords.get(2) < 1 )
-							newBasis.add(new Site(s.getElement(),candidateSiteLoc));
+							newBasisCandidates.add((new Site(s.getElement(),candidateSiteLoc.getVectShiftedIntoBasis(newVectors))));
 					}
 				}
 			}
 		}
 		
-		return new Cell(newVectors, newBasis, cell.getLabel());
+		for (int i = 0; i < newBasisCandidates.size(); i++) {
+			Cell cWithRedundantSites = new Cell(newVectors, newBasisCandidates, cell.getLabel());
+			Site s = cWithRedundantSites.getSite(i);
+			for (Site r : cWithRedundantSites.getAtomsInSphereSorted(s.getCoords(), Constants.epsilon)) {
+				if (r != s) {					
+					newBasisCandidates.remove(r);
+				}
+			}			
+		}
+		
+		return new Cell(newVectors, newBasisCandidates, cell.getLabel());
 	}
 	
 	public List<Site> getSites() {
-		//TODO: return a deep copy
 		return basis;
 	}
 	
@@ -665,6 +673,7 @@ public class Cell implements Serializable {
         	System.out.println("ERROR: Niggli cell reduction gained or lost atoms");
         	System.out.println(this);
         	System.out.println(result);
+        	(new Exception()).printStackTrace();
         }
         
         niggliReducedCell = result;
@@ -730,6 +739,7 @@ public class Cell implements Serializable {
 	public boolean matchesCell(Cell other, double atomicMisfit, double lengthMisfit, double angleMisfit) {
 		// get Niggli reduced cell of this and other
 		// and shift this cell so that one atom is at the origin
+		/*
 		Cell n1 = this.getNigliReducedCell().getWyckoffCell();
 		Cell n2 = null;
 		
@@ -737,6 +747,14 @@ public class Cell implements Serializable {
 			n2 = other.getNigliReducedCell().getWyckoffCell();
 		else
 			n2 = other.getNigliReducedCell().getWyckoffCell().getCellWithSiteIShiftedToOrigin(0);
+			*/
+		Cell n1 = this.getWyckoffCell();
+		Cell n2 = null;
+		
+		if (other.getBasisSize() <= 0)
+			n2 = other.getWyckoffCell();
+		else
+			n2 = other.getWyckoffCell().getCellWithSiteIShiftedToOrigin(0);
 		
 		if (n1 == null || n2 == null)
 			return false;
@@ -870,6 +888,16 @@ public class Cell implements Serializable {
 		
 		return new Cell(this.getLatticeVectors(), newSites, this.getLabel());
 	}
+	
+	public List<Site> getAtomsInSphereSortedIgnoringPBCs(final Vect center, double dist) {
+		List<Site> result = new ArrayList<Site>();
+		
+		for (Site s : basis)
+			if (center.getCartDistanceTo(s.getCoords()) < dist)
+				result.add(s);
+		
+		return result;
+	}
 
 	// return nearest neighborslist sorted by distance from center
 	public List<Site> getAtomsInSphereSorted(final Vect center, double dist) {
@@ -899,8 +927,11 @@ public class Cell implements Serializable {
 						Vect trialCoords = s.getCoords().plus(latticeVectors.get(0).scalarMult((double)i))
 										    .plus(latticeVectors.get(1).scalarMult((double)j))
 										    .plus(latticeVectors.get(2).scalarMult((double)k));
-						if (center.getCartDistanceTo(trialCoords) < dist)
-							result.add(new Site(s.getElement(), trialCoords));
+						if (center.getCartDistanceTo(trialCoords) < dist) {
+							result.add(s);
+							continue;
+						}
+						//	result.add(new Site(s.getElement(), trialCoords));
 					}
 				}
 			}
@@ -1091,7 +1122,11 @@ public class Cell implements Serializable {
 					continue;
 				if (readingInAtoms) {
 					String siteStr = t.nextToken();
-					String symbol = siteStr.substring(1, 2).matches("[A-Za-z]") ? siteStr.substring(0, 2) : siteStr.substring(0, 1); 		
+					String symbol = null;
+					if (siteStr.length() < 2)
+						symbol = siteStr;
+					else
+					    symbol = siteStr.substring(1, 2).matches("[A-Za-z]") ? siteStr.substring(0, 2) : siteStr.substring(0, 1); 		
 					
 					double x = Double.parseDouble(t.nextToken());
 					double y = Double.parseDouble(t.nextToken());
@@ -1223,7 +1258,7 @@ public class Cell implements Serializable {
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
 	//	Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
+		/*Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
 		Cell b = Cell.parseCif(new File("/home/wtipton/andysexamples/29.cif"));
 		Cell c = Cell.parseCif(new File("/home/wtipton/andysexamples/3851.cif"));
 	//	System.out.println(b);
@@ -1237,7 +1272,18 @@ public class Cell implements Serializable {
 		
 		System.out.println(a.matchesCell(a, 0.1, 0.05, 0.05));
 		System.out.println(b.matchesCell(b, 0.1, 0.05, 0.05));
-		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05));
+		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
+		
+		Cell a = Cell.parseCif(new File("/home/wtipton/bob.cif"));
+		
+		a.getNigliReducedCell();
+		
+		for (int i = 0; i < a.getNumSites(); i++) {
+			// it's no good if there are any other atoms in the minimum radius sphere
+			if (a.getAtomsInSphereSorted(a.getSite(i).getCoords(), .8).size() > 1) {
+				System.out.println("Organism failed minimum interatomic distance constraint.");
+			}
+		}
 
 		
 //		a.writeCIF("test");

@@ -6,6 +6,7 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 
+import chemistry.CompositionSpace;
 import chemistry.Element;
 
 import utility.*;
@@ -52,6 +53,7 @@ public class LammpsEnergy implements Energy {
 	private static String getLammpsDataFile(StructureOrg c) {
 		
 		Cell cell = c.getCell().getCellRotatedIntoPrincDirs();
+		CompositionSpace compSpace = GAParameters.getParams().getCompSpace();
 		//example:
 		/* 
 header
@@ -83,7 +85,9 @@ Atoms
 
 		result.append("Written by LammpsEnergy" + newline + newline);
 		result.append(cell.getBasisSize() + " atoms" + newline);
-		result.append(cell.getComposition().getNumElements() + " atom types" + newline);
+		// turns out we need to tell it there's an atom type for each entry in the potential file
+	//	result.append(cell.getComposition().getNumElements() + " atom types" + newline);
+		result.append(compSpace.getElements().size() + " atom types" + newline);
 		
 		// The parallelepiped has its "origin" at (xlo,ylo,zlo) and is defined by 3 edge vectors 
 		// starting from the origin given by A = (xhi-xlo,0,0); B = (xy,yhi-ylo,0); C = (xz,yz,zhi-zlo).
@@ -101,7 +105,7 @@ Atoms
 		
 		// Masses
 		result.append("Masses" + newline + newline);
-		List<Element> elems = cell.getComposition().getElements();
+		List<Element> elems = compSpace.getElements();
 		for (int i = 0; i < elems.size(); i++)
 			result.append(i+1 + " " + elems.get(i).getAtomicMass() + newline);
 		
@@ -110,7 +114,7 @@ Atoms
         for (int i = 0; i < cell.getSites().size(); i++) {
         	Site s = cell.getSites().get(i);
         	
-        	result.append(i+1 + " " + (1 + cell.getComposition().getElements().indexOf(cell.getSite(i).getElement())) + " ");
+        	result.append((i+1) + " " + (1 + compSpace.getElements().indexOf(cell.getSite(i).getElement())) + " ");
         	//for (double d : s.getCoords().getComponentsWRTBasis(c.getCell().getLatticeVectors()))
         	for (double d : s.getCoords().getCartesianComponents())
         		result.append(df.format(d) + " ");
@@ -222,12 +226,11 @@ Atoms
 				System.out.println("Warning: bad Lammps output.  Not updating structure.");
 		} else {
 			c.setCell(a);
+			finalEnergy = parseFinalEnergy(lammpsOutput);
 		}
 		
 		// write cell to disk
 		//Utility.writeStringToFile(c.getCIF(), outDirPath + "/" + c.getID() + ".relaxed.cif");
-
-		finalEnergy = parseFinalEnergy(lammpsOutput);
 		
 		if (verbosity >= 3)
 			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
@@ -238,9 +241,9 @@ Atoms
 	private Cell parseOutputStructure(Cell origCell, String outFile) {
 		// make sure out file was created successfully
 		
-		if (! (new File(outFile)).exists()) {
+		if (! (new File(outFile)).exists() || Utility.readStringFromFile(outFile).isEmpty()) {
 			if (GAParameters.getParams().getVerbosity() >= 4)
-				System.out.println("In LammpsEnergy.parseOutputStructure: dump file doesn't exist.");
+				System.out.println("In LammpsEnergy.parseOutputStructure: dump file doesn't exist or is empty.");
 			return null;
 		}
 		
@@ -298,7 +301,7 @@ Atoms
 			double x = Double.parseDouble(as[2]);
 			double y = Double.parseDouble(as[3]);
 			double z = Double.parseDouble(as[4]);
-			sites.add(new Site(origCell.getComposition().getElements().get(type),
+			sites.add(new Site(GAParameters.getParams().getCompSpace().getElements().get(type),
 					   new Vect(x - xlo,y - ylo,z - zlo)));
 		}
 		
@@ -326,7 +329,11 @@ Atoms
 		for (i = 0; i < lines.length; i++) {
 			if (lines[i].matches(".*Step *Temp *E_pair *E_mol *TotEng *Press *Volume.*")) {
 				String energies[] = lines[i+2].trim().split("  *");
-				finalEnergy = Double.parseDouble(energies[4]);
+				try {
+					finalEnergy = Double.parseDouble(energies[4]);
+				}	catch (NumberFormatException x) {
+					System.out.println("Warning: malformed LAMMPS output when trying to parse energy.");
+				}
 			//	break;
 			}
 		}

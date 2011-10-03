@@ -20,7 +20,7 @@ public class RedundancyGuard implements Serializable {
 
 	// holds all the structures the algorithm has "seen"
 	// and maps them to their Organism IDs
-	Map<StructureOrg,Integer> structures;
+	Map<Cell,Integer> structures;
 
 	// 
 	//private double lAngleTol = 0.5;
@@ -33,7 +33,7 @@ public class RedundancyGuard implements Serializable {
 	
 	public RedundancyGuard(String[] args) {
 		// initialize structures
-		structures = new HashMap<StructureOrg,Integer>();
+		structures = new HashMap<Cell,Integer>();
 		
 		// parse args
 		if (args == null || args.length < 3)
@@ -61,22 +61,23 @@ public class RedundancyGuard implements Serializable {
 			if (GAParameters.getParams().getVerbosity() >= 3)
 				System.out.println("Warning: RedundancyGuard got passed structure with no sites. Ignoring...");
 		} else {
-			structures.put(s, new Integer(s.getID()));
+			structures.put(s.getCell(), new Integer(s.getID()));
 		}
 	}
 	
+	/*
 	public void removeStructureOrg(Organism o) {
 		// the Organism better be a StructureOrg
 		StructureOrg s = (StructureOrg)o;
 		
 		structures.remove(s);
-	}
+	}*/
 	
 	// returns the ID of the matching StructureOrg if we've seen it before,
 	// null otherwise
 	public Integer checkStructureOrg(StructureOrg s1) {
 		Cell s = s1.getCell();
-		Iterator<StructureOrg> i;
+		Iterator<Cell> i;
 		
 		// loop through all the Structures we've seen and compare
 /*		if (useBothComparators) {
@@ -91,7 +92,7 @@ public class RedundancyGuard implements Serializable {
 		// if all those seem ok, do the more thorough checks:
 		i = structures.keySet().iterator();
 		while (i.hasNext()) {
-			StructureOrg t = i.next();
+			Cell t = i.next();
 			// don't fail an organism for looking like itself
 		//	if (structures.get(t) != s1.getID() && s.matchesCell(t, atomicMisfit, latticeMisfit))
 		//		return structures.get(t);
@@ -115,7 +116,7 @@ public class RedundancyGuard implements Serializable {
 					(Math.abs(t.getEnergyPerAtom() - s1.getEnergyPerAtom()) < ENERGY_TOL) &&
 					(c1.getBasisSize() == c2.getBasisSize()))
 					*/
-			if (s.matchesCell(t.getCell(), atomicMisfit, latticeMisfit, angleMisfit))
+			if (s.matchesCell(t, atomicMisfit, latticeMisfit, angleMisfit))
 				return structures.get(t);
 		} 
 

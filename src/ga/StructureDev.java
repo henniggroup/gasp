@@ -77,13 +77,31 @@ public final class StructureDev implements Development, Serializable {
 		// if we added the structure to the wholepop rGuard before doing the vasp
 		//  calc and then the vasp calc sets its cell to null, we'll have problems.
 		//  so, in this case, we remove the structure from the rGuard.
+		// this was fixed by making redundancyguard save cells instead of structureorgs
 		if (s.getCell() == null) {
 			if (verbosity >= 3)
 				System.out.println("Organism " + s.getID() + " failed: had null cell.");
-			if (rGuard != null)
-				rGuard.removeStructureOrg(s);
+	//		if (rGuard != null)
+	//			rGuard.removeStructureOrg(s);
 			return false;
 		}
+		
+		// Interatomic Distances
+		// - important to do this before some stuff that breaks if, e.g., we have two sites w/
+		//   exactly the same position (e.g. niggli cell reduction losing those atoms b/c of supercell method)
+		if (minid != -1)
+			for (int i = 0; i < s.getCell().getNumSites(); i++) {
+				// it's no good if there are any other atoms in the minimum radius sphere
+				if (s.getCell().getAtomsInSphereSorted(s.getCell().getSite(i).getCoords(), minid).size() > 1) {
+					if (verbosity >= 3)
+						System.out.println("Organism " + s.getID() + " failed minimum interatomic distance constraint.");
+					// if we've added structure to wholepop rGuard before doing relaxation and now it fails, remove it
+					//  - this was fixed by making rguard save cells instead of structureorgs
+			//		if (rGuard != null)
+			//			rGuard.removeStructureOrg(s);
+					return false;
+				}
+			}
 		
 		// use the Niggli reduced cell 
 		if (useNiggliReducedCell ) {
@@ -165,22 +183,7 @@ public final class StructureDev implements Development, Serializable {
 							+ i + "] == " + lAngles[i] + ").");
 				return false;
 			}
-		}
-
-		// Interatomic Distances
-		if (minid != -1)
-			for (int i = 0; i < structure.getNumSites(); i++) {
-				// it's no good if there are any other atoms in the minimum radius sphere
-				if (structure.getAtomsInSphereSorted(structure.getSite(i).getCoords(), minid).size() > 1) {
-					if (verbosity >= 3)
-						System.out.println("Organism " + s.getID() + " failed minimum interatomic distance constraint.");
-					return false;
-				}
-/*				else {
-					System.out.println("Sites: " + structure.getSites());
-				}
-*/				
-			}	
+		}	
 		
 		// check the stoichiometry
 		/*
