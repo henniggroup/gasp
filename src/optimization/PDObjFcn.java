@@ -12,7 +12,6 @@ import chemistry.*;
 public class PDObjFcn extends ObjectiveFunction {
 	
 	ObjectiveFunction energyFcn;
-	PDBuilder pdbuilder;
 	
 	StructureOrg org;
 	
@@ -22,17 +21,16 @@ public class PDObjFcn extends ObjectiveFunction {
 		pdbuilder = new PDBuilder(entries, elements, chempots);
 	} */
 	
-	public PDObjFcn(String[] subArray, Organism o, PDBuilder pdb) {
+	public PDObjFcn(String[] subArray, Organism o) {
 		// TODO Auto-generated constructor stub
 		energyFcn = new EnergyPerAtom(subArray, o);
 		org = (StructureOrg)o;
-		pdbuilder = pdb;
 	}
 
 	// TODO: remember to update numCalculations when implementing this
 	public Thread evaluate() {		
 		// short circuit here if we've done the calculation already
-		if (org.knowsValue()) // TODO: have to update due to changing phase diagram :/
+		if (org.knowsValue()) // TODO: have to update due to changing phase diagram ???
 			return null;
 		
 		// another total energy calculation:
@@ -56,7 +54,7 @@ public class PDObjFcn extends ObjectiveFunction {
 		}
 		
 		// updating structure w/ relaxed version is this done in EPA already
-		org.setValue((new PDAnalyzer(pdbuilder.getPDData())).getEnergyPerAtomAboveHull(org));
+		org.setValue((new PDAnalyzer(GAParameters.getParams().getPDBuilder().getPDData())).getEnergyPerAtomAboveHull(org));
 		
 	}
 	

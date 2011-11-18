@@ -37,11 +37,18 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 		return structure;
 	}
 	
+	
 	public void setCell(Cell s) {
+		setCell(s, true);
+	}
+		
+	public void setCell(Cell s, boolean invalidateEnergies) {
 		structure = s;
 		// changing the structure invalidates the energy and fitness and satisfiesConstraints
-		value = null;
-		fitness = null;
+		if (invalidateEnergies) {
+			value = null;
+			fitness = null;
+		}
 	}
 	
 	public void standardize() {

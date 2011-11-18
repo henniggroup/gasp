@@ -9,7 +9,11 @@ import jv.viewer.PvViewer;
 import chemistry.*;
 import crystallography.*;
 import javax.swing.*;
+
+import utility.Utility;
+
 import java.awt.event.*;
+import java.io.File;
 
 /**
  * Applet shows simple interactive linear algebra.
@@ -56,6 +60,7 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 	CheckboxMenuItem cbmiMakePDD;
 	MenuItem miGetStructureInfo;
 	
+	MenuItem miExportCHPDB;
 	
 	SelectPtsForPDD_IP selectPtsInfoPanel;
 
@@ -264,6 +269,12 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 		menuBar.remove(windowMenu);
 		menuBar.remove(helpMenu);
 		
+		// add export option to file menu
+		fileMenu.addSeparator();
+		miExportCHPDB = new MenuItem("Export Convex Hull", null);
+		miExportCHPDB.addActionListener(this);
+		fileMenu.add(miExportCHPDB);
+		
 		menuBar.add(fileMenu);
 		menuBar.add(optionsMenu);
 		menuBar.add(toolsMenu);
@@ -314,7 +325,17 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_SCALE_RECT);
 		} else if (source == miGetStructureInfo) {
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_PICK);
-		} 
+		}  else if (source == miExportCHPDB) {
+			//Create a file chooser
+			final JFileChooser fc = new JFileChooser();
+	        int returnVal = fc.showOpenDialog(this);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            String fileName = fc.getSelectedFile().getAbsolutePath();
+	            //This is where a real application would open the file.
+	            PDData p = (PDData)pdd;
+	            Utility.writeSerializable((new PDBuilder(p.getStableEntries(), p.getElements(), p.getChemPots())).getPDData(), fileName);
+	        }
+		}
 	}
         
         

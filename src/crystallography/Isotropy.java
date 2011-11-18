@@ -222,18 +222,19 @@ public class Isotropy {
 	}
 	
 	public static void main(String args[]) {
+		Cell c = VaspOut.getPOSCAR(args[0]);
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
-		Cell a = Cell.parseCif(new File("/home/wtipton/10631.cif"));
-		Cell b = Cell.parseCif(new File("/home/wtipton/11929.cif"));
+	//	Cell a = Cell.parseCif(new File("/home/wtipton/10631.cif"));
+	//	Cell b = Cell.parseCif(new File("/home/wtipton/11929.cif"));
 		
-		System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+	//	System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
 
 		//String fsInput = utility.Utility.readStringFromFile("/home/wtipton/fstest");
 		
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
-		//System.out.println(runFindsym(getFindsymInput(c)));		
-		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
+		System.out.println(getFindsymOutput(c));		
+//		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
 	//	b.getNigliReducedCell().writeCIF("/home/wtipton/11134.nig.cif");
 	//	System.out.println(getWyckoffCell(c));
 		

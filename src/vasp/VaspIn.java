@@ -70,6 +70,10 @@ public class VaspIn {
 				}
 				writer.write("\n");
 			}
+			/* Write elements */
+			for (Element e : elements)
+				writer.write(e.getSymbol() + " ");
+			writer.write("\n");
 			/* Write number of each type of site */
 			for (Element e : elements)
 				writer.write(cell.getNumSitesWithElement(e) + " ");

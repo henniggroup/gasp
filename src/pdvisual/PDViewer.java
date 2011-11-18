@@ -55,6 +55,7 @@ public class PDViewer {
 						elements.add(e);
 						chempots.put(e, 0.0);
 					}
+				System.out.println("Using ManualComputedEntry with composition " + cell.getComposition() + " and total energy " + energy);
 			}
 		}
 				

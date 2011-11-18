@@ -75,6 +75,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 		double value = totalEnergy / org.getCell().getNumSites();
 		
 		org.setTotalEnergy(totalEnergy);
+		
+		System.out.println("Setting value of org " + org.getID() + " to " + value);
 		org.setValue(value);
 		
 	}

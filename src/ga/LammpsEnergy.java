@@ -238,7 +238,7 @@ Atoms
 		return finalEnergy;
 	}
 	
-	private Cell parseOutputStructure(Cell origCell, String outFile) {
+	public static Cell parseOutputStructure(Cell origCell, String outFile) {
 		// make sure out file was created successfully
 		
 		if (! (new File(outFile)).exists() || Utility.readStringFromFile(outFile).isEmpty()) {

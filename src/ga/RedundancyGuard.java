@@ -30,6 +30,7 @@ public class RedundancyGuard implements Serializable {
 	private double atomicMisfit;
 	private double latticeMisfit;
 	private double angleMisfit;
+	private boolean usePBCs;
 	
 	public RedundancyGuard(String[] args) {
 		// initialize structures
@@ -46,6 +47,11 @@ public class RedundancyGuard implements Serializable {
 		atomicMisfit = Double.parseDouble(args[0]);
 		latticeMisfit = Double.parseDouble(args[1]);
 		angleMisfit = Double.parseDouble(args[2]);
+		
+		if (args.length > 3)
+			usePBCs = Boolean.parseBoolean(args[3]);
+		else
+			usePBCs = true;
 	}
 	
 	public String toString() {
@@ -116,7 +122,9 @@ public class RedundancyGuard implements Serializable {
 					(Math.abs(t.getEnergyPerAtom() - s1.getEnergyPerAtom()) < ENERGY_TOL) &&
 					(c1.getBasisSize() == c2.getBasisSize()))
 					*/
-			if (s.matchesCell(t, atomicMisfit, latticeMisfit, angleMisfit))
+			if (usePBCs && s.matchesCell(t, atomicMisfit, latticeMisfit, angleMisfit))
+				return structures.get(t);
+			if (!usePBCs && s.matchesCellNoPBCs(t, atomicMisfit))
 				return structures.get(t);
 		} 
 

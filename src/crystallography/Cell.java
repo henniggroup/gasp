@@ -264,6 +264,19 @@ public class Cell implements Serializable {
 		return newCellVectors;
 	}
 	
+	public boolean isMalformed() {
+		Vect v = new Vect(0.0, 0.0, 0.0);
+		
+		// check if we have a degenerate lattice
+		try {
+			v.getComponentsWRTBasis(this.getLatticeVectors());
+		} catch( IllegalArgumentException x ) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	public Cell getCellRotatedIntoPrincDirs() {
 		// so we keep all the sites with the same fractional coordinates
 		// and just make new axes with the same lengths/angles but in
@@ -439,6 +452,9 @@ public class Cell implements Serializable {
     public Cell getNigliReducedCell() {
     	if (niggliReducedCell != null)
     		return niggliReducedCell;
+    
+//    	if (true)
+//throw new RuntimeException("nrc");
     	    	
         double TOL = 1e-8;
 
@@ -735,8 +751,145 @@ public class Cell implements Serializable {
 		return wyckoffCell;
 	}
 	
-	// angle misfit given in degrees
+	// average position of all the sites.  doesnt necessarily make sense when using PBCs!
+	public Vect getCentroid() {
+		Vect result = new Vect(0.0, 0.0, 0.0);
+		
+		for (Site s : this.getSites()) {
+			result = result.plus(s.getCoords());
+		}
+		
+		result = result.scalarMult(1.0 / this.getNumSites());
+		
+		return result;
+	}
+	
+	// use PBCs by default
 	public boolean matchesCell(Cell other, double atomicMisfit, double lengthMisfit, double angleMisfit) {
+		return matchesCellPBCs(other, atomicMisfit, lengthMisfit, angleMisfit);
+	}
+	
+	
+	// we want to : 
+	// - translate the centroid to the origin
+	// - apply rotations so that site s1 is on the (+) axis and site s2 is in the positive quadrange of the x-y plane.
+	private Cell getCellRotatedWithSitesInPrincDirections(Vect v1, Vect v2) {
+		Vect minusCentroid = getCentroid().scalarMult(-1.0);
+		
+		Vect p1 = v1.plus(minusCentroid);
+
+		// get rotation matrix to rotate p1 onto the x axis
+		// this is a rotation of angle cos^-1 ( (p1 . x-axis) / (2 * |p1| * |xaxis|  ) 
+		//     about the vector (p1 x xaxis)   (<- x = cross product)
+		double p1_rot_angle = p1.angleToInRadians(Vect.xHat());
+		Vect p1_rot_vect = p1.cross(Vect.xHat());
+		Matrix p1_rot_mat = Utility.getRotationMatrix(p1_rot_angle, p1_rot_vect);
+		
+		// make p2 by v1 translated by centroid and by the first rotation
+		// get rotation matrix to then rotate p2 onto the x-y plane
+		// this is a rotation about the x-axis of angle found by:
+		// - project p2 into the y-z plane, and find the angle between the y-axis and that projection
+		Vect p2 = v2.plus(minusCentroid).leftMultByMatrix(p1_rot_mat);
+		Vect p2proj = new Vect(0.0, p2.getCartesianComponents().get(1), p2.getCartesianComponents().get(2));
+		double p2_rot_angle = p2proj.angleToInRadians(Vect.yHat());
+		
+		Matrix p2_rot_mat;
+		if (p2.getCartesianComponents().get(2) < 0) // make sure we're rotating into the POSITIVE quadrant of the x-y plane
+			p2_rot_mat = Utility.getRotationMatrix(p2_rot_angle, Vect.xHat());
+		else
+			p2_rot_mat = Utility.getRotationMatrix(2*Math.PI - p2_rot_angle, Vect.xHat());
+		
+		Matrix total_rot = p2_rot_mat.times(p1_rot_mat);
+		
+		List<Vect> newVects = new ArrayList<Vect>();
+		for (Vect b : this.getLatticeVectors())
+			newVects.add(b.leftMultByMatrix(total_rot));
+		
+		List<Site> newSites = new ArrayList<Site>();
+		for (Site s : this.getSites())
+			newSites.add(new Site(s.getElement(), s.getCoords().plus(minusCentroid).leftMultByMatrix(total_rot)));
+		
+		return new Cell(newVects, newSites, this.getLabel());
+	}
+	
+	/* Comparing cluster geometries:
+	 *  - let c1, c2 be the centers of both clusters
+	 *  - select p11 and p12 two arbitrary sites from cluster 1
+	 *  - search over all cluster 2 sites to find those, p21, st
+	 *    d(c1, p11) = d(c2, p21) (up to a tolerance) (compare elements also)
+	 *  - for each of these, search over all cluster 2 sites p22 st
+	 *    d(c1, p21) = d(c2, p22) _and_ d(p12,p11) = d(p22,p21) (compare elements also)
+	 *  - this fixes an orientation of the two clusters
+	 *  - so, make a rotated + shifted copy of cluster 2 so that c1,c2  p21,211  and p22,p12 all match up
+	 *  - if all the other points line up too, we have a match
+	 */
+	public boolean matchesCellNoPBCs(Cell other, double atomicMisfit) {
+		
+		if (this.getNumSites() != other.getNumSites())
+			return false;
+		if (! this.getComposition().equals(other.getComposition()))
+			return false;
+		if (this.getNumSites() < 2)
+			return true;
+		
+		Vect c1 = this.getCentroid();
+		Vect c2 = other.getCentroid();
+		
+		Site p11 = this.getSite(0);
+		Site p12 = this.getSite(1);
+		
+		Cell thisStd = this.getCellRotatedWithSitesInPrincDirections(p11.getCoords(), p12.getCoords());
+		
+		for (Site p21 : other.getSites()) {
+			if (Math.abs( c1.getCartDistanceTo(p11.getCoords()) - c2.getCartDistanceTo(p21.getCoords()) ) > atomicMisfit)
+				continue;
+			if (p11.getElement() != p21.getElement())
+				continue;
+			
+			for (Site p22 : other.getSites()) {
+				if (p21 == p22)
+					continue;
+				if (Math.abs( c1.getCartDistanceTo(p12.getCoords()) - c2.getCartDistanceTo(p22.getCoords()) ) > atomicMisfit)
+					continue;
+				if (Math.abs( p11.getCoords().getCartDistanceTo(p12.getCoords()) - p21.getCoords().getCartDistanceTo(p22.getCoords()) ) > atomicMisfit)
+					continue;
+				if (p12.getElement() != p22.getElement())
+					continue;
+				
+				// at this point, the correspondence c1<->c2, p11<->p21, p12<->p22 are 3 points that match between
+				// the two clusters.  we can now imagine rotate/shifting one so that these 3 points lie on top of
+				// each other, and then check that all the other points line on top of each other too to establish
+				// the match.
+				// the idea:
+				// - generate transforms for both clusters such that:
+				//   - centroid is at the origin
+				//   - the first points (i.e. p11 and p21) are rotated onto the x axis
+				//   - the second points (i.e. p12 and p22) are rotated onto the positive quadrante of the x-y plane
+				Cell otherCandStd = other.getCellRotatedWithSitesInPrincDirections(p21.getCoords(), p22.getCoords());
+				boolean successfulMatchOfWholeStructs = true;
+				for (Site s : otherCandStd.getSites()) {
+					boolean foundMatchForSite = false;
+					for (Site t : thisStd.getAtomsInSphereSortedIgnoringPBCs(s.getCoords(), atomicMisfit)) {
+						if (s.getElement() == t.getElement()) {
+							foundMatchForSite = true;
+							break;
+						}
+					}
+					if (!foundMatchForSite) {
+						successfulMatchOfWholeStructs = false;
+						break;
+					}
+				}
+				if (successfulMatchOfWholeStructs)
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	// angle misfit given in degrees
+	public boolean matchesCellPBCs(Cell other, double atomicMisfit, double lengthMisfit, double angleMisfit) {
 		// get Niggli reduced cell of this and other
 		// and shift this cell so that one atom is at the origin
 		/*
@@ -941,10 +1094,22 @@ public class Cell implements Serializable {
 			public int compare(Site s1, Site s2) {
 				if (s1.getCoords().getCartDistanceTo(center) > s2.getCoords().getCartDistanceTo(center))
 					return 1;
-				else
+				else if (s1.getCoords().getCartDistanceTo(center) == s2.getCoords().getCartDistanceTo(center))
+					return 0;
+				else 
 					return -1;
 			}
 		};
+		
+		/*
+		for (int i = 0; i < result.size(); i++) {
+			System.out.println(result.get(i) + " : " + result.get(i).getCoords().getCartDistanceTo(center));
+			for (int j = 0; j < result.size(); j++) {
+				System.out.println(result.get(j) + " : " + result.get(j).getCoords().getCartDistanceTo(center) 
+						+ " : " + c.compare(result.get(i), result.get(j)));
+			}
+		}*/
+		
 		Collections.sort(result, c);
 		
 		return result;
@@ -1255,8 +1420,16 @@ public class Cell implements Serializable {
 	
 	// just for testing
 	public static void main(String args[]) {
-		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/17.cif"));
+		Cell a = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/lj_cluster_test/garun_lj_cluster/4363.cif"));
 	//	Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
+		Cell b = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/lj_cluster_test/garun_lj_cluster/4387.cif"));
+
+		Cell arot = a.getCellRotatedWithSitesInPrincDirections(a.getSite(1).getCoords(), a.getSite(0).getCoords());
+		System.out.println(a.getSite(1).getCoords());
+		System.out.println(arot.getSite(1).getCoords());
+
+		System.out.println(a.matchesCellNoPBCs(b, .1));
+
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 		/*Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
 		Cell b = Cell.parseCif(new File("/home/wtipton/andysexamples/29.cif"));
@@ -1274,6 +1447,7 @@ public class Cell implements Serializable {
 		System.out.println(b.matchesCell(b, 0.1, 0.05, 0.05));
 		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
 		
+		/*
 		Cell a = Cell.parseCif(new File("/home/wtipton/bob.cif"));
 		
 		a.getNigliReducedCell();
@@ -1283,7 +1457,7 @@ public class Cell implements Serializable {
 			if (a.getAtomsInSphereSorted(a.getSite(i).getCoords(), .8).size() > 1) {
 				System.out.println("Organism failed minimum interatomic distance constraint.");
 			}
-		}
+		} */
 
 		
 //		a.writeCIF("test");

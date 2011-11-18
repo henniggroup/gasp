@@ -71,18 +71,19 @@ public final class StructureDev implements Development, Serializable {
 		int minatoms = params.getMinNumAtoms();
 		
 		// fail if cell is null.
-		// this can happen if, e.g., the VASP calculation on a structure fails
-		//  and so, after failing to parse the VASP output, VaspOut sets
-		//  the cell to null.
-		// if we added the structure to the wholepop rGuard before doing the vasp
-		//  calc and then the vasp calc sets its cell to null, we'll have problems.
-		//  so, in this case, we remove the structure from the rGuard.
-		// this was fixed by making redundancyguard save cells instead of structureorgs
+		// this shouldnt happen anymore.
 		if (s.getCell() == null) {
 			if (verbosity >= 3)
 				System.out.println("Organism " + s.getID() + " failed: had null cell.");
 	//		if (rGuard != null)
 	//			rGuard.removeStructureOrg(s);
+			return false;
+		}
+		
+		// fail if cell is bad
+		if (s.getCell().isMalformed()) {
+			if (verbosity >= 3)
+				System.out.println("Organism " + s.getID() + " failed: had malformed cell.");
 			return false;
 		}
 		
@@ -275,6 +276,7 @@ public final class StructureDev implements Development, Serializable {
 				return false;
 			} 
 		}
+		
 		// check against the wholePopulation RG only if we haven't done the energy calculation
 		if (useWholePopRG && !s.knowsValue()) {
 			Integer orgID = rGuard.checkStructureOrg(s);

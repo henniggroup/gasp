@@ -54,6 +54,21 @@ public class Vect implements Serializable {
 	public Vect(double[] ds) {
 		this(ds[0], ds[1], ds[2]);
 	}
+	
+	public Vect leftMultByMatrix(Matrix m) {
+		if (m.getColumnDimension() != this.getDimension())
+			throw new RuntimeException("dims dont match in Vect.leftMultByMatrix");
+		
+		return new Vect(m.times(new Matrix(this.getPackedCartComps())).getColumnPackedCopy());
+	}
+	
+	public double[][] getPackedCartComps() {
+		List<Double> ccomps = getCartesianComponents();
+		double result[][] = new double[ccomps.size()][1];
+		for (int i = 0; i < ccomps.size(); i++)
+			result[i][0] = ccomps.get(i);
+		return result;
+	}
 
 	public List<Double> getCartesianComponents() {
 		if (basis == null) {
@@ -198,7 +213,7 @@ public class Vect implements Serializable {
 		List<Double> thisCCs = getCartesianComponents();
 		
 		if (otherCCs.size() != thisCCs.size())
-			throw new RuntimeException("Vector: trying to compare different lengths");
+			throw new RuntimeException("Vector: trying to get distance between vectors of different lengths.");
 		
 		double sum = 0.0;
 		for (int i = 0; i < getDimension(); i++)

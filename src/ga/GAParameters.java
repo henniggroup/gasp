@@ -199,7 +199,7 @@ public class GAParameters implements Serializable {
 //		System.out.println("   --constituents <fix stoichiometry?> <stoichiometry (e.g. Mn 1 O 2)>");
 		System.out.println("   --compositionSpace <numElements> <Sym>* (<Num>*)*          System composition");
 		System.out.println("   --optimizeDensity <weight of adaptation> <num orgs to avg. over>");
-		System.out.println("   --useRedundancyGuard <wholePopulation|perGeneration|both> <atomic misfit> <lattice misfit> <angle misfit>");
+		System.out.println("   --useRedundancyGuard <wholePopulation|perGeneration|both> <atomic misfit> <lattice misfit> <angle misfit> <use PBCs?>");
 		System.out.println("   --useSurrogateModel <gulp header file> <potentials_specification file> <refit frequency>");
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
@@ -212,6 +212,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --initialPopulation <num> manual");
 		System.out.println("   --initialPopulation <num> units <numMols> <numAtoms_1>...<numAtoms_n> (<symbol_i> <x_i> <y_i> <z_i>)+ <numUnits_1>...<numUnits_n> <targetDensity> <densityTol> <unitsOnly?>");
 		System.out.println("Objective Functions");
+		System.out.println("   --objectiveFunction cluster <padding length> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
 		System.out.println("   --objectiveFunction <epa/pd> ohmms <header> <footer> <cautious?>");
@@ -654,39 +655,16 @@ public class GAParameters implements Serializable {
 	    throw new CloneNotSupportedException(); 
 	}
 	
-	private PDBuilder makePDBuilder() {
-		Map<Element, Double> cps = new HashMap<Element,Double>();
-		for (Element e : compSpace.getElements())
-			cps.put(e, 0.0);
-			return new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
-	}
-	
 	public ObjectiveFunction getObjectiveFunctionInstance(Organism o) {
-		if (objFcnArgs == null || objFcnArgs.length < 1)
-			usage("Not enough parameters passed to --ObjectiveFunction", true);
-		
-		ObjectiveFunction obj = null;
-				
-		String objFcnType = objFcnArgs[0];
-		if (objFcnType.equalsIgnoreCase("epa")) 
-			obj = new EnergyPerAtom(GAUtils.subArray(objFcnArgs, 1), o);
-		else if (objFcnType.equalsIgnoreCase("pd")) {
-			if (pdbuilder == null)
-				pdbuilder = makePDBuilder();
-			if (getRecord().getGenNum() < 1) {
-				obj = new EnergyPerAtom(GAUtils.subArray(objFcnArgs, 1), o);
-			} else {
-				obj = new PDObjFcn(GAUtils.subArray(objFcnArgs, 1), o, pdbuilder);
-			}
-		} else
-			usage("Unknown objective function " + objFcnType, true);	
-		
-		return obj;
+		return ObjFcnFactory.getObjectiveFunctionInstance(o, objFcnArgs);
 	}
 	
 	public boolean doingPDRun() {
-		String objFcnType = objFcnArgs[0];
-		return objFcnType.equalsIgnoreCase("pd");
+		for (String s : objFcnArgs)
+			if (s.equalsIgnoreCase("pd"))
+				return true;
+		
+		return false;
 	}
 	
 	/********************* All the Getters go below here ********************/
@@ -867,6 +845,13 @@ public class GAParameters implements Serializable {
 	}
 	
 	public PDBuilder getPDBuilder() {
+		if (pdbuilder == null) {
+			Map<Element, Double> cps = new HashMap<Element,Double>();
+			for (Element e : compSpace.getElements())
+				cps.put(e, 0.0);
+			pdbuilder = new PDBuilder(new LinkedList<IComputedEntry>(), compSpace.getElements(), cps );
+		}
+		
 		return pdbuilder;
 	}
 	

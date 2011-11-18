@@ -8,10 +8,26 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.*;
 
+import Jama.Matrix;
+
 public class Utility {
 	
 	public static void writeStringToFile(String s, String path) {
 		writeStringToFile(s, path, false);
+	}
+	
+	public static String matrixToString(Matrix m) {
+		StringBuilder result = new StringBuilder();
+		
+		for (int i = 0; i < m.getRowDimension(); i++) {
+			for (int j = 0; j < m.getColumnDimension(); j++) {
+				result.append(m.get(i,j));
+				result.append(" ");
+			}
+			result.append("\n");
+		}
+		
+		return result.toString();
 	}
 	
 	public static void writeStringToFile(String s, String path, boolean append) {
@@ -90,12 +106,34 @@ public class Utility {
 		return answer;
 	}
 	
-    /**
-     * see Tim Mueller's ArrayUtils....
-     * @param orig
-     * @param obj
-     * @return
-     */
+	// rotate an angle theta aroudn vector vect
+	// see http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
+	public static Matrix getRotationMatrix(double theta, Vect vect) {
+		double u = vect.getCartesianComponents().get(0);
+		double v = vect.getCartesianComponents().get(1);
+		double w = vect.getCartesianComponents().get(2);
+		double u2 = u*u;
+		double v2 = v*v;
+		double w2 = w*w;
+		double mag = vect.length();
+		double mag_sq = mag*mag;
+		double cost = Math.cos(theta);
+		double sint = Math.sin(theta);
+		
+		double result[][] = new double[Constants.numDimensions][Constants.numDimensions];
+
+		result[0][0] = (u2 + (v2+w2)*cost) / mag_sq;
+		result[0][1] = (u*v*(1-cost) - w*mag*sint) / mag_sq;
+		result[0][2] = (u*w*(1-cost) + v*mag*sint) / mag_sq;
+		result[1][0] = (u*v*(1-cost) + w*mag*sint) / mag_sq;
+		result[1][1] = (v2 + (u2+w2)*cost) / mag_sq;
+		result[1][2] = (v*w*(1-cost) - u*mag*sint) / mag_sq;
+		result[2][0] = (u*w*(1-cost) - v*mag*sint) / mag_sq;
+		result[2][1] = (v*w*(1-cost) + u*mag*sint) / mag_sq;
+		result[2][2] = (w2 + (u2+v2)*cost) / mag_sq;
+		
+		return new Matrix(result);
+	}
 
     public static <T> T[] appendArray(T[] orig, T obj){
         T[] appa =  (T[])Array.newInstance(orig.getClass().getComponentType(), orig.length + 1);
