@@ -39,6 +39,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 			energyFcn = new DLPolyEnergy(GAUtils.subArray(args, 1));
 		else if (energyType.equalsIgnoreCase("mopac"))
 			energyFcn = new MopacEnergy(GAUtils.subArray(args, 1));
+		else if (energyType.equalsIgnoreCase("dftpp"))
+			energyFcn = new DFTPPEnergy(GAUtils.subArray(args, 1));
 		else
 			throw new RuntimeException("Unknown energy function in EnergyPerAtom: " + energyType);
 		

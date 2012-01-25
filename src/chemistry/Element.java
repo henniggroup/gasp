@@ -152,6 +152,14 @@ public class Element implements Comparable, Serializable {
 		throw new RuntimeException("Element.getZFromSymbol() tried to get nonexistent symbol: " + symb);
 	}
 	
+	private static int getZFromName(String name) {
+		for (String[] entry : elementData) {
+			if (name.compareToIgnoreCase(entry[nameEntryLoc]) == 0)
+				return Integer.parseInt(entry[ZEntryLoc]);
+		}
+		throw new RuntimeException("Element.getZFromName() tried to get nonexistent name: " + name);
+	}
+	
 	public String getSymbol() {
 		return getEntryFromZ(Z)[symbolEntryLoc];
 	}
@@ -162,6 +170,14 @@ public class Element implements Comparable, Serializable {
 	
 	public double getDensity() {
 		return Double.parseDouble(getEntryFromZ(Z)[densityEntryLoc]);
+	}
+	
+	public String getName() {
+		return getEntryFromZ(Z)[nameEntryLoc];
+	}
+	
+	public int getZ() {
+		return Z;
 	}
 	
 	public String toString() {
@@ -190,6 +206,13 @@ public class Element implements Comparable, Serializable {
 			initializeElementsArray();
 		
 		return elements[getEntryNumFromZ(Z)];
+	}
+	
+	public static Element getElemFromName(String name) {
+		if (elements == null)
+			initializeElementsArray();
+		
+		return elements[getEntryNumFromZ(getZFromName(name))];
 	}
 	
 	@Override
