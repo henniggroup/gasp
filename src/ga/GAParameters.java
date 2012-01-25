@@ -94,6 +94,7 @@ public class GAParameters implements Serializable {
 	private double minLatticeAngle = -1;
 	private int maxNumAtoms = 1;
 	private int minNumAtoms = 1;
+	private int minNumSpecies = 1;
 	private boolean doNonnegativityConstraint = true;
 	private double dValue = 0;
 	private List<Set<String>> notNearestNeighbors = null;
@@ -221,6 +222,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file>");
 		System.out.println("   --objectiveFunction <epa/pd> dlpoly <loc> <potl>");
 		System.out.println("   --objectiveFunction <epa/pd> mopac <execpath>");
+		System.out.println("   --objectiveFunction <epa/pd> dftpp <dftpp_inputs> <element ppFile l_max l_loc>*");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
 		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?>");
@@ -244,6 +246,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --minLatticeAngle d : minimum lattice angle (Degrees)");
 		System.out.println("   --maxNumAtoms n");
 		System.out.println("   --minNumAtoms n");
+		System.out.println("   --minNumSpecies n");
 		System.out.println("   --doNonnegativityConstraint <boolean>");
 		System.out.println("   --dValue x : discard organisms within a value of x of each other");
 		
@@ -309,6 +312,8 @@ public class GAParameters implements Serializable {
 				maxNumAtoms = Integer.parseInt(getValues(flag)[0]);
 			else if (flag.equalsIgnoreCase("--minNumAtoms"))
 				minNumAtoms = Integer.parseInt(getValues(flag)[0]);
+			else if (flag.equalsIgnoreCase("--minNumSpecies"))
+				minNumSpecies = Integer.parseInt(getValues(flag)[0]);
 			else if (flag.equalsIgnoreCase("--doNonnegativityConstraint"))
 				doNonnegativityConstraint = Boolean.parseBoolean(getValues(flag)[0]);
 			else if (flag.equalsIgnoreCase("--dValue"))
@@ -726,6 +731,10 @@ public class GAParameters implements Serializable {
 	
 	public int getMinNumAtoms() {
 		return minNumAtoms;
+	}
+	
+	public int getMinNumSpecies() {
+		return minNumSpecies;
 	}
 	
 	public boolean getDoNonnegativityConstraint() {
