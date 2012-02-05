@@ -80,6 +80,13 @@ public final class StructureDev implements Development, Serializable {
 			return false;
 		}
 		
+		if (s.knowsValue() && Double.isNaN(s.getEnergyPerAtom())) {
+			if (verbosity >= 3)
+				System.out.println("Organism " + s.getID() + " failed: had NaN energy. Something must have gone wrong with the energy calc.");
+
+			return false;
+		}
+		
 		// fail if cell is bad
 		if (s.getCell().isMalformed()) {
 			if (verbosity >= 3)

@@ -222,7 +222,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file>");
 		System.out.println("   --objectiveFunction <epa/pd> dlpoly <loc> <potl>");
 		System.out.println("   --objectiveFunction <epa/pd> mopac <execpath>");
-		System.out.println("   --objectiveFunction <epa/pd> dftpp <dftpp_inputs> <element ppFile l_max l_loc>*");
+		System.out.println("   --objectiveFunction <epa/pd> dftpp <dftpp_inputs> <cautious?> <element ppFile.fhi>*");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
 		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?>");

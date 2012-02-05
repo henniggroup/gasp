@@ -23,6 +23,8 @@ public class ObjFcnFactory {
 			}
 		} else if (objFcnType.equals("cluster")) {
 			obj = new ClusterObjFcn(GAUtils.subArray(objFcnArgs, 1), o);
+		} else if (objFcnType.equals("surface")) {
+			obj = new SurfaceObjFcn(GAUtils.subArray(objFcnArgs, 1), o);
 		} else {
 			GAParameters.usage("Unknown objective function " + objFcnType, true);	
 		}

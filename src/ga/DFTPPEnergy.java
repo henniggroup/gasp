@@ -26,23 +26,22 @@ public class DFTPPEnergy implements Energy {
 	
 	static final String inFileName = "dft.in";
 	static final String optionsFileName = "options.in";
+	static final String outFileName = "out";
 	static final double bohrPerAngstrom = 1.889725989;
-	static final String ionPosFilePrefix = "ionpos.";
+	static final String ionPosFileString = "ionpos";
 
 	public DFTPPEnergy(String[] args)
 	{
-		if (args == null || args.length < 13 || (args.length - 2) % 11 != 0)
+		if (args == null || args.length < 4 || (args.length) % 2 != 0)
 			GAParameters.usage("Wrong parameters given to DFTPPEnergy", true);
 
 		inputStr = GAUtils.readStringFromFile(new File(args[0]));
 		cautious = Boolean.parseBoolean(args[1]);
 
 		ppsMap = new HashMap<Element,String>();
-		for (int i = 2; i < args.length - 1; i = i+11) {
+		for (int i = 2; i < args.length - 1; i = i+2) {
 			Element e = Element.getElemFromSymbol(args[i]);
-			ppsMap.put(e, args[i+1] + " " + args[i+2] + " " + args[i+3] + " " +
-			              args[i+4] + " " + args[i+5] + " " + args[i+6] + " " +
-			              args[i+7] + " " + args[i+8] + " " + args[i+9] + " " + args[i+10]);
+			ppsMap.put(e, args[i+1]);
 		}
 		
 
@@ -85,9 +84,11 @@ public class DFTPPEnergy implements Energy {
 		*/
 		
 		ans.append("dump End IonicPositions" + GAUtils.newline() + GAUtils.newline());
-		ans.append("relax-ions" + GAUtils.newline() + GAUtils.newline());
-		ans.append("calculate-forces" + GAUtils.newline() + GAUtils.newline());
-		ans.append("electronic-minimization" + GAUtils.newline() + GAUtils.newline());
+
+		// removed in new version of dft++:
+		//ans.append("relax-ions" + GAUtils.newline() + GAUtils.newline());
+		//ans.append("calculate-forces" + GAUtils.newline() + GAUtils.newline());
+		//ans.append("electronic-minimization" + GAUtils.newline() + GAUtils.newline());
 
 		ans.append("latt-scale 1 1 1" + GAUtils.newline());
 		ans.append("lattice ");
@@ -98,17 +99,16 @@ public class DFTPPEnergy implements Energy {
 		ans.append("coords-type cartesian" + GAUtils.newline() + GAUtils.newline());
 		
 		for (Element e : c.getCell().getComposition().getElements()) {
-		//	ans.append("ion-species " + e.getName() + " " + e.getZ() 
-		//			+ " " + e.getAtomicMass() + " " + ppsMap.get(e) + " none" + GAUtils.newline());
-			ans.append(ppsMap.get(e) + GAUtils.newline());
-			ans.append("ion-relax-param " + e.getName() + " 0 0.5" + GAUtils.newline());
+			ans.append("ion-species " + ppsMap.get(e) + GAUtils.newline());
+			// removed in newer version of dftpp
+			// ans.append("ion-relax-param " + e.getName() + " 0 0.5" + GAUtils.newline());
 		}
 		ans.append(GAUtils.newline());
 		
 		// fix the position of the first ion
 		boolean writingFirstIon = true;
 		for (Site s : c.getCell().getSites()) {
-			ans.append("ion " + s.getElement().getName() + " ");
+			ans.append("ion " + s.getElement().getSymbol() + " ");
 			for (Double d : s.getCoords().getCartesianComponents())
 				ans.append(d * bohrPerAngstrom + " ");
 			if (writingFirstIon) {
@@ -155,7 +155,7 @@ public class DFTPPEnergy implements Energy {
 				System.out.println("Warning: bad DFT++ output.  Not updating structure.");
 		} else {
 			c.setCell(a);
-			finalEnergy = parseFinalEnergy(dftppOutput);
+			finalEnergy = parseFinalEnergy(Utility.readStringFromFile(outDirPath + "/" + outFileName));
 		}
 		
 		// write cell to disk
@@ -238,14 +238,14 @@ public class DFTPPEnergy implements Energy {
 		
 		for (int i = 0; i < lines.length; i++) {
 			String tokens[] = lines[i].trim().split("  *");
-			if (tokens.length != 6)
+			if (tokens.length != 6 || tokens[0].startsWith("#"))
 				continue;
-			String elementName = tokens[1];
+			String elementSym = tokens[1];
 			double x = Double.parseDouble(tokens[2]) / bohrPerAngstrom;
 			double y = Double.parseDouble(tokens[3]) / bohrPerAngstrom;
 			double z = Double.parseDouble(tokens[4]) / bohrPerAngstrom;
 
-			sites.add(new Site(Element.getElemFromName(elementName), new Vect(x,y,z)));
+			sites.add(new Site(Element.getElemFromSymbol(elementSym), new Vect(x,y,z)));
 		} 
 		
 		return new Cell(origCell.getLatticeVectors(), sites, origCell.getLabel());
@@ -253,7 +253,7 @@ public class DFTPPEnergy implements Energy {
 	
 	private static class OutPosFileFilter implements FilenameFilter {
 		public boolean accept(File f, String name) {
-			return name.startsWith(ionPosFilePrefix);
+			return name.contains(ionPosFileString);
 		}
 	}
 	
@@ -278,25 +278,27 @@ public class DFTPPEnergy implements Energy {
 		
 		String lines[] = output.split("\n");
 		
+		/*
 		for (int i = 0; i < lines.length; i++) {
 			if (lines[i].matches("F .*")) {
 				String energies[] = lines[i].trim().split("  *");
 				try {
-					finalEnergy = Double.parseDouble(energies[2]);
+					finalEnergy = Double.parseDouble(energies[4]);
 				}	catch (NumberFormatException x) {
 					System.out.println("Warning: malformed DFT++ output when trying to parse F.");
 				}
 			}
-		} 
+		} */
 
+		// IonicMinimize: Iter:   4  Etot: -1.726088327116451e+01  |grad|_K:  4.057e-04  alpha:  2.761e+00, linmin =  6.784e-01, cgtest = -8.019e-01
 		if (finalEnergy == Double.POSITIVE_INFINITY) {
 			for (int i = 0; i < lines.length; i++) {
-				if (lines[i].matches("Etot .*")) {
+				if (lines[i].matches("IonicMinimize: Iter: *[0-9][0-9]* *Etot:.*")) {
 					String energies[] = lines[i].trim().split("  *");
 					try {
-						finalEnergy = Double.parseDouble(energies[2]);
+						finalEnergy = Double.parseDouble(energies[4]);
 					}	catch (NumberFormatException x) {
-						System.out.println("Warning: malformed DFT++ output when trying to parse F.");
+						System.out.println("Warning: malformed DFT++ output when trying to parse Etot.");
 					}
 				}
 			} 
@@ -307,12 +309,12 @@ public class DFTPPEnergy implements Energy {
 	
 	// just for testing
 	public static void main(String args[]) {
-		String output = Utility.readStringFromFile("/home/wtipton/gpu_test/out");
+		String output = Utility.readStringFromFile("/home/wtipton/out");
 		
 		System.out.println(parseFinalEnergy(output));
 		
-		Cell origCell = Cell.parseCif(new File("/home/wtipton/gpu_test/4.unrelaxed.cif"));
-		System.out.println(parseOutputStructure(origCell, "/home/wtipton/gpu_test/"));
+	//	Cell origCell = Cell.parseCif(new File("/home/wtipton/gpu_test/4.unrelaxed.cif"));
+	//	System.out.println(parseOutputStructure(origCell, "/home/wtipton/gpu_test/"));
 	}
 	
 }

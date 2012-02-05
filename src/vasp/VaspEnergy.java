@@ -50,9 +50,9 @@ public class VaspEnergy implements Energy {
 
 		String s = null;
 		try {
-			// run the vasp command. in order to avoid hardcoding thing which are
+			// run the vasp command. in order to avoid hard-coding things which are
 			// probably system-dependent, we call a wrapper script which is probably
-			// just "cd $1; vasp"
+			// just "cd $1; vasp" for simple set ups
 			Process p = Runtime.getRuntime().exec("callvasp " + inputDir);
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
@@ -99,32 +99,12 @@ public class VaspEnergy implements Energy {
 		outDir.mkdir();
 		
 		// make the vasp files
-		VaspIn vaspin;
-//		try {
-			vaspin = new VaspIn(o.getCell(), kpointsFile, incarFile, potcarFileMap);
-/*		} catch (IOException x) {
-			if (verbosity >= 2)
-				System.out.println("Can't make VaspOut: " + x.getMessage());
-			return 0;
-		}*/
-// for testing
-//vaspin.setNSW(0);
-//vaspin.setIBRION(-1);
-//vaspin.setPREC("low");
-//vaspin.setEDIFF(1);
-//vaspin.setLREAL(".FALSE.");
-//vaspin.setISMEAR(1);
-//		try {
-			vaspin.makeINCAR(outDir.getAbsolutePath() + "/");
-			vaspin.makePOSCAR(outDir.getAbsolutePath() + "/");
-			vaspin.makeKPOINTS(outDir.getAbsolutePath() + "/");
-			vaspin.makePOTCAR(outDir.getAbsolutePath() + "/");
-/*		} catch (FileNotFoundException x) {
-			if (verbosity >= 2)
-				System.out.println("The Vaspin threw a FileNotFoundException: " + x.getMessage());
-			return 0;
-		}
-*/		
+		VaspIn vaspin = new VaspIn(o.getCell(), kpointsFile, incarFile, potcarFileMap);
+		vaspin.makeINCAR(outDir.getAbsolutePath() + "/");
+		vaspin.makePOSCAR(outDir.getAbsolutePath() + "/");
+		vaspin.makeKPOINTS(outDir.getAbsolutePath() + "/");
+		vaspin.makePOTCAR(outDir.getAbsolutePath() + "/");
+	
 		// run vasp
 		String vaspOutput = runVasp(outDir.getAbsolutePath());
 		

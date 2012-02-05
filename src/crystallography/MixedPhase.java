@@ -243,6 +243,8 @@ public class MixedPhase {
 				result = possibleResult;
 			}
 		}
+		if (lowestEnergy == Double.POSITIVE_INFINITY)
+			System.out.println("ERROR: lowestEnergy == Double.POSITIVE_INFINITY in MixedPhase.makeCompFromBasis indicates something is wrong with structures' energies.");
 		return result;
 	}
 	
