@@ -30,18 +30,18 @@ public class CastepEnergy implements Energy {
 	
 	public static String castepPrefix = "in";
 		
-	public CastepEnergy(String[] args) {
-		if (args == null || args.length < 6 || args.length % 2 != 0)
+	public CastepEnergy(List<String> args) {
+		if (args == null || args.size() < 6 || args.size() % 2 != 0)
 			GAParameters.usage("Not enough or malformed parameters given to CastepEnergy", true);
 		
-		cautious = Boolean.parseBoolean(args[0]);
-		kpointSpacing = Double.parseDouble(args[1]);
-		pressure = Double.parseDouble(args[2]);
-		paramFile = args[3];
+		cautious = Boolean.parseBoolean(args.get(0));
+		kpointSpacing = Double.parseDouble(args.get(1));
+		pressure = Double.parseDouble(args.get(2));
+		paramFile = args.get(3);
 		ppFileMap = new HashMap<Element,String>();
-		for (int i = 4; i < args.length; i = i+2) {
-			Element e = Element.getElemFromSymbol(args[i]);
-			String potcarFile = args[i+1];
+		for (int i = 4; i < args.size(); i = i+2) {
+			Element e = Element.getElemFromSymbol(args.get(i));
+			String potcarFile = args.get(i+1);
 			ppFileMap.put(e, potcarFile);
 		}
 

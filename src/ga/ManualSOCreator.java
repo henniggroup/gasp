@@ -2,6 +2,8 @@
 
 package ga;
 
+import java.util.List;
+
 import crystallography.Cell;
 
 
@@ -13,7 +15,7 @@ public class ManualSOCreator implements StructureOrgCreator {
 	
 	Cell[] seeds;
 
-	public ManualSOCreator(String[] args) {
+	public ManualSOCreator(List<String> args) {
 		// nothing
 	}
 	

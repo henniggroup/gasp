@@ -3,6 +3,7 @@
 package ga;
 
 import java.io.*;
+import java.util.List;
 
 import crystallography.Cell;
 
@@ -15,10 +16,10 @@ public class FromCifsSOCreator implements StructureOrgCreator {
 	
 	File[] cifFiles;
 
-	public FromCifsSOCreator(String[] args) {
-		if (args.length < 1)
+	public FromCifsSOCreator(List<String> args) {
+		if (args.size() < 1)
 			GAParameters.usage("Not enough arguments passed to FromCifsSOCreator.", true);
-		dirName = new String(args[0]);		
+		dirName = new String(args.get(0));		
 	}
 	
 	public String toString() {

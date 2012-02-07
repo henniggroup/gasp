@@ -50,21 +50,21 @@ public final class Slicer implements Variation {
 	private int axis;
 	private boolean growParents;
 	
-	public Slicer(String[] args) {
-		if (args == null || args.length < 6)
+	public Slicer(List<String> args) {
+		if (args == null || args.size() < 6)
 			GAParameters.usage("Not enough parameters given to Slicer", true);
 		
-		thicknessMean = Double.parseDouble(args[0]);
-		thicknessSigma = Double.parseDouble(args[1]);
+		thicknessMean = Double.parseDouble(args.get(0));
+		thicknessSigma = Double.parseDouble(args.get(1));
 		
-		mainShiftFrac = Double.parseDouble(args[2]);
-		minorShiftFrac = Double.parseDouble(args[3]);
+		mainShiftFrac = Double.parseDouble(args.get(2));
+		minorShiftFrac = Double.parseDouble(args.get(3));
 		
-		maxAmplitude = Double.parseDouble(args[4]);
-		maxFreq = Integer.parseInt(args[5]);
+		maxAmplitude = Double.parseDouble(args.get(4));
+		maxFreq = Integer.parseInt(args.get(5));
 		
-		if (args.length >= 7)
-			growParents = Boolean.parseBoolean(args[6]);
+		if (args.size() >= 7)
+			growParents = Boolean.parseBoolean(args.get(6));
 		else
 			growParents = false;
 	}
@@ -228,6 +228,7 @@ public final class Slicer implements Variation {
 		parents.addOrganism(s1);
 		parents.addOrganism(s2);
 		
+		/*
 		String[] hsArgs = {"0.5", "0.0", "0", "0.00", "0", "0"};
 		Variation p = new Slicer(hsArgs);
 		String[] selArgs = {"2", "0"};
@@ -238,7 +239,7 @@ public final class Slicer implements Variation {
 		//GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false); 
 		o.standardize();
 		//GAUtils.writeStringToFile(o.getCIF(), new File("offspring_red.cif"), false); 
-		System.out.println(o);
+		System.out.println(o); */
 
 	}
 }

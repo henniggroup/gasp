@@ -3,6 +3,7 @@
 package ga;
 
 import java.io.Serializable;
+import java.util.List;
 
 import pdvisual.IComputedEntry;
 
@@ -14,11 +15,11 @@ public class Promotion implements Serializable {
 	
 	private int n;
 	
-	public Promotion(String[] args) {
-		if (args.length < 1)
+	public Promotion(List<String> args) {
+		if (args.size() < 1)
 			GAParameters.usage("Not enough parameters given to Promotion", true);
 		
-		n = Integer.parseInt(args[0]);
+		n = Integer.parseInt(args.get(0));
 	}
 	
 	public String toString() {

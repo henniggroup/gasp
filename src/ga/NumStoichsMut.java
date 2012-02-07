@@ -20,12 +20,12 @@ public class NumStoichsMut implements Variation {
 	double meanNum;
 	double sigmaNum;
 	
-	public NumStoichsMut(String[] args) {
-		if (args == null || args.length < 2)
+	public NumStoichsMut(List<String> args) {
+		if (args == null || args.size() < 2)
 			GAParameters.usage("Not enough parameters given to NumStoichsMut", true);
 		
-		meanNum = Double.parseDouble(args[0]);
-		sigmaNum = Double.parseDouble(args[1]);
+		meanNum = Double.parseDouble(args.get(0));
+		sigmaNum = Double.parseDouble(args.get(1));
 	}
 	
 	private void addAtoms(int numAtoms, List<Site> newSites, List<Vect> newVects) {
@@ -106,6 +106,7 @@ public class NumStoichsMut implements Variation {
 
 	// just for testing
 	public static void main(String[] args) {
+		/*
 		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
 		GAParameters params = GAParameters.getParams();
 		s1.setFitness(1);
@@ -126,6 +127,6 @@ public class NumStoichsMut implements Variation {
 		StructureOrg o = (StructureOrg)s.doVariation(parents, null, sel);
 	//	System.out.println(o.getCell().getNumSites());
 	//	GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false);
-		System.out.println(o);
+		System.out.println(o); */
 	}
 }

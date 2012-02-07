@@ -22,20 +22,20 @@ public class OhmmsEnergy implements Energy {
 	
 	private final String outStructureFileName = "restart.xml";
 
-	public OhmmsEnergy(String[] args)
+	public OhmmsEnergy(List<String> args)
 	{
-		if (args == null || args.length < 3)
+		if (args == null || args.size() < 3)
 			GAParameters.usage("Not enough parameters given to OhmmsEnergy", true);
 		
 		// read in the GULP header to use
-		File headerFile = new File(args[0]);
+		File headerFile = new File(args.get(0));
 		headerStr = GAUtils.readStringFromFile(headerFile);
 
 		// read in the GULP potential to use
-		File footerFile = new File(args[1]);
+		File footerFile = new File(args.get(1));
 		footerStr = GAUtils.readStringFromFile(footerFile);
 		
-		cautious = Boolean.parseBoolean(args[2]);
+		cautious = Boolean.parseBoolean(args.get(2));
 	}
 
 	public String toString() {
@@ -307,6 +307,7 @@ public class OhmmsEnergy implements Energy {
 	
 	// just for testing:
 	public static void main(String[] args) {
+		/*
 		String[] geArgs = {"header", "footer", "true"};
 		OhmmsEnergy bob = new OhmmsEnergy(geArgs);
 		StructureOrg c = new StructureOrg(Cell.parseCif(new File("in.cif")));
@@ -315,7 +316,7 @@ public class OhmmsEnergy implements Energy {
 		double energy = bob.getEnergy(c);
 		System.out.println(energy);
 		System.out.println(c.getCell());
-		
+		*/
 		
 	}
 }

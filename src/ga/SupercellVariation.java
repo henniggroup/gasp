@@ -15,11 +15,11 @@ public class SupercellVariation  implements Variation {
 	
 	private boolean relaxChildren;
 	
-	public SupercellVariation(String[] args) {
-		if (args == null || args.length != 1)
+	public SupercellVariation(List<String> args) {
+		if (args == null || args.size() != 1)
 			GAParameters.usage("Wrong parameters given to SupercellVariation", true);
 		
-		relaxChildren = Boolean.parseBoolean(args[0]);
+		relaxChildren = Boolean.parseBoolean(args.get(0));
 	}
 	
 	public String toString() {

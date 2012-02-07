@@ -25,13 +25,13 @@ public class LammpsEnergy implements Energy {
 	private static final String dumpFileName = "dump.atom";
 	private static final String inFileName = "in.min";
 
-	public LammpsEnergy(String[] args)
+	public LammpsEnergy(List<String> args)
 	{
-		if (args == null || args.length < 1)
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to LammpsEnergy", true);
 
 		// read in the LAMMPS potential to use
-		File potlFile = new File(args[0]);
+		File potlFile = new File(args.get(0));
 		potlStr = GAUtils.readStringFromFile(potlFile);
 
 	}
@@ -352,6 +352,7 @@ Atoms
 	
 	// just for testing:
 	public static void main(String[] args) {
+		/*
 		String[] geArgs = {"/home/wtipton/temp/lammpspot"};
 		LammpsEnergy bob = new LammpsEnergy(geArgs);
 		StructureOrg c = new StructureOrg(Cell.parseCif(new File("/home/wtipton/POSCAR4.cif")));
@@ -360,6 +361,6 @@ Atoms
 		System.out.println(energy);
 		System.out.println(c.getCell());
 		
-		
+		*/
 	}
 }

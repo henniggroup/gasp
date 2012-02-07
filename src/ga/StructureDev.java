@@ -37,9 +37,12 @@ public final class StructureDev implements Development, Serializable {
 		String rgType = params.getRedundancyGuardType();
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
 		usePerGenRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("perGeneration"));
-		String useStructureFitter = "true";
-		if (useWholePopRG)
-			rGuard = new RedundancyGuard((String[])Utility.appendArray(params.getRedundancyGuardArgs(), useStructureFitter));
+		if (useWholePopRG) {
+			String useStructureFitter = "true";
+			List<String> wprgArgs = params.getRedundancyGuardArgs();
+			wprgArgs.add(useStructureFitter);
+			rGuard = new RedundancyGuard(wprgArgs);
+		}
 		
 		if (params.usingSurrogateModel()) 
 			surrogate = new GulpSurrogate(params.getSurrogateArgs());

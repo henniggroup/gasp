@@ -114,7 +114,7 @@ public class GAParameters implements Serializable {
 	private Selection sel = null;
 	private Development dev = null;
 	private Promotion pro = null;
-	private String[] objFcnArgs;
+	private List<String> objFcnArgs;
 	private int minPopSize = 0;
 	private int numCalcsInParallel = 1;
 	// vars holds the variations that run on each generation to make the next generation.
@@ -129,9 +129,9 @@ public class GAParameters implements Serializable {
 	// population related options
 	private int popSize = 40;
 	private String redundancyGuardType = "none";
-	private String[] redundancyGuardArgs = null;
+	private List<String> redundancyGuardArgs = null;
 	private boolean useSurrogate = false;
-	private String[] surrogateArgs = null;
+	private List<String> surrogateArgs = null;
 //	private static boolean unitsOnly = false;
 	
 	// constituents holds key-value pairs of the form (Atomic symbol, quantity) where the
@@ -259,195 +259,172 @@ public class GAParameters implements Serializable {
 	// precedence over those in the input file.  thus we can
 	// use the same code to set the private variables.
 	public void setArgs(String[] args) {
-		// parse the commandline arguments
-	//	ArgumentParser aParser = new ArgumentParser(args);
-		argmap = (new ArgumentParser(args)).getCLParserData();
-	
-		// parse the input file arguments
-		if(!isSet("--f")) {
-			if (verbosity >= 2)
-				System.out.println("Really no input file?");
-		} else {
-			inputFile = getValues("--f")[0];
-			List<Pair<String,String[]>> inputFileArgs = parseInputFile();
-			
-			// combine the two maps such that the commandline args take precedence
-			inputFileArgs.addAll(argmap);
-			argmap = inputFileArgs;
+		// parse the input arguments
+		ArgumentParser aParser;
+		String inputFileName = null;
+		for (int i = 0; i < args.length - 1; i++) {
+			if (args[i].equals("--f"))
+				inputFileName = args[i+1];
 		}
 		
-		if (argmap == null)
-			usage("", true);
-		
-		// TODO: switch everything to use aParser
-		if (!isSet("--compositionSpace")) 
-			usage("No --compositionSpace option passed.",true);
+		if(inputFileName == null) {
+			if (verbosity >= 3)
+				System.out.println("WARNING: No input file given.");
+			aParser = new ArgumentParser(args);
+		} else {
+			aParser = new ArgumentParser(args, inputFileName);
+		}
 		
 		// parse the combined set of arguments
-		for (Pair<String,String[]> p: argmap) {
+		for (Pair<String,List<String>> p : aParser.getOptions()) {
 			String flag = p.getFirst();
+			List<String> arguments = p.getSecond();
+			
 			if (flag.equals("--help"))
 				usage("", true);
-			else if (flag.equalsIgnoreCase("--verbosity"))
-				verbosity = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--runTitle"))
-				runTitle = getValues(flag)[0];
-			else if (flag.equalsIgnoreCase("--outDirName")) {
+			else if (flag.equalsIgnoreCase("verbosity"))
+				verbosity = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("runTitle"))
+				runTitle = arguments.get(0);
+			else if (flag.equalsIgnoreCase("outDirName")) {
 				outDirName = "";
-				String[] values = getValues(flag);
-				for (String s : values)
+				for (String s : arguments)
 					outDirName += s;
-			}
-			else if (flag.equalsIgnoreCase("--minInteratomicDistance"))
-				minInteratomicDistance = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--maxLatticeLength"))
-				maxLatticeLength = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--minLatticeLength"))
-				minLatticeLength = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--maxLatticeAngle"))
-				maxLatticeAngle = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--minLatticeAngle"))
-				minLatticeAngle = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--maxNumAtoms"))
-				maxNumAtoms = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--minNumAtoms"))
-				minNumAtoms = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--minNumSpecies"))
-				minNumSpecies = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--doNonnegativityConstraint"))
-				doNonnegativityConstraint = Boolean.parseBoolean(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--dValue"))
-				dValue = Double.parseDouble(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--endgameNumGens"))
-				endGameNumGens = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--useNiggliReducedCell"))
-				useNiggliReducedCell = Boolean.parseBoolean(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--popSize"))
-				popSize = Integer.parseInt(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--keepTempFiles"))
-				keepTempFiles = Boolean.parseBoolean(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--saveStateEachIter"))
-				saveStateEachIter = Boolean.parseBoolean(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--useRedundancyGuard")) {
-				redundancyGuardType = getValues(flag)[0];
-				redundancyGuardArgs = GAUtils.subArray(getValues(flag), 1);
-			} else if (flag.equalsIgnoreCase("--useSurrogateModel")) {
+			} else if (flag.equalsIgnoreCase("minInteratomicDistance"))
+				minInteratomicDistance = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxLatticeLength"))
+				maxLatticeLength = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minLatticeLength"))
+				minLatticeLength = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxLatticeAngle"))
+				maxLatticeAngle = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minLatticeAngle"))
+				minLatticeAngle = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxNumAtoms"))
+				maxNumAtoms = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minNumAtoms"))
+				minNumAtoms = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minNumSpecies"))
+				minNumSpecies = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("doNonnegativityConstraint"))
+				doNonnegativityConstraint = Boolean.parseBoolean(arguments.get(0));
+			else if (flag.equalsIgnoreCase("dValue"))
+				dValue = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("endgameNumGens"))
+				endGameNumGens = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("useNiggliReducedCell"))
+				useNiggliReducedCell = Boolean.parseBoolean(arguments.get(0));
+			else if (flag.equalsIgnoreCase("popSize"))
+				popSize = Integer.parseInt(arguments.get(0));
+			else if (flag.equalsIgnoreCase("keepTempFiles"))
+				keepTempFiles = Boolean.parseBoolean(arguments.get(0));
+			else if (flag.equalsIgnoreCase("saveStateEachIter"))
+				saveStateEachIter = Boolean.parseBoolean(arguments.get(0));
+			else if (flag.equalsIgnoreCase("useRedundancyGuard")) {
+				redundancyGuardType = arguments.get(0);
+				redundancyGuardArgs = Utility.subList(arguments, 1);
+			} else if (flag.equalsIgnoreCase("useSurrogateModel")) {
 				useSurrogate = true;
-				surrogateArgs = getValues(flag);
-			} else if (flag.equalsIgnoreCase("--optimizeDensity")) {
-				String[] values = getValues(flag);
+				surrogateArgs =  arguments;
+			} else if (flag.equalsIgnoreCase("optimizeDensity")) {
 				optimizeDensity = true;
 				if (optimizeDensity) {
-					if (values.length < 2)
+					if (arguments.size() < 2)
 						usage("Error: not enough arguments to optimizeDensity", true);
-					weightDenAdapt = Double.parseDouble(values[0]);
-					numDenAdapt = Integer.parseInt(values[1]);
+					weightDenAdapt = Double.parseDouble(arguments.get(0));
+					numDenAdapt = Integer.parseInt(arguments.get(1));
 				}
 			}
-			else if (flag.equalsIgnoreCase("--notNearestNeighbors")) {
-				String[] values = getValues(flag);
-				maxNearestNeighborLength = Double.parseDouble(values[0]);
-				notNearestNeighbors = GAUtils.parsePairs(GAUtils.subArray(values, 1));
+			else if (flag.equalsIgnoreCase("notNearestNeighbors")) {
+				maxNearestNeighborLength = Double.parseDouble(arguments.get(0));
+				notNearestNeighbors = GAUtils.parsePairs(Utility.subList(arguments, 1));
 			}
-			else if (flag.equalsIgnoreCase("--dryRun"))
-				dryRun = Boolean.parseBoolean(getValues(flag)[0]);
-			else if (flag.equalsIgnoreCase("--objectiveFunction")) {
-				String[] values = getValues(flag);
-				if (values.length < 2)
+			else if (flag.equalsIgnoreCase("dryRun"))
+				dryRun = Boolean.parseBoolean(arguments.get(0));
+			else if (flag.equalsIgnoreCase("objectiveFunction")) {
+				if (arguments.size() < 2)
 					usage("Not enough parameters given to --objectiveFunction", true);
-				objFcnArgs = values;
+				objFcnArgs = arguments;
 			}
-			else if (flag.equalsIgnoreCase("--parallelize")) {
-				numCalcsInParallel = Integer.parseInt(getValues(flag)[0]);
-				minPopSize = Integer.parseInt(getValues(flag)[1]);
+			else if (flag.equalsIgnoreCase("parallelize")) {
+				numCalcsInParallel = Integer.parseInt(arguments.get(0));
+				minPopSize = Integer.parseInt(arguments.get(1));
 			}
-			else if (flag.equalsIgnoreCase("--selection")) {
-				String[] values = getValues(flag);
-				if (values[0].equalsIgnoreCase("probDist"))
-					sel = new ProbDistSelection(GAUtils.subArray(values, 1));
-				else if (values[0].equalsIgnoreCase("off")) 
+			else if (flag.equalsIgnoreCase("selection")) {
+				if (arguments.get(0).equalsIgnoreCase("probDist"))
+					sel = new ProbDistSelection( Utility.subList(arguments, 1));
+				else if (arguments.get(0).equalsIgnoreCase("off")) 
 					sel = null;
 				else 
-					usage("Unknown selection function " + values[0], true);
+					usage("Unknown selection function " + arguments.get(0), true);
 			}
 			// kind of a hack. (it's because java collections don't support multiple identical keys)
-			else if (flag.toLowerCase().startsWith("--variation")) {
-				String[] values = getValues(flag, 3);
-				String variation = values[2];
-				initialVarProbs.add(Double.parseDouble(values[0]));
-				endgameVarProbs.add(Double.parseDouble(values[1]));
+			else if (flag.toLowerCase().startsWith("variation")) {
+				if (arguments.size() < 3)
+					usage("Malformed input to variation", true);
+				String variation = arguments.get(2);
+				initialVarProbs.add(Double.parseDouble(arguments.get(0)));
+				endgameVarProbs.add(Double.parseDouble(arguments.get(1)));
 				if (variation.equalsIgnoreCase("slicer"))
-					vars.add(new Slicer(GAUtils.subArray(values, 3)));
+					vars.add(new Slicer(Utility.subList(arguments, 3)));
 				else if (variation.equalsIgnoreCase("structureMut")) 
-					vars.add(new StructureMut(GAUtils.subArray(values, 3)));
+					vars.add(new StructureMut(Utility.subList(arguments, 3)));
 				else if (variation.equalsIgnoreCase("permutation")) 
-					vars.add(new Permutation(GAUtils.subArray(values, 3)));
+					vars.add(new Permutation(Utility.subList(arguments, 3)));
 				else if (variation.equalsIgnoreCase("numStoichsMut")) 
-					vars.add(new NumStoichsMut(GAUtils.subArray(values, 3)));
+					vars.add(new NumStoichsMut(Utility.subList(arguments, 3)));
 				else if (variation.equalsIgnoreCase("supercell")) 
-					vars.add(new SupercellVariation(GAUtils.subArray(values, 3)));
+					vars.add(new SupercellVariation(Utility.subList(arguments, 3)));
 				else 
 					usage("Unknown variation function " + variation, true);
 			}
 			// similar to the variation handling above
-			else if (flag.toLowerCase().startsWith("--convergencecriterion")) {
-				String[] values = getValues(flag);
-				if (values[0].equalsIgnoreCase("maxFunctionEvals"))
-					ccs.add(new NumFunctionEvalsCC(GAUtils.subArray(values, 1)));
-				else if (values[0].equalsIgnoreCase("maxNumGens"))
-					ccs.add(new NumGensCC(GAUtils.subArray(values, 1)));
-				else if (values[0].equalsIgnoreCase("maxNumGensWOImpr")) 
-					ccs.add(new NumGensWOImprCC(GAUtils.subArray(values, 1)));
-				else if (values[0].equalsIgnoreCase("valueAchieved")) 
-					ccs.add(new ValueAchievedCC(GAUtils.subArray(values, 1)));
-				else if (values[0].equalsIgnoreCase("foundStructure")) 
-					ccs.add(new FoundStructureCC(GAUtils.subArray(values, 1)));
+			else if (flag.toLowerCase().startsWith("convergencecriterion")) {
+				if (arguments.get(0).equalsIgnoreCase("maxFunctionEvals"))
+					ccs.add(new NumFunctionEvalsCC( Utility.subList(arguments, 1) ));
+				else if (arguments.get(0).equalsIgnoreCase("maxNumGens"))
+					ccs.add(new NumGensCC( Utility.subList(arguments, 1)));
+				else if (arguments.get(0).equalsIgnoreCase("maxNumGensWOImpr")) 
+					ccs.add(new NumGensWOImprCC( Utility.subList(arguments, 1)));
+				else if (arguments.get(0).equalsIgnoreCase("valueAchieved")) 
+					ccs.add(new ValueAchievedCC( Utility.subList(arguments, 1)));
+				else if (arguments.get(0).equalsIgnoreCase("foundStructure")) 
+					ccs.add(new FoundStructureCC( Utility.subList(arguments, 1)));
 				else 
-					usage("Unknown convergence criterion " + values[0], true);
+					usage("Unknown convergence criterion " + arguments.get(0), true);
 			}
-			else if (flag.equalsIgnoreCase("--promotion")) {
-				String[] values = getValues(flag);
-				pro = new Promotion(values);
+			else if (flag.equalsIgnoreCase("promotion")) {
+				pro = new Promotion(arguments);
 			}
-			else if (flag.toLowerCase().startsWith("--initialpopulation")) {
-				String[] values = getValues(flag, 2);
-				Integer numOrgs = new Integer(Integer.parseInt(values[0]));
-				String creatorType = values[1];
+			else if (flag.toLowerCase().startsWith("initialpopulation")) {
+				if (arguments.size() < 2)
+					this.usage("Malformed input in initialpopulation", true);
+				Integer numOrgs = new Integer(Integer.parseInt(arguments.get(0)));
+				String creatorType = arguments.get(1);
 
 				if (creatorType.equalsIgnoreCase("random")) {
-					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new RandomSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new RandomSOCreator( Utility.subList(arguments, 2)), numOrgs));
 //				} else if (creatorType.equalsIgnoreCase("resume")) {
 //					initialOrgCreators.put(new ResumeSOCreator(GAUtils.subArray(values, 2)), numOrgs);
 				} else if (creatorType.equalsIgnoreCase("manual")) {
-					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new ManualSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new ManualSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("fromCifs")) {
-					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new FromCifsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new FromCifsSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("units")) {
-					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator(GAUtils.subArray(values, 2)), numOrgs));
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else {
 					usage("Unrecognized population type " + creatorType, true);
 				}					
-			}
-			else if (flag.equalsIgnoreCase("--constituents")) {
-				System.out.println("WARNING: --constituents flag obsolete. Use --compositionSpace.");
-		//		String[] values = getValues(flag);
-		//		if (values.length % 2 != 1)
-		//			usage("Error: Constituents requires an odd number of arguments", true);
-		//		fixStoich = Boolean.parseBoolean(values[0]);
-		//		for (int j = 1; j < values.length; j = j + 2) {
-		//			constituents.put(values[j], Integer.parseInt(values[j+1]));
-		//		}
-			} else if (flag.equalsIgnoreCase("--compositionSpace")) {
+			} else if (flag.equalsIgnoreCase("compositionSpace")) {
 				List<String> csArgs = new LinkedList<String>();
 				for (String s : p.getSecond())
 					csArgs.add(s);
 				compSpace = new CompositionSpace(csArgs, false);
-			} else if (flag.equalsIgnoreCase("--writeHartkeFile")) {
-				String[] values = getValues(flag, 1);
-				writeHartkeFile = Boolean.parseBoolean(values[0]);
+			} else if (flag.equalsIgnoreCase("writeHartkeFile")) {
+				writeHartkeFile = Boolean.parseBoolean(arguments.get(0));
 			}
 			// we deal with the input file separately
-			else if (!flag.equalsIgnoreCase("--f") && verbosity >= 1)
+			else if (!flag.equalsIgnoreCase("f") && verbosity >= 1)
 				System.out.println("Ignoring unrecognized flag " + flag);
 		}
 		
@@ -464,6 +441,8 @@ public class GAParameters implements Serializable {
 	
 	public void checkInputs() {
 		// some sanity checks, not systematic
+		if (compSpace == null) 
+			usage("No --compositionSpace option passed.",true);
 		if (minLatticeLength > maxLatticeLength)
 			usage("Error: minLatticeLength > maxLatticeLength.", true);
 		if (minLatticeAngle > maxLatticeAngle)
@@ -477,9 +456,9 @@ public class GAParameters implements Serializable {
 				|| redundancyGuardType.equalsIgnoreCase("wholePopulation")
 				|| redundancyGuardType.equalsIgnoreCase("perGeneration")))
 					usage("ERROR: Unrecognized RedundancyGuard type " + redundancyGuardType, true);
-		if (objFcnArgs == null || objFcnArgs.length < 2)
+		if (objFcnArgs == null || objFcnArgs.size() < 2)
 			usage("ERROR: Need an objective function.", true);
-		String objFcnType = objFcnArgs[0];
+		String objFcnType = objFcnArgs.get(0);
 		if (objFcnType.equalsIgnoreCase("pd") && this.getCompSpace().getNumDimensions() < 2)
 			usage("ERROR: Can't use pd objFun w/ < 2 dimensions.", true);
 		if (vars == null || vars.size() == 0)
@@ -489,91 +468,7 @@ public class GAParameters implements Serializable {
 	public void setSeedGeneration(Cell[] initialPop) {
 		seedStructures = initialPop;
 	}
-	
-	// returns a mapping of key-value pairs parsed from the input file
-	private List<Pair<String,String[]>>  parseInputFile() {
-		int verbosity = GAParameters.getParams().getVerbosity();
-		List<Pair<String,String[]>> result = new ArrayList<Pair<String,String[]>>();
-		String line = null;
-		
-		// make sure we have a file to parse
-		if (inputFile == null || inputFile.equals("")) 
-			usage("Give an input file.", true);
-		
-		// open the input file
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(inputFile));
-			while ((line = in.readLine()) != null) {
-    			StringTokenizer t = new StringTokenizer(line);
-    			// skip empty lines:
-    			if (!t.hasMoreTokens())
-    				continue;
-    			String key = t.nextToken();
-    			// allow for comment lines starting with #
-    			if (key.charAt(0) == '#')
-    				continue;
-    			// read in all the values associated with the key
-    			ArrayList<String> valuesList = new ArrayList<String>();
-    			while (t.hasMoreTokens())
-    				valuesList.add(t.nextToken());
-    			// add the key-value pair to the mapping (add the -- to the front of the key)
-    			key = (new String("--")).concat(key);
-    			String[] values = new String[valuesList.size()];
-    			values = valuesList.toArray(values);
-    			result.add(new Pair<String,String[]>(key,values));
-    			//result.put(key, values);
-    			if (verbosity >= 5) {
-    				System.out.print("Parsed from input file: " + key + " ");
-    				for (int i = 0; i < values.length; i++)
-    					System.out.print(values[i] + " ");
-    				System.out.println("");
-    			}
-			}
-		} catch(IOException x) {
-			usage("GAParameters.parseInputFile: " + x.getMessage(), true);
-		}
-		
-		return result;	
-	}
-	
-	// returns the first value associated with the given flag.
-	// if no such value is available, we print the usage statement and exit.
-	private String[] getValues(String flag) {		
-		String[] result = null;
-		for (Pair<String,String[]> p : argmap) {
-			if (p.getFirst().compareToIgnoreCase(flag) == 0) {
-				result = p.getSecond();
-				break;
-			}
-		}
-		
-		if(!isSet(flag) || result == null || result.length == 0)
-			usage("Improper usage of " + flag, true);
-		
-	    return result;
-	}
-	// overloaded getValues:
-	// make sure we have at least n values following the given flag
-	private String[] getValues (String flag, int n) {
-		String[] answer = getValues(flag);
-		if (answer.length < n)
-			usage("Improper usage of " + flag + ". Requires " + n + " arguments.", true);
-		return answer;
-	}
-	
-	// boolean function to determine whether or not a particular flag
-	// was passed on the command line
-	private Boolean isSet(String flag)
-	{
-		if (argmap == null)
-			return false;
-		
-		for (Pair<String,String[]> p : argmap) {
-			if (p.getFirst().compareToIgnoreCase(flag) == 0)
-				return true;
-		}
-		return false;
-	}
+
 	
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -814,16 +709,16 @@ public class GAParameters implements Serializable {
 		return redundancyGuardType;
 	}
 	
-	public String[] getRedundancyGuardArgs() {
-		return redundancyGuardArgs;
+	public List<String> getRedundancyGuardArgs() {
+		return new ArrayList<String>(redundancyGuardArgs);
 	}
 	
 	public boolean usingSurrogateModel() {
 		return useSurrogate;
 	}
 	
-	public String[] getSurrogateArgs() {
-		return surrogateArgs;
+	public List<String> getSurrogateArgs() {
+		return new ArrayList<String>(surrogateArgs);
 	}
 	
 	public String getTempDirName() {

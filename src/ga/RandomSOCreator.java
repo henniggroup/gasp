@@ -21,22 +21,22 @@ public class RandomSOCreator implements StructureOrgCreator {
 	private String newGenType;
 	private double givenVolPerAtom;
 	
-	public RandomSOCreator(String[] args) {
+	public RandomSOCreator(List<String> args) {
 		GAParameters params = GAParameters.getParams();
 		
 		// parse the options passed in
-		if (args == null || args.length < 1)
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to RandomSOCreator", true);
-		newGenType = args[0];
+		newGenType = args.get(0);
 		
 		if (newGenType.equalsIgnoreCase("randomVol")) {
 			// nothing
 		} else if (newGenType.equalsIgnoreCase("givenVol")) {
-			if (args.length != 2)
+			if (args.size() != 2)
 				GAParameters.usage("Incorrect number of parameters given to RandomSOCreator", true);
-			givenVolPerAtom = Double.parseDouble(args[1]);
+			givenVolPerAtom = Double.parseDouble(args.get(1));
 		} else {
-			GAParameters.usage("Unrecognized population type " + args[0], true);
+			GAParameters.usage("Unrecognized population type " + args.get(0), true);
 		}
 	}
 		

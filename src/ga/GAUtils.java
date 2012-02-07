@@ -124,19 +124,19 @@ public class GAUtils {
 	
 	// takes in an array of strings of the form Mg-O and returns list of Sets of String,
 	// where each set contains the two strings (e.g. Mg and O)
-	public static List<Set<String>> parsePairs(String[] args) {
+	public static List<Set<String>> parsePairs(List<String> args) {
 		GAParameters params = GAParameters.getParams();
 		// parse the pairs of atoms which can be exchanged
 		ArrayList<Set<String>> result = new ArrayList<Set<String>>();
-		for (int i = 0; i < args.length; i++) {
+		for (int i = 0; i < args.size(); i++) {
 			// get the pair
-			String[] symbols = args[i].split("-");
+			String[] symbols = args.get(i).split("-");
 			// make sure we've got a pair of species that are in the system
 			if (symbols.length != 2)
-				GAParameters.usage("Malformed species pair " + args[i], true);
+				GAParameters.usage("Malformed species pair " + args.get(i), true);
 			if (!params.getCompSpace().getElements().contains(Element.getElemFromSymbol(symbols[0]))
 					|| !params.getCompSpace().getElements().contains(Element.getElemFromSymbol(symbols[1])))
-				GAParameters.usage("Species not in the system: " + args[i], true);
+				GAParameters.usage("Species not in the system: " + args.get(i), true);
 			// TODO: how should we handle above contingency in PD obj fcn case (when it happens,
 			// to, say, select an elemental phase)?
 			// store the pair

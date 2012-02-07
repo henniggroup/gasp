@@ -32,24 +32,24 @@ public class RedundancyGuard implements Serializable {
 	private double angleMisfit;
 	private boolean usePBCs;
 	
-	public RedundancyGuard(String[] args) {
+	public RedundancyGuard(List<String> args) {
 		// initialize structures
 		structures = new HashMap<Cell,Integer>();
 		
 		// parse args
-		if (args == null || args.length < 3)
+		if (args == null || args.size() < 3)
 			GAParameters.usage("Not enough parameters given to RedundancyGuard", true);
 		
 		//lAngleTol = Double.parseDouble(args[0]);
 		//lLengthTol = Double.parseDouble(args[1]);
 		//interval = Double.parseDouble(args[2]);
 
-		atomicMisfit = Double.parseDouble(args[0]);
-		latticeMisfit = Double.parseDouble(args[1]);
-		angleMisfit = Double.parseDouble(args[2]);
+		atomicMisfit = Double.parseDouble(args.get(0));
+		latticeMisfit = Double.parseDouble(args.get(1));
+		angleMisfit = Double.parseDouble(args.get(2));
 		
-		if (args.length > 3)
-			usePBCs = Boolean.parseBoolean(args[3]);
+		if (args.size() > 3)
+			usePBCs = Boolean.parseBoolean(args.get(3));
 		else
 			usePBCs = true;
 	}
@@ -171,6 +171,7 @@ public class RedundancyGuard implements Serializable {
 	
 	// just for testing
 	public static void main(String[] args) {
+		/*
 		String[] rdArgs = {"0.5", "0.5", "0.05", "false"};
 		
 		RedundancyGuard bob = new RedundancyGuard(rdArgs);
@@ -184,6 +185,7 @@ public class RedundancyGuard implements Serializable {
 		bob.addStructureOrg(temp1);
 		System.out.print("They match: ");
 		System.out.println((bob.checkStructureOrg(temp2) != null));
+		*/
 
 	}
 	

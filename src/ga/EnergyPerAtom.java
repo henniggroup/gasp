@@ -2,11 +2,14 @@
 
 package ga;
 
+import java.util.List;
+
 import mopac.MopacEnergy;
 import avogadro.AvogadroEnergy;
 import castep.CastepEnergy;
 import dlpoly.DLPolyEnergy;
 import gulp.GulpEnergy;
+import utility.Utility;
 import vasp.VaspEnergy;
 
 // EnergyPerAtom is an ObjectiveFunction.  It uses an Energy object to compute the
@@ -18,29 +21,29 @@ public class EnergyPerAtom extends ObjectiveFunction {
 	Energy energyFcn;
 	StructureOrg org;
 
-	public EnergyPerAtom (String args[], Organism o) {
-		if (args == null || args.length < 1)
+	public EnergyPerAtom (List<String> args, Organism o) {
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to EnergyPerAtom", true);
 		
-		String energyType = args[0];
+		String energyType = args.get(0);
 		if (energyType.equalsIgnoreCase("gulp"))
-			energyFcn = new GulpEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new GulpEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("vasp"))
-			energyFcn = new VaspEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new VaspEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("ohmms"))
-			energyFcn = new OhmmsEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new OhmmsEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("lammps"))
-			energyFcn = new LammpsEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new LammpsEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("castep"))
-			energyFcn = new CastepEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new CastepEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("avogadro"))
-			energyFcn = new AvogadroEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new AvogadroEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("dlpoly"))
-			energyFcn = new DLPolyEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new DLPolyEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("mopac"))
-			energyFcn = new MopacEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new MopacEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("dftpp"))
-			energyFcn = new DFTPPEnergy(GAUtils.subArray(args, 1));
+			energyFcn = new DFTPPEnergy(Utility.subList(args, 1));
 		else
 			throw new RuntimeException("Unknown energy function in EnergyPerAtom: " + energyType);
 		

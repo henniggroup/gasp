@@ -29,13 +29,13 @@ public final class StructureMut implements Variation {
 	private double sigmaAtoms;
 	private double sigmaLattice;
 	
-	public StructureMut(String[] args) {
-		if (args == null || args.length < 3)
+	public StructureMut(List<String> args) {
+		if (args == null || args.size() < 3)
 			GAParameters.usage("Not enough parameters given to StructureMut", true);
 		
-		mutRate = Double.parseDouble(args[0]);
-		sigmaAtoms = Double.parseDouble(args[1]);
-		sigmaLattice = Double.parseDouble(args[2]);
+		mutRate = Double.parseDouble(args.get(0));
+		sigmaAtoms = Double.parseDouble(args.get(1));
+		sigmaLattice = Double.parseDouble(args.get(2));
 	}
 	
 	public String toString() {
@@ -173,6 +173,7 @@ public final class StructureMut implements Variation {
 	
 	// just for testing
 	public static void main(String[] args) {
+		/*
 		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
 		s1.setFitness(-1);
 		
@@ -188,6 +189,7 @@ public final class StructureMut implements Variation {
 		StructureOrg o = (StructureOrg)s.doVariation(parents, null, sel);
 	//	GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false);
 		System.out.println(o);
+		*/
 	}
 
 }

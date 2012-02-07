@@ -258,6 +258,10 @@ public class Utility {
 		}
 	}
 	
+	public static <E> List<E> subList(List<E> l, int i) {
+		return new ArrayList<E>(l.subList(i, l.size()));
+	}
+	
 	public static Serializable readSerializable(String fName) {
 		Serializable result = null;
 		FileInputStream fis = null;

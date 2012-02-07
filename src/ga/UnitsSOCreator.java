@@ -36,20 +36,20 @@ public class UnitsSOCreator implements StructureOrgCreator {
 	
 // ------------------------------------------------------------
 	
-	public UnitsSOCreator(String[] args) {
+	public UnitsSOCreator(List<String> args) {
 		
 		// Length of arguments
-		int length = args.length;
+		int length = args.size();
 		
 		// Parse unitsOnly
-		unitsOnly = Boolean.parseBoolean(args[length-1]);
+		unitsOnly = Boolean.parseBoolean(args.get(length-1));
 		
 		// Parse density parameters
-		densityTol = Double.parseDouble(args[length-2]);
-		targetDensity = Double.parseDouble(args[length-3]);
+		densityTol = Double.parseDouble(args.get(length-2));
+		targetDensity = Double.parseDouble(args.get(length-3));
 		
 		// Parse number of different molecules
-		difUnits = Integer.parseInt(args[0]);
+		difUnits = Integer.parseInt(args.get(0));
 		
 		// Marks location of coordinates
 		int cStart = difUnits + 1;
@@ -59,7 +59,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		// Parse in number of atoms per molecule
 		numSites = 0;
 		for (int i=0; i<difUnits; i++) {
-			int l = Integer.parseInt(args[1+i]);
+			int l = Integer.parseInt(args.get(1 + i));
 			numAtoms[i] = l;
 			numSites = numSites + l;
 		}
@@ -74,7 +74,7 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			range = false;
 			numUnits = new int[difUnits];
 			for (int i=0; i<difUnits; i++) {
-				numUnits[i] = Integer.parseInt(args[eStart+i]);
+				numUnits[i] = Integer.parseInt(args.get(eStart+i));
 			}
 		}
 		// if given a range of targets
@@ -82,14 +82,14 @@ public class UnitsSOCreator implements StructureOrgCreator {
 			range = true;
 			numUnits = new int[difUnits*2];
 			for (int i=0; i<difUnits*2; i++) {
-				numUnits[i] = Integer.parseInt(args[eStart+i]);
+				numUnits[i] = Integer.parseInt(args.get(eStart+i));
 			}
 		}
 		
 		// String array of all atoms
 		atoms = new String[numSites];
 		for (int i=0; i<numSites; i++) {
-			atoms[i] = args[cStart + i*4];
+			atoms[i] = args.get(cStart + i*4);
 		}
 		
 		// Double array of atom coordinates
@@ -98,11 +98,11 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		for (int r=0; r<numSites; r++) {
 			for (int c=0; c<Constants.numDimensions; c++) {
 				if (pos % 4 != 0) {
-					coords[r][c] = Double.parseDouble(args[cStart + pos]);
+					coords[r][c] = Double.parseDouble(args.get(cStart + pos));
 					pos++;
 				}
 				else {
-					coords[r][c] = Double.parseDouble(args[cStart + pos + 1]);
+					coords[r][c] = Double.parseDouble(args.get(cStart + pos + 1));
 					pos = pos + 2;
 				}
 			}

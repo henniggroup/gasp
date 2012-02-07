@@ -3,6 +3,9 @@
 package ga;
 
 import java.io.*;
+import java.util.List;
+
+import utility.Utility;
 
 import crystallography.Cell;
 
@@ -15,17 +18,18 @@ public class FoundStructureCC implements ConvergenceCriterion {
 	
 	RedundancyGuard target;
 	
-	public FoundStructureCC(String[] args) {
-		if (args == null || args.length < 1)
+	public FoundStructureCC(List<String> args) {
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to FoundStructureCC", true);
 		
-		String targetFilename = args[0];
+		String targetFilename = args.get(0);
 		
 		StructureOrg targetSOrg = new StructureOrg(Cell.parseCif(new File(targetFilename)));
 		
 		// initialize the target
 		//String[] rgArgs = {"1.0", "0.001"};
-		target = new RedundancyGuard(GAUtils.subArray(args,1));
+		
+		target = new RedundancyGuard(Utility.subList(args, 1));
 		
 		target.addStructureOrg(targetSOrg);
 	}

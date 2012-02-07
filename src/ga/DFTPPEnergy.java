@@ -30,18 +30,18 @@ public class DFTPPEnergy implements Energy {
 	static final double bohrPerAngstrom = 1.889725989;
 	static final String ionPosFileString = "ionpos";
 
-	public DFTPPEnergy(String[] args)
+	public DFTPPEnergy(List<String> args)
 	{
-		if (args == null || args.length < 4 || (args.length) % 2 != 0)
+		if (args == null || args.size() < 4 || (args.size()) % 2 != 0)
 			GAParameters.usage("Wrong parameters given to DFTPPEnergy", true);
 
-		inputStr = GAUtils.readStringFromFile(new File(args[0]));
-		cautious = Boolean.parseBoolean(args[1]);
+		inputStr = GAUtils.readStringFromFile(new File(args.get(0)));
+		cautious = Boolean.parseBoolean(args.get(1));
 
 		ppsMap = new HashMap<Element,String>();
-		for (int i = 2; i < args.length - 1; i = i+2) {
-			Element e = Element.getElemFromSymbol(args[i]);
-			ppsMap.put(e, args[i+1]);
+		for (int i = 2; i < args.size() - 1; i = i+2) {
+			Element e = Element.getElemFromSymbol(args.get(i));
+			ppsMap.put(e, args.get(i+1));
 		}
 		
 

@@ -36,13 +36,13 @@ public class AvogadroEnergy implements Energy {
 	private String logpath;
 	private static String errorpath;
 
-	public AvogadroEnergy(String[] args) {		
+	public AvogadroEnergy(List<String> args) {		
 		
-		if (args == null || args.length < 1)
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to AvogadroEnergy", true);
 		
 		// read in the Avogadro header to use
-		File headerFile = new File(args[0]);
+		File headerFile = new File(args.get(0));
 		headerStr = GAUtils.readStringFromFile(headerFile);		
 
 	}

@@ -28,16 +28,16 @@ import org.openbabel.*;
 
 public class DLPolyEnergy implements Energy {
 
-	public DLPolyEnergy(String[] args) {		
+	public DLPolyEnergy(List<String> args) {		
 		
-		if (args == null || args.length < 2)
+		if (args == null || args.size() < 2)
 			GAParameters.usage("Not enough parameters given to DLPolyEnergy", true);
 		
 		// read in the location of DLPoly files
-		String loc = args[0];
+		String loc = args.get(0);
 		
 		// read in the location of the potl file
-		String potl = args[1];
+		String potl = args.get(1);
 		
 /*		// create a directory for calldlpoly files
 		File calldl = new File("/home/skw57/bin/calldl");

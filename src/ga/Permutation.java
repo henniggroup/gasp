@@ -6,6 +6,7 @@ import java.util.*;
 
 import chemistry.Element;
 
+import utility.Utility;
 import utility.Vect;
 
 import crystallography.Cell;
@@ -20,20 +21,20 @@ public class Permutation implements Variation {
 	
 	private double meanExchanges;
 	private double sigmaExchanges;
-	String[] pairStrings;
+	List<String> pairStrings;
 	private List<Set<String>> pairs = null;
 	
-	public Permutation(String[] args) {
-		if (args.length < 3)
+	public Permutation(List<String> args) {
+		if (args.size() < 3)
 			GAParameters.usage("Not enough parameters given to Permutation", true);
 		
-		meanExchanges = Double.parseDouble(args[0]);
-		sigmaExchanges = Double.parseDouble(args[1]);
+		meanExchanges = Double.parseDouble(args.get(0));
+		sigmaExchanges = Double.parseDouble(args.get(1));
 		
 		if (meanExchanges == 0 && sigmaExchanges == 0)
 			GAParameters.usage("Bad mean/sigma given to Permutation", true);
 		
-		pairStrings = GAUtils.subArray(args, 2);
+		pairStrings = Utility.subList(args, 2);
 	}
 	
 	public String toString() {

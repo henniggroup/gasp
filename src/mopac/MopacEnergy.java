@@ -30,13 +30,13 @@ public class MopacEnergy implements Energy {
 
 	private static String execpath;
 	
-	public MopacEnergy(String[] args) {		
+	public MopacEnergy(List<String> args) {		
 		
-		if (args == null || args.length < 1)
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to MopacEnergy", true);
 		
 		// read path to executable, ensure it points directly to the executable
-		execpath = args[0];
+		execpath = args.get(0);
 /*		int length = execpath.length();
 		if (!execpath.substring(length-4).equals("exe")) {
 			if (execpath.substring(length-1).equals("/")) {

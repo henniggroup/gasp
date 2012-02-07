@@ -21,11 +21,11 @@ public final class ProbDistSelection implements Selection, Serializable {
 	private int numSurvivors;
 	private double power;
 
-	public ProbDistSelection(String[] args) {
-		if (args.length < 2)
+	public ProbDistSelection(List<String> args) {
+		if (args.size() < 2)
 			GAParameters.usage("Not enough parameters given to ProbDistSelection", true);
-		numSurvivors = Integer.parseInt(args[0]);
-		power = Double.parseDouble(args[1]);	
+		numSurvivors = Integer.parseInt(args.get(0));
+		power = Double.parseDouble(args.get(1));	
 	}
 	
 	public String toString() {
@@ -178,7 +178,9 @@ public final class ProbDistSelection implements Selection, Serializable {
 	}
 	
 	public static void main(String[] args) {
-		String[] elitistArgs = {"5", "1"};
+		List<String> elitistArgs = new ArrayList<String>();
+		elitistArgs.add("5");
+		elitistArgs.add("1");
 		ProbDistSelection bob = new ProbDistSelection(elitistArgs);
 		
 		Structures g = new Structures();

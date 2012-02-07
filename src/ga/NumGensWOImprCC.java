@@ -2,6 +2,8 @@
 
 package ga;
 
+import java.util.List;
+
 // NumGensWOImprCC implements ConvergenceCriterion.  It indicates that the algorithm has
 // converged when the algorithm has run for a given number of generations without improving
 // its best solution.
@@ -14,12 +16,12 @@ public class NumGensWOImprCC implements ConvergenceCriterion {
 	int maxNumGensWOProgress;
 	double improvementTolerance;
 	
-	public NumGensWOImprCC(String[] args) {
-		if (args == null || args.length < 2)
+	public NumGensWOImprCC(List<String> args) {
+		if (args == null || args.size() < 2)
 			GAParameters.usage("Not enough parameters given to NumGensWOImprCC", true);
 		
-		maxNumGensWOProgress = Integer.parseInt(args[0]);
-		improvementTolerance = Double.parseDouble(args[1]);
+		maxNumGensWOProgress = Integer.parseInt(args.get(0));
+		improvementTolerance = Double.parseDouble(args.get(1));
 	}
 	
 	public String toString() {

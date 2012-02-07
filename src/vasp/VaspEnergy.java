@@ -27,17 +27,17 @@ public class VaspEnergy implements Energy {
 	private String incarFile;
 	private boolean cautious;
 		
-	public VaspEnergy(String[] args) {
-		if (args == null || args.length < 5 || args.length % 2 != 1)
+	public VaspEnergy(List<String> args) {
+		if (args == null || args.size() < 5 || args.size() % 2 != 1)
 			GAParameters.usage("Not enough or malformed parameters given to VaspEnergy", true);
 		
-		cautious = Boolean.parseBoolean(args[0]);
-		kpointsFile = args[1];
-		incarFile = args[2];
+		cautious = Boolean.parseBoolean(args.get(0));
+		kpointsFile = args.get(1);
+		incarFile = args.get(2);
 		potcarFileMap = new HashMap<Element,String>();
-		for (int i = 3; i < args.length; i = i+2) {
-			Element e = Element.getElemFromSymbol(args[i]);
-			String potcarFile = args[i+1];
+		for (int i = 3; i < args.size(); i = i+2) {
+			Element e = Element.getElemFromSymbol(args.get(i));
+			String potcarFile = args.get(i+1);
 			potcarFileMap.put(e, potcarFile);
 		}
 

@@ -21,7 +21,7 @@ public class PDObjFcn extends ObjectiveFunction {
 		pdbuilder = new PDBuilder(entries, elements, chempots);
 	} */
 	
-	public PDObjFcn(String[] subArray, Organism o) {
+	public PDObjFcn(List<String> subArray, Organism o) {
 		// TODO Auto-generated constructor stub
 		energyFcn = new EnergyPerAtom(subArray, o);
 		org = (StructureOrg)o;

@@ -38,21 +38,21 @@ public class GulpSurrogate implements Serializable {
 	private double shift = 0.0;
 	private int refit_freq;
 	
-	public GulpSurrogate(String args[]) {
+	public GulpSurrogate(List<String> args) {
 		
-		if (args.length != 3) {
+		if (args.size() != 3) {
 			System.out.println("ERROR: wrong args given to GulpSurrogate:");
 			for (String s : args)
 				System.out.println(s);
 		}
 		
-		headerStr = Utility.readStringFromFile(args[0]);
+		headerStr = Utility.readStringFromFile(args.get(0));
 		
 		entries = new ArrayList<IComputedEntry>();
  
-		parsePotentialsString(Utility.readStringFromFile(args[1]));
+		parsePotentialsString(Utility.readStringFromFile(args.get(1)));
 		
-		refit_freq = Integer.parseInt(args[2]);
+		refit_freq = Integer.parseInt(args.get(2));
 	}
 	
 	private void parsePotentialsString(String potlsStr) {
@@ -346,6 +346,7 @@ public class GulpSurrogate implements Serializable {
 	
 	// just for testing
 	public static void main (String args[]) {
+		/*
 		// set up the stuff needed for RandomSOCreator
 		Generation g = new Structures();
 		GAParameters.getParams().setMaxNumAtoms(10);
@@ -388,6 +389,6 @@ public class GulpSurrogate implements Serializable {
 					". Real energy: " + energy.getEnergy(cell) +
 					". Surrogate model energy: " + s.evaluateTotalEnergy(cell.getCell()));
 		} 
-		
+		*/
 	}	
 }

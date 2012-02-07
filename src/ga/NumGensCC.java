@@ -2,6 +2,8 @@
 
 package ga;
 
+import java.util.List;
+
 // NumGensCC implements ConvergenceCriterion.  It indicates that the algorithm has
 // converged when the algorithm has run for a given number of generations.
 
@@ -9,11 +11,11 @@ public class NumGensCC implements ConvergenceCriterion {
 
 	int maxNumGens;
 	
-	public NumGensCC(String[] args) {
-		if (args == null || args.length < 1)
+	public NumGensCC(List<String> args) {
+		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to NumGensCC", true);
 		
-		maxNumGens = Integer.parseInt(args[0]);
+		maxNumGens = Integer.parseInt(args.get(0));
 	}
 	
 	public String toString() {

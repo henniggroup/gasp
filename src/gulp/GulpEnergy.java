@@ -35,24 +35,24 @@ public class GulpEnergy implements Energy {
 	private ArrayList<String> speciesWithShell;
 	private Boolean cautious;
 
-	public GulpEnergy(String[] args)
+	public GulpEnergy(List<String> args)
 	{
-		if (args == null || args.length < 3)
+		if (args == null || args.size() < 3)
 			GAParameters.usage("Not enough parameters given to GulpEnergy", true);
 		
 		// read in the GULP header to use
-		File headerFile = new File(args[0]);
+		File headerFile = new File(args.get(0));
 		headerStr = GAUtils.readStringFromFile(headerFile);
 
 		// read in the GULP potential to use
-		File potlFile = new File(args[1]);
+		File potlFile = new File(args.get(1));
 		potlStr = GAUtils.readStringFromFile(potlFile);
 		
-		cautious = Boolean.parseBoolean(args[2]);
+		cautious = Boolean.parseBoolean(args.get(2));
 		
 		speciesWithShell = new ArrayList<String>();
-		for (int i = 4; i < args.length; i++)
-			speciesWithShell.add(args[i]);
+		for (int i = 4; i < args.size(); i++)
+			speciesWithShell.add(args.get(i));
 	}
 
 	public String toString() {
@@ -428,12 +428,13 @@ public class GulpEnergy implements Energy {
 	
 	// just for testing:
 	public static void main(String[] args) {
+		/*
 		String[] geArgs = {"/home/wtipton/projects/ga_for_crystals/gulp_header", "/home/wtipton/projects/ga_for_crystals/gulppotls/gulppotl_alcu", "true"};
 		GulpEnergy bob = new GulpEnergy(geArgs);
 		Cell c = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/alcu_compspace/refstates/8.cif"));
 		
 		System.out.println(bob.getEnergy(new StructureOrg(c)));
-		
+		*/
 	//	String output = GulpEnergy.runGULP("mno2_poly.gin");
 	//	System.out.println(output);
 	//	System.out.println(GulpEnergy.parseFinalEnergy(output, bob.cautious));
