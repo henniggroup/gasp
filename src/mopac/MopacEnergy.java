@@ -1,6 +1,7 @@
 package mopac;
 
 import ga.Energy;
+import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.StructureOrg;
@@ -106,7 +107,6 @@ public class MopacEnergy implements Energy {
 	
 	public static void runMopac(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		// Write input files
 		String input = writeInput(c);		
@@ -125,8 +125,7 @@ public class MopacEnergy implements Energy {
 			
 			// read the output
 			while ((s = stdInput.readLine()) != null) {
-				if (verbosity >= 5)
-					System.out.println(s);
+				GAOut.out().stdout(s, GAOut.DEBUG);
 			}
 
 			// print out any errors
@@ -146,9 +145,7 @@ public class MopacEnergy implements Energy {
 			
 		// Parse final structure, set as return structure
 		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out") == null) {
-			if (verbosity >= 3) {
-				System.out.println("Warning: bad MOPAC CIF.  Not updating structure.");
-			}
+			GAOut.out().stdout("Warning: bad MOPAC CIF.  Not updating structure.", GAOut.WARNING, c.getID());
 		} else {
 			Cell p = parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out");
 			c.setCell(p);
@@ -158,7 +155,6 @@ public class MopacEnergy implements Energy {
 	
 	public static Cell parseStructure(StructureOrg c, String output) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		List<Site> sites = c.getCell().getSites();
 		List<Vect> newVects = new LinkedList<Vect>();
@@ -179,8 +175,7 @@ public class MopacEnergy implements Energy {
 					}
 				}
 			} catch (IOException x) {
-				if (verbosity >= 1)
-					System.out.println("MopacEnergy: IOException.");
+				GAOut.out().stdout("MopacEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL, c.getID());
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("MopacEnergy.parseStructure: .out not found");
@@ -235,19 +230,15 @@ public class MopacEnergy implements Energy {
 							}
 							
 						} catch (NumberFormatException x) {
-							if (verbosity >= 3) 
-								System.out.println("MopacEnergy.parseStructure: " + x.getMessage());
-							if (verbosity >= 5) {
-								System.out.println("MOPAC output follows: ");
-								System.out.println(output);
-							}
+							GAOut.out().stdout("MopacEnergy.parseStructure: " + x.getMessage(), GAOut.NOTICE, c.getID());
+							GAOut.out().stdout("MOPAC output follows: ", GAOut.DEBUG, c.getID());
+							GAOut.out().stdout(output, GAOut.DEBUG, c.getID());
 						}
 						break;
 					}
 				}
 			} catch (IOException x) {
-				if (verbosity >= 1)
-					System.out.println("MopacEnergy: IOException.");
+				GAOut.out().stdout("MopacEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL, c.getID());
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("MopacEnergy.parseStructure: .out not found");
@@ -266,7 +257,6 @@ public class MopacEnergy implements Energy {
 	//TODO: parsing from the .arc file rather than .out might be cleaner, though not necessary
 	public static Double parseFinalEnergy(String output) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		Double finalEnergy = Double.POSITIVE_INFINITY;
 		
@@ -288,19 +278,15 @@ public class MopacEnergy implements Energy {
 							m.nextToken(); m.nextToken(); m.nextToken();
 							finalEnergy = Double.parseDouble(m.nextToken());
 						} catch (NumberFormatException x) {
-							if (verbosity >= 3) 
-								System.out.println("MopacEnergy.parseFinalEnergy: " + x.getMessage());
-							if (verbosity >= 5) {
-								System.out.println("MOPAC output follows: ");
-								System.out.println(output);
-							}
+							GAOut.out().stdout("MopacEnergy.parseFinalEnergy: " + x.getMessage(), GAOut.NOTICE);
+							GAOut.out().stdout("MOPAC output follows: ", GAOut.DEBUG);
+							GAOut.out().stdout(output, GAOut.DEBUG);
 						}
 						break;
 					}
 				}
 			} catch (IOException x) {
-				if (verbosity >= 1)
-					System.out.println("MopacEnergy: IOException.");
+				GAOut.out().stdout("MopacEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL);
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("MopacEnergy.parseFinalEnergy: .out not found");

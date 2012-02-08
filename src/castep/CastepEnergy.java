@@ -49,7 +49,6 @@ public class CastepEnergy implements Energy {
 	
 	// runs CASTEP on the input file given and returns the results in a String
 	private String runCastep(String inputDir) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder castepOutput = new StringBuilder();
 
 		String s = null;
@@ -68,8 +67,7 @@ public class CastepEnergy implements Energy {
 				// read the output
 				while ((s = stdInput.readLine()) != null) {
 					castepOutput.append(s + GAUtils.newline());
-					if (verbosity >= 5)
-						System.out.println(s);
+					GAOut.out().stdout(s, GAOut.DEBUG);
 				}
 	
 				// print out any errors
@@ -91,12 +89,10 @@ public class CastepEnergy implements Energy {
 	
 	private double castepRun(StructureOrg o) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		// some output
-		if (verbosity >= 3)
-			System.out.println("Starting CASTEP computation on organism "
-					+ o.getID() + "... ");
+		GAOut.out().stdout("Starting CASTEP computation on organism "
+				+ o.getID() + "... ", GAOut.NOTICE, o.getID());
 		
 		// make temp directory
 		File outDir = new File(params.getTempDirName() + "/" + params.getRunTitle() + "." + o.getID());
@@ -111,8 +107,7 @@ public class CastepEnergy implements Energy {
 		// run castep
 		String castepOutput = runCastep(outDir.getAbsolutePath());
 		
-		if (verbosity >= 5)
-			System.out.println(castepOutput);
+		GAOut.out().stdout(castepOutput, GAOut.DEBUG, o.getID());
 
 		// store the relaxed structure back into o
 		Cell newCell = CastepOut.getCell(outDir.getAbsolutePath() + "/" + castepPrefix + ".castep");
@@ -121,8 +116,8 @@ public class CastepEnergy implements Energy {
 		
 		// return the energy
 		double finalEnergy = CastepOut.getFinalEnergy(outDir.getAbsolutePath() + "/" + castepPrefix + ".castep", cautious);
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + o.getID() + ": " + finalEnergy + " ");
+		
+		GAOut.out().stdout("Energy of org " + o.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, o.getID());
 		
 		return finalEnergy; 
 	}

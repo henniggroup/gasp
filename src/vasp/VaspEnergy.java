@@ -45,7 +45,6 @@ public class VaspEnergy implements Energy {
 	
 	// runs VASP on the input file given and returns the results in a String
 	private String runVasp(String inputDir) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder vaspOutput = new StringBuilder();
 
 		String s = null;
@@ -64,8 +63,7 @@ public class VaspEnergy implements Energy {
 				// read the output
 				while ((s = stdInput.readLine()) != null) {
 					vaspOutput.append(s + GAUtils.newline());
-					if (verbosity >= 5)
-						System.out.println(s);
+					GAOut.out().stdout(s, GAOut.DEBUG);
 				}
 	
 				// print out any errors
@@ -87,12 +85,10 @@ public class VaspEnergy implements Energy {
 	
 	private double vaspRun(StructureOrg o) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		// some output
-		if (verbosity >= 3)
-			System.out.println("Starting VASP computation on organism "
-					+ o.getID() + "... ");
+		GAOut.out().stdout("Starting VASP computation on organism "
+				+ o.getID() + "... ", GAOut.NOTICE, o.getID());
 		
 		// make temp directory
 		File outDir = new File(params.getTempDirName() + "/" + params.getRunTitle() + "." + o.getID());
@@ -108,8 +104,7 @@ public class VaspEnergy implements Energy {
 		// run vasp
 		String vaspOutput = runVasp(outDir.getAbsolutePath());
 		
-		if (verbosity >= 5)
-			System.out.println(vaspOutput);
+		GAOut.out().stdout(vaspOutput, GAOut.DEBUG, o.getID());
 
 		// store the relaxed structure back into o
 		Cell newCell = VaspOut.getPOSCAR(outDir.getAbsolutePath() + "/CONTCAR");
@@ -118,8 +113,7 @@ public class VaspEnergy implements Energy {
 		
 		// return the energy
 		double finalEnergy = VaspOut.getFinalEnergy(outDir.getAbsolutePath() + "/OUTCAR", cautious);
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + o.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + o.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, o.getID());
 		
 		return finalEnergy; 
 	}

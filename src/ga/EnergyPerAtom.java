@@ -81,7 +81,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 		
 		org.setTotalEnergy(totalEnergy);
 		
-		System.out.println("Setting value of org " + org.getID() + " to " + value);
+		GAOut.out().stdout("Setting value of org " + org.getID() + " to " + value, GAOut.NOTICE, org.getID());
+		
 		org.setValue(value);
 		
 	}

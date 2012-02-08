@@ -18,7 +18,6 @@ public class GeneticAlgorithm {
 	// and returns the best Organism found.
 	public static Organism doGeneticAlgorithm() {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		// Create the objects for the algorithms
 		Selection sel = params.getSelection();
@@ -52,8 +51,7 @@ public class GeneticAlgorithm {
 					organisms.add(new Pair<Organism,Integer>(newOrg, 1 + ObjectiveFunction.getNumCalculations()));
 					
 					// some status info
-					if (verbosity >= 5)
-						System.out.println(newOrg);
+					GAOut.out().stdout(newOrg.toString(), GAOut.DEBUG, newOrg.getID());
 					
 					// start the energy computation
 					if (!newOrg.knowsValue())
@@ -65,8 +63,7 @@ public class GeneticAlgorithm {
 					for (Thread t : threads)
 						t.join();
 				} catch (InterruptedException x) {
-					if (verbosity >= 3)
-						System.out.println("InterruptedException in energy calc thread: " + x.getMessage());
+					GAOut.out().stdout("InterruptedException in energy calc thread: " + x.getMessage(), GAOut.WARNING);
 				}
 				// re-develop each of the organisms and possibly add it to the offspring generation
 				for (Pair<Organism,Integer> o : organisms) {
@@ -75,8 +72,8 @@ public class GeneticAlgorithm {
 						s.setSOCreator(null);
 						continue;
 					}
-					if (verbosity >= 3)
-						System.out.println("Adding organism " + s.getID() + " to generation " + params.getRecord().getGenNum() + ".");
+					GAOut.out().stdout("Adding organism " + s.getID() + " to generation " + params.getRecord().getGenNum() + ".", GAOut.NOTICE, s.getID());
+
 					offspring.addOrganism(s);
 					// if it was in the first gen, mark its creator as having successfully created
 					StructureOrgCreator soc;
@@ -94,8 +91,8 @@ public class GeneticAlgorithm {
 			}
 			
 			// find the organisms' fitnesses
-			if (verbosity >= 2)
-				System.out.println("Starting fitness evaluations...");
+			GAOut.out().stdout("Starting fitness evaluations...", GAOut.WARNING);
+
 			offspring.findFitnesses();
 			
 			// prints and saves status/progress info and whatnot
@@ -185,8 +182,7 @@ public class GeneticAlgorithm {
 				initialOrgCreators.set(socIndx, new Pair<StructureOrgCreator,Integer>(soc, 0));
 			
 			// some status info
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Organisms left for current StructureOrgCreator: " + initialOrgCreators.get(socIndx).getSecond());	
+			GAOut.out().stdout("Organisms left for current StructureOrgCreator: " + initialOrgCreators.get(socIndx).getSecond(), GAOut.NOTICE);
 		}
 				
 		return newOrg;
@@ -195,7 +191,6 @@ public class GeneticAlgorithm {
 	private static Organism makeOffspringOrg(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
 		Vector<Variation> vars = params.getVariations();
-		int verbosity = params.getVerbosity();
 		Development dev = params.getDevelopment();
 		Random rand = params.getRandom();
 		
@@ -214,9 +209,8 @@ public class GeneticAlgorithm {
 		// we won't short variations which tend to make offspring which don't fit the constraints.
 		Organism newOrg;
 		do { // some output
-			if (verbosity >= 2)
-				System.out.println("Starting variation " + v + " (done " + offspring.getNumOrganisms()
-						+ " of " + params.getPopSize() + ").");
+			GAOut.out().stdout("Starting variation " + v + " (done " + offspring.getNumOrganisms()
+					+ " of " + params.getPopSize() + ").", GAOut.WARNING);
 			newOrg = v.doVariation(parents, offspring, sel);
 			if (newOrg == null) // if the chosen variation can't make a child, try another variation
 				return makeOffspringOrg(parents, offspring, sel);
@@ -234,8 +228,7 @@ public class GeneticAlgorithm {
 				if (i.getSecond() > 0) 
 					return false;
 			}
-			if (GAParameters.getParams().getVerbosity() >= 1)
-				System.out.println("Finished creating initial population.");
+			GAOut.out().stdout("Finished creating initial population.", GAOut.WARNING);
 			return true;
 		} else {	
 			// only use the minimum population size option if we're doing parallel energy calculations

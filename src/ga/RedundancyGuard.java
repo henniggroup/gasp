@@ -64,8 +64,7 @@ public class RedundancyGuard implements Serializable {
 		
 		// ignore structures w/ no atoms. should maybe stop this from happening elsewhere?
 		if (s.getCell().getBasisSize() < 1) {
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Warning: RedundancyGuard got passed structure with no sites. Ignoring...");
+			GAOut.out().stdout("Warning: RedundancyGuard got passed structure with no sites. Ignoring...", GAOut.NOTICE, o.getID());
 		} else {
 			structures.put(s.getCell(), new Integer(s.getID()));
 		}

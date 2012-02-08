@@ -3,6 +3,7 @@
 package gulp;
 
 import ga.Energy;
+import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.StructureOrg;
@@ -164,7 +165,6 @@ public class GulpEnergy implements Energy {
 
 	// runs GULP on the input file given and returns the results in a String
 	public static String runGULP(String inputFile) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder gulpOutput = new StringBuilder();
 
 		String s = null;
@@ -185,8 +185,7 @@ public class GulpEnergy implements Energy {
 			// read the output
 			while ((s = stdInput.readLine()) != null) {
 				gulpOutput.append(s + GAUtils.newline());
-				if (verbosity >= 5)
-					System.out.println(s);
+				GAOut.out().stdout(s, GAOut.DEBUG);
 			}
 
 			// print out any errors
@@ -212,14 +211,12 @@ public class GulpEnergy implements Energy {
 	public double gulpRun(StructureOrg c, String potlStr,
 			Boolean relax, ArrayList<String> swShell) {
 		double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		speciesWithShell = swShell;
 
 		String inputFile = gulpInputFile(c, potlStr);
-		if (verbosity >= 3)
-			System.out.println("Starting GULP computation on organism "
-					+ c.getID());
+		GAOut.out().stdout("Starting GULP computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
+	
 		String gulpOutput = runGULP(inputFile);
 
 		// if we're optimizing the structure, store the results of the run
@@ -228,8 +225,7 @@ public class GulpEnergy implements Energy {
 			String cifFileName = inputFile + ".cif";
 			Cell a = Cell.parseCif(new File(cifFileName));
 			if (a == null) {
-				if (verbosity >= 3)
-					System.out.println("Warning: bad GULP CIF.  Not updating structure.");
+				GAOut.out().stdout("Warning: bad GULP CIF.  Not updating structure.", GAOut.NOTICE, c.getID());
 			} else {
 				c.setCell(a);
 			}
@@ -238,15 +234,13 @@ public class GulpEnergy implements Energy {
 
 		finalEnergy = parseFinalEnergy(gulpOutput, cautious);
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + c.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, c.getID());
 
 		return finalEnergy;
 	}
 	
 	public static double parseFinalEnergy(String gulpOutput, boolean cautious) {
 		Double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// parse the gulpOutput to find the final energy
 		String line = null;
@@ -269,20 +263,16 @@ public class GulpEnergy implements Energy {
 					try {
 						finalEnergy = Double.parseDouble(t.nextToken());
 					} catch (NumberFormatException x) {
-						if (verbosity >= 3) 
-							System.out.println("GulpEnergy.parseFinalEnergy: " + x.getMessage());
-						if (verbosity >= 5) {
-							System.out.println("GULP output follows:");
-							System.out.println(gulpOutput);
-						}
+						GAOut.out().stdout("GulpEnergy.parseFinalEnergy: " + x.getMessage(), GAOut.NOTICE);
+						GAOut.out().stdout("GULP output follows:", GAOut.DEBUG);
+						GAOut.out().stdout(gulpOutput, GAOut.DEBUG);
 					}
 					break;
 				}
 			}
 			line = r.readLine();
 		} catch (IOException x) {
-			if (verbosity >= 1)
-				System.out.println("GulpEnergy.gulpRun: IOException.");
+			GAOut.out().stdout("GulpEnergy.gulpRun: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL);
 		}
 		
 		if (line == null)
@@ -297,8 +287,7 @@ public class GulpEnergy implements Energy {
 		try {
 			finalGNorm = Double.parseDouble(t.nextToken());
 		} catch (NumberFormatException x) {
-			if (verbosity >= 3) 
-				System.out.println("GulpEnergy.parseFinalEnergy: " + x.getMessage());
+			GAOut.out().stdout("GulpEnergy.parseFinalEnergy: " + x.getMessage(), GAOut.NOTICE);
 			if (cautious)
 				return Double.POSITIVE_INFINITY;
 		}
@@ -311,8 +300,7 @@ public class GulpEnergy implements Energy {
 				&& !(finalGNorm < 0.1 && gulpOutput.contains("BFGS"))
 				&& (gulpOutput.contains("warning") || gulpOutput.contains("failed") || gulpOutput.contains("caution")
 						|| gulpOutput.contains("Maximum number of function calls"))) {
-			if (verbosity >= 4)
-				System.out.println("WARNING: Being cautious - GULP run failed.");
+			GAOut.out().stdout("WARNING: Being cautious - GULP run failed.", GAOut.INFO);
 			return Double.POSITIVE_INFINITY;
 		}
 				

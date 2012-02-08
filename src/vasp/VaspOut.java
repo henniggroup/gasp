@@ -1,6 +1,7 @@
 package vasp;
 
 import crystallography.Cell;
+import ga.GAOut;
 import ga.GAParameters;
 
 import java.io.*;
@@ -91,8 +92,8 @@ public class VaspOut {
 				}
 			}
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Warning: VaspOut.getCell() failed: " + x.getMessage());
+			GAOut.out().stdout("Warning: VaspOut.getCell() failed: " + x.getMessage(), GAOut.NOTICE);
+
 			return null;
 		} 
 		
@@ -119,8 +120,7 @@ public class VaspOut {
 			energyLineTok.nextToken();energyLineTok.nextToken();
 			energy = Double.parseDouble(energyLineTok.nextToken());
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Warning: VaspOut.getFinalEnergy() failed: " + x.getMessage());
+			GAOut.out().stdout("Warning: VaspOut.getFinalEnergy() failed: " + x.getMessage(), GAOut.NOTICE);
 		}
 		
 		return energy;

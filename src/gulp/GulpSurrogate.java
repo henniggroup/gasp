@@ -1,5 +1,6 @@
 package gulp;
 
+import ga.GAOut;
 import ga.GAParameters;
 import ga.Generation;
 import ga.RandomSOCreator;
@@ -244,23 +245,21 @@ public class GulpSurrogate implements Serializable {
 	}
 	
 	private void updateSurrogateModel() {
-		if (GAParameters.getParams().getVerbosity() >= 4)
-			System.out.println("Updating surrogate model...");
+		GAOut.out().stdout("Updating surrogate model...", GAOut.INFO);
 		
 		List<List<Integer>> pinnedParms = getInitPinnedParms();
 		updateAllParameters(pinnedParms);
 		
-		if (GAParameters.getParams().getVerbosity() >= 4)
-			for (GulpPotential p : pots)
-				System.out.println(p.toGulpPotlStr(null));
+		for (GulpPotential p : pots)
+			GAOut.out().stdout(p.toGulpPotlStr(null), GAOut.INFO);
 		
 		while (needsRerun(pinnedParms)) {
-			if (GAParameters.getParams().getVerbosity() >= 4)
-				System.out.println("Constraints violated. Reoptimizing...");
+			GAOut.out().stdout("Constraints violated. Reoptimizing...", GAOut.INFO);
+
 			updateAllParameters(pinnedParms);
-			if (GAParameters.getParams().getVerbosity() >= 4)
-				for (GulpPotential p : pots)
-					System.out.println(p.toGulpPotlStr(null));
+			
+			for (GulpPotential p : pots)
+				GAOut.out().stdout(p.toGulpPotlStr(null), GAOut.INFO);
 		}
 	}
 	
@@ -309,8 +308,7 @@ public class GulpSurrogate implements Serializable {
 				result.add(new GulpPotential(currPot, newParams, fitParms.get(i)));
 			}
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 2)
-				System.out.println("WARNING: gulp surrogate model fitting failed. Not updating potential model.");
+			GAOut.out().stdout("WARNING: gulp surrogate model fitting failed. Not updating potential model.", GAOut.WARNING);
 			result = null;
 		}
 		

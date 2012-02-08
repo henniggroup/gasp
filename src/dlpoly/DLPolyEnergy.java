@@ -1,6 +1,7 @@
 package dlpoly;
 
 import ga.Energy;
+import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.StructureOrg;
@@ -216,7 +217,6 @@ public class DLPolyEnergy implements Energy {
 	
 	public static void runDLPoly(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		// Write input files
 		writeConfig(c);
@@ -255,8 +255,7 @@ public class DLPolyEnergy implements Energy {
 			
 			// read the output
 			while ((s = stdInput.readLine()) != null) {
-				if (verbosity >= 5)
-					System.out.println(s);
+				GAOut.out().stdout(s, GAOut.DEBUG, c.getID());
 			}
 
 			// print out any errors
@@ -288,9 +287,7 @@ public class DLPolyEnergy implements Energy {
 		
 		// Parse final structure, set as return structure
 		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + "/REVCON") == null) {
-			if (verbosity >= 3) {
-				System.out.println("Warning: bad DLPoly CIF.  Not updating structure.");
-			}
+			GAOut.out().stdout("Warning: bad DLPoly CIF.  Not updating structure.", GAOut.NOTICE, c.getID());
 		} else {
 			Cell p = parseStructure(c, params.getTempDirName() + "/" + c.getID() + "/REVCON");
 			c.setCell(p);
@@ -300,7 +297,6 @@ public class DLPolyEnergy implements Energy {
 	
 	public static Cell parseStructure(StructureOrg c, String revcon) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		List<Site> sites = c.getCell().getSites();
 		List<Vect> newVects = new LinkedList<Vect>();
@@ -341,19 +337,15 @@ public class DLPolyEnergy implements Energy {
 									r.readLine(); r.readLine(); r.readLine(); line = r.readLine();
 							}
 						} catch (NumberFormatException x) {
-							if (verbosity >= 3) 
-								System.out.println("DLPolyEnergy.parseStructure: " + x.getMessage());
-							if (verbosity >= 5) {
-								System.out.println("DLPoly output follows: ");
-								System.out.println(revcon);
-							}
+							GAOut.out().stdout("DLPolyEnergy.parseStructure: " + x.getMessage(), GAOut.NOTICE, c.getID());
+							GAOut.out().stdout("DLPoly output follows: ", GAOut.DEBUG, c.getID());
+							GAOut.out().stdout(revcon, GAOut.DEBUG, c.getID());
 						}
 						break;
 					}
 				}
 			} catch (IOException x) {
-				if (verbosity >= 1)
-					System.out.println("DLPolyEnergy: IOException.");
+				GAOut.out().stdout("DLPolyEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL, c.getID());
 			}
 		} catch (FileNotFoundException e) {
 			System.out.println("DLPolyEnergy.parseStructure: REVCON not found");
@@ -371,7 +363,6 @@ public class DLPolyEnergy implements Energy {
 	
 	public static Double parseFinalEnergy(String output) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		
 		Double finalEnergy = Double.POSITIVE_INFINITY;
 		
@@ -395,22 +386,18 @@ public class DLPolyEnergy implements Energy {
 							m.nextToken();
 							finalEnergy = Double.parseDouble(m.nextToken());
 						} catch (NumberFormatException x) {
-							if (verbosity >= 3) 
-								System.out.println("DLPolyEnergy.parseFinalEnergy: " + x.getMessage());
-							if (verbosity >= 5) {
-								System.out.println("DLPoly output follows: ");
-								System.out.println(output);
-							}
+							GAOut.out().stdout("DLPolyEnergy.parseFinalEnergy: " + x.getMessage(), GAOut.NOTICE);
+							GAOut.out().stdout("DLPoly output follows: ", GAOut.DEBUG);
+							GAOut.out().stdout(output, GAOut.DEBUG);
 						}
 						break;
 					}
 				}
 			} catch (IOException x) {
-				if (verbosity >= 1)
-					System.out.println("DLPolyEnergy: IOException.");
+				GAOut.out().stdout("DLPolyEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL);
 			}
 		} catch (FileNotFoundException e) {
-			System.out.println("DLPolyEnergy.parseFinalEnergy: OUTPUT not found");
+			GAOut.out().stdout("DLPolyEnergy.parseFinalEnergy: OUTPUT not found", GAOut.NOTICE);
 		}
 		
 		return finalEnergy;

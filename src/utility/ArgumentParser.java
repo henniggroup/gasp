@@ -4,6 +4,7 @@ package utility;
 
 //TODO: i don't like having to associate key-value pairs with =
 
+import ga.GAOut;
 import ga.GAParameters;
 
 import java.io.BufferedReader;
@@ -92,7 +93,6 @@ public class ArgumentParser {
     
 	// returns a mapping of key-value pairs parsed from the input file
 	private void  parseInputFile(String inputFileName) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		String line = null;
 		
 		// make sure we have a file to parse
@@ -120,12 +120,14 @@ public class ArgumentParser {
     			
     			options.add(new Pair<String,List<String>>(key,valuesList));
     			//result.put(key, values);
-    			if (verbosity >= 5) {
-    				System.out.print("Parsed from input file: " + key + " ");
-    				for (int i = 0; i < valuesList.size(); i++)
-    					System.out.print(valuesList.get(i) + " ");
-    				System.out.println("");
-    			}
+
+    			// some debug output
+				StringBuilder outStrB = new StringBuilder();
+				outStrB.append("Parsed from input file: " + key + " ");
+				for (int i = 0; i < valuesList.size(); i++)
+					outStrB.append(valuesList.get(i) + " ");
+				outStrB.append("\n");
+    			GAOut.out().stdout(outStrB.toString(), GAOut.DEBUG);
 			}
 		} catch(IOException x) {
 			System.out.println("Problem parsing input file " + inputFileName + ": " + x.getMessage());

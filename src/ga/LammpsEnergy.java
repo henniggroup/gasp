@@ -156,7 +156,6 @@ Atoms
 
 	// runs Lammps on the input file given and returns the results in a String
 	private static String runLAMMPS(String runDir) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder lammpsOutput = new StringBuilder();
 
 		String s = null;
@@ -176,8 +175,7 @@ Atoms
 				// read the output
 				while ((s = stdInput.readLine()) != null) {
 					lammpsOutput.append(s + GAUtils.newline());
-					if (verbosity >= 5)
-						System.out.println(s);
+					GAOut.out().stdout(s, GAOut.DEBUG);
 				}
 	
 				// print out any errors
@@ -202,7 +200,6 @@ Atoms
 	private double lammpsRun(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
 		double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// make temp directory
 		String outDirPath = params.getTempDirName() + "/" + params.getRunTitle() + "." + c.getID();
@@ -214,8 +211,7 @@ Atoms
 		
 		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(getLammpsDataFile(c), outDirPath + "/" + dataFileName);
-		if (verbosity >= 3)
-			System.out.println("Starting Lammps computation on organism " + c.getID());
+		GAOut.out().stdout("Starting Lammps computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
 		
 		String lammpsOutput = runLAMMPS(outDir.getAbsolutePath());
 
@@ -223,8 +219,7 @@ Atoms
 		// update c to be the structure in Lammps's output
 		Cell a = parseOutputStructure(c.getCell(), outDirPath + "/" + dumpFileName);
 		if (a == null) {
-			if (verbosity >= 3)
-				System.out.println("Warning: bad Lammps output.  Not updating structure.");
+			GAOut.out().stdout("Warning: bad Lammps output.  Not updating structure.", GAOut.NOTICE, c.getID());
 		} else {
 			c.setCell(a);
 			finalEnergy = parseFinalEnergy(lammpsOutput);
@@ -233,8 +228,7 @@ Atoms
 		// write cell to disk
 		//Utility.writeStringToFile(c.getCIF(), outDirPath + "/" + c.getID() + ".relaxed.cif");
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + c.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, c.getID());
 
 		return finalEnergy;
 	}
@@ -243,8 +237,7 @@ Atoms
 		// make sure out file was created successfully
 		
 		if (! (new File(outFile)).exists() || Utility.readStringFromFile(outFile).isEmpty()) {
-			if (GAParameters.getParams().getVerbosity() >= 4)
-				System.out.println("In LammpsEnergy.parseOutputStructure: dump file doesn't exist or is empty.");
+			GAOut.out().stdout("In LammpsEnergy.parseOutputStructure: dump file doesn't exist or is empty.", GAOut.INFO);
 			return null;
 		}
 		
@@ -316,7 +309,6 @@ Atoms
 	
 	private double parseFinalEnergy(String lammpsOutput) {
 		Double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		String lines[] = lammpsOutput.split("\n");
 		int i;

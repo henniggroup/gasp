@@ -5,6 +5,7 @@ import Jama.Matrix;
 import chemistry.*;
 import crystallography.*;
 
+import ga.GAOut;
 import ga.GAParameters;
 import ga.Organism;
 
@@ -110,12 +111,10 @@ public class PDBuilder implements Serializable {
                 needToRemove = true;
             }
             if (needToRemove) {
-            	if (GAParameters.getParams().getVerbosity() >= 5) {
-	                System.out.println("removing facet (all vertices on vertical face of hull):");
-	                for (int i = 0; i < facet.size(); i++) {
-	                    System.out.println(newPDData.getEntry(facet.get(i)));
-	                }
-            	}
+    			GAOut.out().stdout("removing facet (all vertices on vertical face of hull):", GAOut.DEBUG);
+                for (int i = 0; i < facet.size(); i++) {
+                	GAOut.out().stdout(newPDData.getEntry(facet.get(i)).toString(), GAOut.DEBUG);
+                }
                 iFacet.remove();
             }
         }

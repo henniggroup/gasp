@@ -3,6 +3,7 @@
 package avogadro;
 
 import ga.Energy;
+import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.StructureOrg;
@@ -74,7 +75,6 @@ public class AvogadroEnergy implements Energy {
 	// either optimize the structure or not.
 	private String avogadroInputFile(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		String ans = new String("Maybe file creation failed.");
 		String newline = GAUtils.newline();
 
@@ -113,8 +113,7 @@ public class AvogadroEnergy implements Energy {
 			out.write("conv.WriteFile(mol,\"" + params.getTempDirName() + "/" + params.getRunTitle() + "." + c.getID() + ".py.cif\")");
 			out.close();
 		} catch (IOException e) {
-			if (verbosity >= 2)
-				System.out.println("AvogadroEnergy IOException: " + e.getMessage());
+			GAOut.out().stdout("AvogadroEnergy IOException: " + e.getMessage(), GAOut.WARNING, c.getID());
 		}
 
 		return ans;
@@ -126,7 +125,6 @@ public class AvogadroEnergy implements Energy {
 		
 		Boolean status = true;
 		
-		int verbosity = params.getVerbosity();
 		StringBuilder avogadroOutput = new StringBuilder();
 
 		String s = null;
@@ -173,14 +171,12 @@ public class AvogadroEnergy implements Energy {
 	// we update c to be the local minimum found by Avogadro.
 	public double avogadroRun(StructureOrg c) {
 		double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		String inputFile = avogadroInputFile(c);
 		Utility.writeStringToFile(c.getCell().getCIF(), unrelaxed_cifpath);
-		if (verbosity >= 3)
-			System.out.println("Starting Avogadro computation on organism "
-					+ c.getID());
 		
+		GAOut.out().stdout("Starting Avogadro computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
+
 		// Execute the python script
 		if (!runAvogadro(inputFile))
 			return Double.POSITIVE_INFINITY;
@@ -189,9 +185,7 @@ public class AvogadroEnergy implements Energy {
 		String cifFileName = inputFile + ".cif";
 		Cell a = Cell.parseAvogCif(new File(cifFileName));
 		if (a == null) {
-			if (verbosity >= 3) {
-				System.out.println("Warning: bad Avogadro CIF.  Not updating structure.");
-			}
+			GAOut.out().stdout("Bad Avogadro CIF.  Not updating structure.", GAOut.NOTICE, c.getID());
 		} else {
 			c.setCell(a);
 		}
@@ -202,15 +196,13 @@ public class AvogadroEnergy implements Energy {
 		// parse energy from log
 		finalEnergy = parseFinalEnergy(line);
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + c.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, c.getID());
 	
 		return finalEnergy;			
 	}
 	
 	public static double parseFinalEnergy(String avogadroOutput) {
 		Double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// parse the avogadroOutput to find the final energy
 		String line = null;
@@ -232,20 +224,15 @@ public class AvogadroEnergy implements Energy {
 					try {
 						finalEnergy = Double.parseDouble(t.nextToken());
 					} catch (NumberFormatException x) {
-						if (verbosity >= 3) 
-							System.out.println("AvogadroEnergy.parseFinalEnergy: " + x.getMessage());
-						if (verbosity >= 5) {
-							System.out.println("Avogadro output follows:");
-							System.out.println(avogadroOutput);
-						}
+						GAOut.out().stdout("AvogadroEnergy.parseFinalEnergy: " + x.getMessage(), GAOut.NOTICE);
+						GAOut.out().stdout("Avogadro output follows: \n" + avogadroOutput, GAOut.DEBUG);
 					}
 					break;
 				}
 			}
 //			line = r.readLine();
 		} catch (IOException x) {
-			if (verbosity >= 1)
-				System.out.println("AvogadroEnergy.avogadroRun: IOException.");
+			GAOut.out().stdout("AvogadroEnergy.avogadroRun: IOException.", GAOut.CRITICAL);
 		}
 		
 		if (line == null)

@@ -51,7 +51,6 @@ public final class StructureMut implements Variation {
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
 		Random rand = params.getRandom();
-		int verbosity = params.getVerbosity();
 		
 		// pick a parent randomly 
 		StructureOrg p = (StructureOrg)(sel.doSelection(parents, 1)[0]);
@@ -106,10 +105,8 @@ public final class StructureMut implements Variation {
 		// make the new offspring
 		StructureOrg result = new StructureOrg(new Cell(newVects, newSites));
 		
-		if (verbosity >= 5) {
-			System.out.println("StructureMut created new StructureOrg:");
-			System.out.println(result);
-		}			
+		GAOut.out().stdout("StructureMut created new StructureOrg:", GAOut.DEBUG, result.getID());
+		GAOut.out().stdout(result.toString(), GAOut.DEBUG, result.getID());		
 		
 		return result;
 	}	

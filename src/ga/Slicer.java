@@ -79,7 +79,6 @@ public final class Slicer implements Variation {
 
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		Random rand = params.getRandom();
 		
 		// calculate the parameters of this slicing
@@ -90,20 +89,18 @@ public final class Slicer implements Variation {
 		split = rand.nextDouble();
 		thickness = GAUtils.renormZeroOne(thicknessMean + thicknessSigma * rand.nextGaussian());
 		
-		if(verbosity >= 4)
-			System.out.println("amp:"+amplitude+" etaFreq:"+etaFreq+" zetaFreq:"+zetaFreq
-				+" axis:"+axis+" split:"+split+" thickness:"+thickness);
-		
+		GAOut.out().stdout("amp:"+amplitude+" etaFreq:"+etaFreq+" zetaFreq:"+zetaFreq
+				+" axis:"+axis+" split:"+split+" thickness:"+thickness, GAOut.DEBUG);
+
 		//choose two random parents' Structures
 		StructureOrg[] ps = (StructureOrg[])(sel.doSelection(parents, 2));
 		Cell a = ps[0].getCell();
 		Cell b = ps[1].getCell();
 		
 		// some status info
-		if (verbosity >= 3)
-			System.out.print("Mating "+ps[0].getID()+" (fitness " + ps[0].getFitness() + ", "
-					+ a.getNumSites()+ " atoms) with " + ps[1].getID() +" (fitness "
-					+ ps[1].getFitness() + ", " + b.getNumSites() + " atoms)... ");
+		GAOut.out().stdout("Mating "+ps[0].getID()+" (fitness " + ps[0].getFitness() + ", "
+				+ a.getNumSites()+ " atoms) with " + ps[1].getID() +" (fitness "
+				+ ps[1].getFitness() + ", " + b.getNumSites() + " atoms)... ", GAOut.NOTICE);
 		
 		// possibly take a supercell of one of the parents
 		if (growParents) {
@@ -112,15 +109,13 @@ public final class Slicer implements Variation {
 				// TODO: make be input options and similarly below
 				if (sizeMultiple > 1) {
 					b = Cell.getSupercell(b, SupercellOptimizer.getOptimalSupercell(b, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
-					if (verbosity >= 3)
-						System.out.println("(actually using supercell of second parent with " + b.getNumSites() + "atoms).");
+					GAOut.out().stdout("(actually using supercell of second parent with " + b.getNumSites() + "atoms).", GAOut.NOTICE);
 				}
 			} else {
 				int sizeMultiple = b.getBasisSize() / a.getBasisSize();
 				if (sizeMultiple > 1) {
 					a = Cell.getSupercell(a, SupercellOptimizer.getOptimalSupercell(a, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
-					if (verbosity >= 3)
-						System.out.println("(actually using supercell of first parent with " + a.getNumSites() + "atoms).");
+					GAOut.out().stdout("(actually using supercell of second parent with " + a.getNumSites() + "atoms).", GAOut.NOTICE);
 				}
 			}
 		}
@@ -173,8 +168,7 @@ public final class Slicer implements Variation {
 		StructureOrg newOrganism = new StructureOrg(new Cell(newLengths[0], newLengths[1], newLengths[2], newAngles[0], newAngles[1], newAngles[2], newSites, null));
 			
 		// some status info
-		if (verbosity >= 3)
-			System.out.println("("+ newOrganism.getCell().getNumSites() +" atoms)");
+		GAOut.out().stdout("("+ newOrganism.getCell().getNumSites() +" atoms)", GAOut.NOTICE, newOrganism.getID());
 		
 		return newOrganism;
 	}

@@ -71,7 +71,6 @@ public class NumStoichsMut implements Variation {
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
 		Random rand = params.getRandom();
-		int verbosity = params.getVerbosity();
 		
 		// pick a parent randomly 
 		StructureOrg p = (StructureOrg)(sel.doSelection(parents, 1)[0]);
@@ -91,10 +90,9 @@ public class NumStoichsMut implements Variation {
 						|| n + pStruct.getBasisSize() < params.getMinNumAtoms());
 		
 		// some output:
-		if (verbosity >= 3)
-			System.out.println("Creating new StructureOrg by adding " + n + 
-					" atoms to StructureOrg " + p.getID());
-		
+		GAOut.out().stdout("Creating new StructureOrg by adding " + n + 
+				" atoms to StructureOrg " + p.getID(), GAOut.NOTICE, p.getID());
+
 		// add or remove species and their points, depending on the sign of n
 		if (n > 0)
 			addAtoms(n, newSites, newVects);

@@ -140,7 +140,6 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 	// assume values have already been calculated
 	public void findFitnesses() {
 		Organism o;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// make sure we have something in our population
 		if (organisms.size() < 1) {
@@ -163,8 +162,8 @@ public abstract class Generation implements Iterable<Organism>, Serializable {
 		}
 		
 		// some output
-		if (verbosity >= 3)
-			for (Organism i : organisms)
-				System.out.println("Org " + i.getID() + "; value: " + i.getValue() + "; fitness: "+ i.getFitness());
+		for (Organism i : organisms)
+			GAOut.out().stdout("Org " + i.getID() + "; value: " + i.getValue() + "; fitness: "+ i.getFitness(), GAOut.NOTICE, i.getID());
+
 	}
 }

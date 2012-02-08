@@ -63,7 +63,6 @@ public final class StructureDev implements Development, Serializable {
 		Structures g = (Structures)gen;
 		
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		// double maxid = params.getMaxInteratomicDistance();
 		double minid = params.getMinInteratomicDistance();
 		double maxll = params.getMaxLatticeLength();
@@ -76,24 +75,20 @@ public final class StructureDev implements Development, Serializable {
 		// fail if cell is null.
 		// this shouldnt happen anymore.
 		if (s.getCell() == null) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed: had null cell.");
+			GAOut.out().stdout("Organism " + s.getID() + " failed: had null cell.", GAOut.NOTICE, s.getID());
 	//		if (rGuard != null)
 	//			rGuard.removeStructureOrg(s);
 			return false;
 		}
 		
 		if (s.knowsValue() && Double.isNaN(s.getEnergyPerAtom())) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed: had NaN energy. Something must have gone wrong with the energy calc.");
-
+			GAOut.out().stdout("Organism " + s.getID() + " failed: had NaN energy. Something must have gone wrong with the energy calc.", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		
 		// fail if cell is bad
 		if (s.getCell().isMalformed()) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed: had malformed cell.");
+			GAOut.out().stdout("Organism " + s.getID() + " failed: had malformed cell.", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		
@@ -104,8 +99,7 @@ public final class StructureDev implements Development, Serializable {
 			for (int i = 0; i < s.getCell().getNumSites(); i++) {
 				// it's no good if there are any other atoms in the minimum radius sphere
 				if (s.getCell().getAtomsInSphereSorted(s.getCell().getSite(i).getCoords(), minid).size() > 1) {
-					if (verbosity >= 3)
-						System.out.println("Organism " + s.getID() + " failed minimum interatomic distance constraint.");
+					GAOut.out().stdout("Organism " + s.getID() + " failed minimum interatomic distance constraint.", GAOut.NOTICE, s.getID());
 					// if we've added structure to wholepop rGuard before doing relaxation and now it fails, remove it
 					//  - this was fixed by making rguard save cells instead of structureorgs
 			//		if (rGuard != null)
@@ -118,8 +112,7 @@ public final class StructureDev implements Development, Serializable {
 		if (useNiggliReducedCell ) {
 			s.standardize();
 			if (!s.isReduced()) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed Niggli reduction.");
+				GAOut.out().stdout("Organism " + s.getID() + " failed Niggli reduction.", GAOut.NOTICE, s.getID());
 				return false;
 			}
 		}
@@ -128,37 +121,32 @@ public final class StructureDev implements Development, Serializable {
 		
 		// check the number of atoms
 		if (minatoms != -1 && structure.getNumSites() < minatoms) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed min number of atoms constraint: (numAtoms = "
-						+ structure.getNumSites() + ").");
+			GAOut.out().stdout("Organism " + s.getID() + " failed min number of atoms constraint: (numAtoms = "
+					+ structure.getNumSites() + ").", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		if (maxatoms != -1 && structure.getNumSites() > maxatoms) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed max number of atoms constraint: (numAtoms = "
-						+ structure.getNumSites() + ").");
+			GAOut.out().stdout("Organism " + s.getID() + " failed max number of atoms constraint: (numAtoms = "
+					+ structure.getNumSites() + ").", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		
 		// dont want to do this the first generation
 		if (structure.getComposition().getNumElements() < params.getMinNumSpecies() && GAParameters.getParams().getRecord().getGenNum() != 0) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed max number of species constraint: (composition = "
-						+ structure.getComposition().toString() + ").");
+			GAOut.out().stdout("Organism " + s.getID() + " failed max number of species constraint: (composition = "
+					+ structure.getComposition().toString() + ").", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		
 		// sanity check on the energy
 		if (Double.isInfinite(s.getEnergyPerAtom())) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " discarded: energy is inf.");
+			GAOut.out().stdout("Organism " + s.getID() + " discarded: energy is inf.", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		if (params.getDoNonnegativityConstraint()) {
 			if (s.knowsValue() && s.getValue() >= 0) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed value nonnegativity constraint: (value = "
-							+ s.getValue() + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed value nonnegativity constraint: (value = "
+						+ s.getValue() + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
 		} 
@@ -174,15 +162,13 @@ public final class StructureDev implements Development, Serializable {
 		double[] lLengths = structure.getCellLengths();
 		for(int i = 0; i <= 2; i++) {
 			if(minll != -1 && lLengths[i] < minll) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed min lattice length constraint: (lLengths["
-							+ i + "] == " + lLengths[i] + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed min lattice length constraint: (lLengths["
+						+ i + "] == " + lLengths[i] + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
 			if(maxll != -1 && lLengths[i] > maxll) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed max lattice length constraint: (lLengths["
-							+ i + "] == " + lLengths[i] + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed max lattice length constraint: (lLengths["
+						+ i + "] == " + lLengths[i] + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
 		}
@@ -191,15 +177,13 @@ public final class StructureDev implements Development, Serializable {
 		double[] lAngles = GAUtils.anglesToDegrees(structure.getCellAngles());
 		for(int i = 0; i <= 2 ; i++) {
 			if(minla != -1 && lAngles[i] < minla) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed min lattice angle constraint (lAngles["
-							+ i + "] == " + lAngles[i] + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed min lattice angle constraint (lAngles["
+						+ i + "] == " + lAngles[i] + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
 			if(maxla != -1 && lAngles[i] > maxla) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed max lattice angle constraint (lAngles["
-							+ i + "] == " + lAngles[i] + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed max lattice angle constraint (lAngles["
+						+ i + "] == " + lAngles[i] + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
 		}	
@@ -229,8 +213,7 @@ public final class StructureDev implements Development, Serializable {
 		}*/
 		// make sure composition is in compSpace
 		if (!params.getCompSpace().contains(s.getCell().getComposition())) {
-			if (verbosity >= 3)
-				System.out.println("Organism " + s.getID() + " failed stoichiometry constraint.");
+			GAOut.out().stdout("Organism " + s.getID() + " failed stoichiometry constraint.", GAOut.NOTICE, s.getID());
 			return false;
 		}
 		
@@ -265,8 +248,7 @@ public final class StructureDev implements Development, Serializable {
 						continue;
 					String nearestNeighbor = atomsInSphere.get(1).getElement().getSymbol();
 					if (otherSymb.equalsIgnoreCase(nearestNeighbor)) {
-						if (verbosity >= 3)
-							System.out.println("Organism " + s.getID() + " failed nearest neighbor constraint.");
+						GAOut.out().stdout("Organism " + s.getID() + " failed nearest neighbor constraint.", GAOut.NOTICE, s.getID());
 						return false;
 					}
 				}
@@ -278,18 +260,17 @@ public final class StructureDev implements Development, Serializable {
 		if (usePerGenRG) {
 			Integer orgID = g.getRedundancyGuard().checkStructureOrg(s);
 			if (orgID != null) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed perGeneration redundancy guard (looks like org "
-							 + orgID + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed perGeneration redundancy guard (looks like org "
+						 + orgID + ").", GAOut.NOTICE, s.getID());
+
 				// keep it anyway if it's better than the old one, but remove the old one
 				Organism org = g.getOrgByID(orgID);
 				// org can equal null if it has already been replaced in this generation
 				if (org != null && s.knowsValue() && s.getValue() < org.getValue()) {
 					g.removeOrganism(org);
 					g.addOrganism(s);
-					if (verbosity >= 4)
-						System.out.println("perGeneration RedundancyGuard removing " + orgID
-								+ " and replacing with " + s.getID());
+					GAOut.out().stdout("perGeneration RedundancyGuard removing " + orgID
+							+ " and replacing with " + s.getID(), GAOut.INFO, s.getID());
 				}
 				return false;
 			} 
@@ -299,9 +280,8 @@ public final class StructureDev implements Development, Serializable {
 		if (useWholePopRG && !s.knowsValue()) {
 			Integer orgID = rGuard.checkStructureOrg(s);
 			if (orgID != null) {
-				if (verbosity >= 3)
-					System.out.println("Organism " + s.getID() + " failed wholePopulation redundancy guard (looks like org "
-							 + orgID + ").");
+				GAOut.out().stdout("Organism " + s.getID() + " failed wholePopulation redundancy guard (looks like org "
+						 + orgID + ").", GAOut.NOTICE, s.getID());
 				return false;
 			} 
 		}
@@ -312,16 +292,14 @@ public final class StructureDev implements Development, Serializable {
 			if (o.knowsValue()) {
 				Organism[] orgs = g.getOrganismsOfValue(o.getValue(), dValue);
 				if (orgs.length >= 1) {
-					if (verbosity >= 3)
-						System.out.println("Organism " + s.getID() + " failed dValue constraint.");
+					GAOut.out().stdout("Organism " + s.getID() + " failed dValue constraint.", GAOut.NOTICE, s.getID());
 					
 					// keep it anyway if it's better than the old one, but remove the old one
 					if (o.getValue() < orgs[0].getValue()) {
 						g.removeOrganism(orgs[0]);
 						g.addOrganism(o);
-						if (verbosity >= 4)
-							System.out.println("dValue rule removing " + orgs[0].getID()
-									+ " and replacing with " + o.getID());
+						GAOut.out().stdout("dValue rule removing " + orgs[0].getID()
+								+ " and replacing with " + o.getID(), GAOut.INFO, s.getID());
 					}
 					return false;
 				}

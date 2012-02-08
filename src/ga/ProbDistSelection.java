@@ -134,19 +134,17 @@ public final class ProbDistSelection implements Selection, Serializable {
 	}
 	
 	public Organism[] doSelection(Generation g, int n) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		Random rand = GAParameters.getParams().getRandom();
 		
 		ArrayList<StructureOrg> resultList = new ArrayList<StructureOrg>();
 		
 		// some output
-		if (verbosity >= 3)
-			System.out.println("Selecting " + n + " of the top " + numSurvivors + " of " + g.getNumOrganisms() + " organisms");
+		GAOut.out().stdout("Selecting " + n + " of the top " + numSurvivors + " of " + g.getNumOrganisms() + " organisms", GAOut.NOTICE);
+
 		
 		// get the mapping from organisms to selection probabilities
 		Map<Organism, Double> probMap = findProbabilities(g);
-		if (verbosity >= 5)
-			printProbMap(probMap);
+		GAOut.out().stdout(getProbMapString(probMap), GAOut.DEBUG);
 		
 		// select n random, distinct organisms according to the calculated selection probabilities
 		for (int i = 0; i < n; i++) {
@@ -157,9 +155,8 @@ public final class ProbDistSelection implements Selection, Serializable {
 			resultList.add(o);
 		
 			// some status info
-			if (verbosity >= 4)
-				System.out.println("Selected organism " + o.getID() + " (fitness " 
-						+ o.getFitness() + ", probability " + probMap.get(o) + ")");
+			GAOut.out().stdout("Selected organism " + o.getID() + " (fitness " 
+					+ o.getFitness() + ", probability " + probMap.get(o) + ")", GAOut.DEBUG, o.getID());
 		}
 		
 		StructureOrg[] result = new StructureOrg[resultList.size()];
@@ -167,14 +164,18 @@ public final class ProbDistSelection implements Selection, Serializable {
 		return result;
 	}
 	
-	private void printProbMap(Map<Organism, Double> probMap) {
+	private String getProbMapString(Map<Organism, Double> probMap) {
+		StringBuilder result = new StringBuilder();
+		
 		Set<Organism> keySet = probMap.keySet();
 		Iterator<Organism> i = keySet.iterator();
 		while (i.hasNext()) {
 			Organism o = i.next();
-			System.out.println("Organism " + o.getID() + " has fitness " + o.getFitness()
-					+" and selection probability " + probMap.get(o));
+			result.append("Organism " + o.getID() + " has fitness " + o.getFitness()
+					+" and selection probability " + probMap.get(o) + "\n");
 		}
+		
+		return result.toString();
 	}
 	
 	public static void main(String[] args) {

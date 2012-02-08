@@ -51,7 +51,6 @@ public class Permutation implements Variation {
 	// sites, and returns it
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		Random rand = params.getRandom();
 		
 		if (pairs == null)
@@ -99,8 +98,8 @@ public class Permutation implements Variation {
 			newSites.set(indexB, new Site(elemA, newSites.get(indexB).getCoords()));
 
 			// some output
-			if (verbosity >= 4)
-				System.out.println("Permuting " + newSites.get(indexA).getElement() + " and " + newSites.get(indexB).getElement());
+			GAOut.out().stdout("Permuting " + newSites.get(indexA).getElement() + " and " + newSites.get(indexB).getElement(), GAOut.INFO);
+
 		}
 		return new StructureOrg(new Cell(newVects, newSites));	
 	}

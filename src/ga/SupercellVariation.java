@@ -33,7 +33,6 @@ public class SupercellVariation  implements Variation {
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
 		GAParameters params = GAParameters.getParams();
 		Random rand = params.getRandom();
-		int verbosity = params.getVerbosity();
 		
 		// pick a parent randomly 
 		// but make sure it's going to work; i.e. it has less than maxnumatoms/2 atoms
@@ -74,10 +73,8 @@ public class SupercellVariation  implements Variation {
 			result.setValue(p.getValue());
 		}
 		
-		if (verbosity >= 5) {
-			System.out.println("SupercellVariation created new StructureOrg:");
-			System.out.println(result);
-		}			
+		GAOut.out().stdout("SupercellVariation created new StructureOrg:", GAOut.DEBUG, result.getID());
+		GAOut.out().stdout(result.toString(), GAOut.DEBUG, result.getID());			
 		
 		return result;
 	}

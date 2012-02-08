@@ -827,7 +827,6 @@ public class GAParameters implements Serializable {
 		// singleton
 		private GARecord() {		
 			GAParameters params = GAParameters.getParams();
-			int verbosity = params.getVerbosity();
 			
 			String runTitle = params.getRunTitle();
 			outDirName = params.getOutDirName();
@@ -903,7 +902,6 @@ public class GAParameters implements Serializable {
 		// end of each generation.
 		public void finishGen(Generation g) {
 			GAParameters params = GAParameters.getParams();
-			int verbosity = params.getVerbosity();
 			
 			// write the generation header (generation x N)
 			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, outFile, true);
@@ -1019,8 +1017,7 @@ public class GAParameters implements Serializable {
 					try {
 						GAUtils.deleteDirectory(tempDir);
 					} catch (IOException x) {
-						if (GAParameters.getParams().getVerbosity() >= 1)
-							System.out.println("Error deleting temp directory: " + x.getMessage());
+						GAOut.out().stdout("Error deleting temp directory: " + x.getMessage(), GAOut.WARNING);
 					}
 			}
 		}

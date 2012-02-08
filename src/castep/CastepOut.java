@@ -1,6 +1,7 @@
 package castep;
 
 import crystallography.Cell;
+import ga.GAOut;
 import ga.GAParameters;
 
 import java.io.*;
@@ -91,8 +92,8 @@ public class CastepOut {
 				}
 			}
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Warning: CastepOut.getCell() failed: " + x.getMessage());
+			GAOut.out().stdout("Warning: CastepOut.getCell() failed: " + x.getMessage(), GAOut.NOTICE);
+
 			return null;
 		} 
 		
@@ -119,8 +120,7 @@ public class CastepOut {
 			energyLineTok.nextToken();energyLineTok.nextToken();
 			energy = Double.parseDouble(energyLineTok.nextToken());
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 3)
-				System.out.println("Warning: CastepOut.getFinalEnergy() failed: " + x.getMessage());
+			GAOut.out().stdout("Warning: CastepOut.getFinalEnergy() failed: " + x.getMessage(), GAOut.NOTICE);
 		}
 		
 		return energy;

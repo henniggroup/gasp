@@ -131,7 +131,6 @@ public class DFTPPEnergy implements Energy {
 	private double dftppRun(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
 		double finalEnergy = Double.POSITIVE_INFINITY;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// make temp directory
 		String outDirPath = params.getTempDirName() + "/" + params.getRunTitle() + "." + c.getID();
@@ -143,8 +142,7 @@ public class DFTPPEnergy implements Energy {
 		
 		utility.Utility.writeStringToFile(getInputFile(c), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(inputStr, outDirPath + "/" + optionsFileName);
-		if (verbosity >= 3)
-			System.out.println("Starting DFT++ computation on organism " + c.getID());
+		GAOut.out().stdout("Starting DFT++ computation on organism ", GAOut.NOTICE, c.getID());
 		
 		String dftppOutput = runDFTPP(outDir.getAbsolutePath());
 
@@ -152,8 +150,7 @@ public class DFTPPEnergy implements Energy {
 		// update c to be the structure in DFT++ output
 		Cell a = parseOutputStructure(c.getCell(), outDirPath);
 		if (a == null) {
-			if (verbosity >= 3)
-				System.out.println("Warning: bad DFT++ output.  Not updating structure.");
+			GAOut.out().stdout("Warning: bad DFT++ output.  Not updating structure.", GAOut.NOTICE, c.getID());
 		} else {
 			c.setCell(a);
 			finalEnergy = parseFinalEnergy(Utility.readStringFromFile(outDirPath + "/" + outFileName));
@@ -162,15 +159,13 @@ public class DFTPPEnergy implements Energy {
 		// write cell to disk
 		//Utility.writeStringToFile(c.getCIF(), outDirPath + "/" + c.getID() + ".relaxed.cif");
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + c.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, c.getID());
 
 		return finalEnergy;
 	}
 	
 	// runs DFT++ on the input file given and returns the results in a String
 	private static String runDFTPP(String runDir) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder output = new StringBuilder();
 
 		String s = null;
@@ -190,8 +185,7 @@ public class DFTPPEnergy implements Energy {
 				// read the output
 				while ((s = stdInput.readLine()) != null) {
 					output.append(s + GAUtils.newline());
-					if (verbosity >= 5)
-						System.out.println(s);
+					GAOut.out().stdout(s, GAOut.DEBUG);
 				}
 	
 				// print out any errors
@@ -215,8 +209,7 @@ public class DFTPPEnergy implements Energy {
 		// make sure out file was created successfully
 		
 		if (! (new File(outDir)).exists()) {
-			if (GAParameters.getParams().getVerbosity() >= 4)
-				System.out.println("In DFTPPEnergy: output dir doesn't exist?");
+			GAOut.out().stdout("In DFTPPEnergy: output dir doesn't exist?", GAOut.INFO);
 			return null;
 		}
 				
@@ -226,8 +219,8 @@ public class DFTPPEnergy implements Energy {
 		File dir = new File(outDir);
 		File outPosFiles[] = dir.listFiles(new OutPosFileFilter());
 		
-		if ((outPosFiles == null || outPosFiles.length == 0) && GAParameters.getParams().getVerbosity() >= 2) {
-			System.out.println("Error: dftpp output positions not found in directory " + outDir);
+		if (outPosFiles == null || outPosFiles.length == 0) {
+			GAOut.out().stdout("Error: dftpp output positions not found in directory " + outDir, GAOut.WARNING);
 			return null;
 		}
 		if (outPosFiles != null && outPosFiles.length > 1) 

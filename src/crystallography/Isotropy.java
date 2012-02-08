@@ -1,5 +1,6 @@
 package crystallography;
 
+import ga.GAOut;
 import ga.GAParameters;
 import ga.StructureOrg;
 
@@ -208,13 +209,12 @@ public class Isotropy {
 		try {
 			answer = parseWyckoffCell(output,cell);
 		} catch (Exception x) {
-			if (GAParameters.getParams().getVerbosity() >= 4) {
-				System.out.println(x.getLocalizedMessage());
-				System.out.println("Warning: Exception in parsing output from findsym for all accuracies tried for cell and input:");
-				System.out.println(cell);
-				System.out.println(getFindsymInput(cell, accuracies[0]));
-				(new Exception()).printStackTrace();
-			}
+			GAOut.out().stdout(x.getLocalizedMessage(), GAOut.INFO);
+			GAOut.out().stdout("Warning: Exception in parsing output from findsym for all accuracies tried for cell and input:", GAOut.INFO);
+			GAOut.out().stdout(cell.toString(), GAOut.INFO);
+			GAOut.out().stdout(getFindsymInput(cell, accuracies[0]), GAOut.INFO);
+			GAOut.out().stdout((new Exception()).getStackTrace().toString(), GAOut.INFO);
+			
 			answer = cell;
 		}
 		

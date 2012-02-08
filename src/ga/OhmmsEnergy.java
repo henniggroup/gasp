@@ -128,7 +128,6 @@ public class OhmmsEnergy implements Energy {
 	// optimize the structure or not.
 	private static String ohmmsInputFile(StructureOrg c, String headerStr, String footerStr, String path) {
 		GAParameters params = GAParameters.getParams();
-		int verbosity = params.getVerbosity();
 		String ans = new String("Maybe file creation failed.");
 		String newline = GAUtils.newline();
 		
@@ -149,8 +148,7 @@ public class OhmmsEnergy implements Energy {
 			out.write(footerStr);
 			out.close();
 		} catch (IOException e) {
-			if (verbosity >= 2)
-				System.out.println("OhmmsEnergy IOException: " + e.getMessage());
+			GAOut.out().stdout("OhmmsEnergy IOException: " + e.getMessage(), GAOut.WARNING, c.getID());
 		}
 
 		return ans;
@@ -158,7 +156,6 @@ public class OhmmsEnergy implements Energy {
 
 	// runs OHMMS on the input file given and returns the results in a String
 	private static String runOHMMS(String runDir) {
-		int verbosity = GAParameters.getParams().getVerbosity();
 		StringBuilder ohmmsOutput = new StringBuilder();
 
 		String s = null;
@@ -177,8 +174,7 @@ public class OhmmsEnergy implements Energy {
 			// read the output
 			while ((s = stdInput.readLine()) != null) {
 				ohmmsOutput.append(s + GAUtils.newline());
-				if (verbosity >= 5)
-					System.out.println(s);
+				GAOut.out().stdout(s, GAOut.DEBUG);
 			}
 
 			// print out any errors
@@ -199,15 +195,13 @@ public class OhmmsEnergy implements Energy {
 	private double ohmmsRun(StructureOrg c) {
 		GAParameters params = GAParameters.getParams();
 		double finalEnergy = 0;
-		int verbosity = GAParameters.getParams().getVerbosity();
 		
 		// make temp directory
 		File outDir = new File(params.getTempDirName() + "/" + params.getRunTitle() + "." + c.getID());
 		outDir.mkdir();
 		
 		ohmmsInputFile(c, headerStr, footerStr, outDir.getAbsolutePath() + "/");
-		if (verbosity >= 3)
-			System.out.println("Starting OHMMS computation on organism " + c.getID());
+		GAOut.out().stdout("Starting OHMMS computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
 		
 		String ohmmsOutput = runOHMMS(outDir.getAbsolutePath());
 
@@ -215,8 +209,7 @@ public class OhmmsEnergy implements Energy {
 		// update c to be the structure in OHMMS's output
 		Cell a = parseOutputStructure(c.getCell(), outDir.getAbsolutePath() + "/" + outStructureFileName);
 		if (a == null) {
-			if (verbosity >= 3)
-				System.out.println("Warning: bad OHMMS output.  Not updating structure.");
+			GAOut.out().stdout("Warning: bad OHMMS output.  Not updating structure.", GAOut.NOTICE, c.getID());
 		} else {
 			c.setCell(a);
 		}
@@ -226,8 +219,7 @@ public class OhmmsEnergy implements Energy {
 
 		finalEnergy = parseFinalEnergy(ohmmsOutput);
 		
-		if (verbosity >= 3)
-			System.out.println("Energy of org " + c.getID() + ": " + finalEnergy + " ");
+		GAOut.out().stdout("Energy of org " + c.getID() + ": " + finalEnergy + " ", GAOut.NOTICE, c.getID());
 
 		return finalEnergy;
 	}
@@ -268,7 +260,6 @@ public class OhmmsEnergy implements Energy {
 	
 	private double parseFinalEnergy(String ohmmsOutput) {
 		Double finalEnergy = 0.0;
-		int verbosity = GAParameters.getParams().getVerbosity();
 
 		// parse the ohmmsOutput to find the final energy 
 		// (looking for the 2nd number in the last line)
@@ -280,8 +271,7 @@ public class OhmmsEnergy implements Energy {
 			while ((line = r.readLine()) != null)
 				lastLine = line;
 		} catch (IOException x) {
-			if (verbosity >= 1)
-				System.out.println("OhmmsEnergy.ohmmsRun: IOException.");
+			GAOut.out().stdout("OhmmsEnergy.ohmmsRun: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL);
 		}
 
 		String[] tokens = lastLine.trim().split("[ 	][ 	]*");
