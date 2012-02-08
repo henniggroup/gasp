@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 import utility.*;
+import vasp.VaspIn;
 
 import crystallography.Cell;
 import crystallography.Site;
@@ -221,7 +222,7 @@ public class OhmmsEnergy implements Energy {
 		}
 		
 		// write cell to disk
-		c.getCell().writeCIF(outDir.getAbsolutePath() + "/" + c.getID() + ".relaxed.cif");
+		VaspIn.writePoscar(c.getCell(), outDir.getAbsolutePath() + "/" + c.getID() + ".relaxed.POSCAR", false);
 
 		finalEnergy = parseFinalEnergy(ohmmsOutput);
 		

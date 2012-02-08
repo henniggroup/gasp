@@ -14,6 +14,7 @@ import chemistry.Element;
 import utility.ArgumentParser;
 import utility.Pair;
 import utility.Utility;
+import vasp.VaspIn;
 
 import crystallography.Cell;
 import crystallography.Isotropy;
@@ -209,7 +210,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --initialPopulation <num> random givenVol <volumeperatom>");
 		System.out.println("   --initialPopulation <num> random randomVol");
 //		System.out.println("   --initialPopulation <num> resume <directory> <recalculate energies?>");
-		System.out.println("   --initialPopulation <num> fromCifs <directory>");
+		System.out.println("   --initialPopulation <num> poscars <directory>");
 		System.out.println("   --initialPopulation <num> manual");
 		System.out.println("   --initialPopulation <num> units <numMols> <numAtoms_1>...<numAtoms_n> (<symbol_i> <x_i> <y_i> <z_i>)+ <numUnits_1>...<numUnits_n> <targetDensity> <densityTol> <unitsOnly?>");
 		System.out.println("Objective Functions");
@@ -408,8 +409,8 @@ public class GAParameters implements Serializable {
 //					initialOrgCreators.put(new ResumeSOCreator(GAUtils.subArray(values, 2)), numOrgs);
 				} else if (creatorType.equalsIgnoreCase("manual")) {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new ManualSOCreator( Utility.subList(arguments, 2)), numOrgs));
-				} else if (creatorType.equalsIgnoreCase("fromCifs")) {
-					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new FromCifsSOCreator( Utility.subList(arguments, 2)), numOrgs));
+				} else if (creatorType.equalsIgnoreCase("poscars")) {
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new GivenSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("units")) {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else {
@@ -887,8 +888,8 @@ public class GAParameters implements Serializable {
 			return result.toString();
 		}
 		
-		private String makeCIFPath(StructureOrg s) {
-			File f = new File(outDir, Integer.toString(s.getID()) + ".cif");
+		private String makePOSCARPath(StructureOrg s) {
+			File f = new File(outDir, Integer.toString(s.getID()) + ".POSCAR");
 			return f.getPath();
 		}
 		
@@ -907,12 +908,12 @@ public class GAParameters implements Serializable {
 			// write the generation header (generation x N)
 			GAUtils.writeStringToFile("generation " + Integer.toString(currentGenNum) + " " + g.getNumOrganisms() + newline, outFile, true);
 			
-			// save structures' cifs and findsym outputs
+			// save structures and findsym outputs
 			for (Organism o : g) {
 				// assume here that our organisms are StructureOrgs
 				StructureOrg s = (StructureOrg)(o);
-				// save the cif
-				s.getCell().writeCIF(makeCIFPath(s));
+				// save the structure
+				VaspIn.writePoscar(s.getCell(), makePOSCARPath(s), false);
 				// save the findsym output
 				File outFindSym = new File(makeFindSymPath(s));
 				GAUtils.writeStringToFile(Isotropy.getFindsymOutput(s.getCell()), outFindSym, false);
@@ -924,7 +925,7 @@ public class GAParameters implements Serializable {
 				StringBuilder info = new StringBuilder();
 				info.append(Integer.toString(s.getID()) + " ");
 				info.append(Double.toString(s.getValue()) + " ");
-				info.append(makeCIFPath(s) + newline);
+				info.append(makePOSCARPath(s) + newline);
 				GAUtils.writeStringToFile(info.toString(), outFile, true);
 			}
 			

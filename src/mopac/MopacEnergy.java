@@ -53,7 +53,7 @@ public class MopacEnergy implements Energy {
 		GAParameters params = GAParameters.getParams();	
 		
 		// Copy original structure (for testing)
-		c.getCell().writeCIF(params.getTempDirName() + "/orig" + c.getID() + ".cif");
+		// c.getCell().writeCIF(params.getTempDirName() + "/orig" + c.getID() + ".cif");
 		
 		// Run MOPAC
 		runMopac(c);

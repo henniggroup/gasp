@@ -10,6 +10,7 @@ import chemistry.CompositionSpace;
 import chemistry.Element;
 
 import utility.*;
+import vasp.VaspIn;
 
 import crystallography.Cell;
 import crystallography.Site;
@@ -209,7 +210,7 @@ Atoms
 		outDir.mkdir();
 		
 		// write unrelaxed cell to disk
-		c.getCell().writeCIF(outDirPath + "/" + c.getID() + ".unrelaxed.cif");
+		VaspIn.writePoscar(c.getCell(), outDirPath + "/" + c.getID() + ".unrelaxed.POSCAR", false);
 		
 		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(getLammpsDataFile(c), outDirPath + "/" + dataFileName);

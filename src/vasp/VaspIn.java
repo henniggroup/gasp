@@ -48,6 +48,10 @@ public class VaspIn {
 		return description;
 	}
 		
+	public static void writePoscar(Cell c, String outPoscar, Boolean useCartesianCoords) {
+		(new VaspIn(c, null, null, null)).writePoscar(outPoscar, useCartesianCoords);
+	}
+		
 	public void writePoscar(String outPoscar, Boolean useCartesianCoords) {
 		/* Note that this will overwrite outPoscar. If this is not desired behavior,
 		 * the calling routine should check if the output file already exists */

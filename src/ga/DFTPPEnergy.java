@@ -14,6 +14,7 @@ import chemistry.Element;
 
 import utility.Utility;
 import utility.Vect;
+import vasp.VaspIn;
 
 import crystallography.Cell;
 import crystallography.Site;
@@ -138,7 +139,7 @@ public class DFTPPEnergy implements Energy {
 		outDir.mkdir();
 		
 		// write unrelaxed cell to disk
-		c.getCell().writeCIF(outDirPath + "/" + c.getID() + ".unrelaxed.cif");
+		VaspIn.writePoscar(c.getCell(), outDirPath + "/" + c.getID() + ".unrelaxed.POSCAR", false);
 		
 		utility.Utility.writeStringToFile(getInputFile(c), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(inputStr, outDirPath + "/" + optionsFileName);
