@@ -1,6 +1,8 @@
 package ga;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GAOut implements Serializable {
 	final static long serialVersionUID = 1l;
@@ -14,6 +16,12 @@ public class GAOut implements Serializable {
 	public static final int WARNING = 2;
 	public static final int CRITICAL = 1;
 	
+	private List<Integer> orgsSeen;
+	
+	private GAOut() {
+		orgsSeen = new ArrayList<Integer>();
+	}
+	
 	// singleton
 	public static GAOut out() {
 		if (instance == null)
@@ -26,16 +34,26 @@ public class GAOut implements Serializable {
 		stdout(message, level, -1);
 	}
 	
+	private String colorifyStringByStructID(String s, int id) {
+		
+		// valid ansi color codes go from 30 to 38
+		int colorNum = (id % 9) + 30;
+		
+		return "\033[1;" + colorNum + "m" + s + "\033[m";
+	}
+	
 	public void stdout(String message, int level, int structureID) {
-		
-		/*
-		for (int i = 30; i < 38; i++) {
-			System.out.println("\033[" + i + "mHello " +
-			 "\033[1;" + i + "mWorld!\033[m");
-			} */
-		
-		if (level <= GAParameters.getParams().getVerbosity())
-			System.out.println(message);
+		if (level <= GAParameters.getParams().getVerbosity()) {
+			if (structureID > 0) {
+				if (!orgsSeen.contains(structureID)) {
+					orgsSeen.add(structureID);
+					System.out.println(colorifyStringByStructID("Organism " + structureID,structureID));
+				}
+				System.out.println(colorifyStringByStructID("   " + message,structureID));
+			} else {
+				System.out.println(message);
+			}
+		}
 	}
 	
 }
