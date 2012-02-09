@@ -198,6 +198,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --keepTempFiles <true|false>");
 		System.out.println("   --saveStateEachIter <true|false>");
 		System.out.println("   --popSize <n> : use a non-initial population size of n");
+		System.out.println("   --promotion <n> : promote n best structures (or the whole CH) to next gen");
 //		System.out.println("   --constituents <fix stoichiometry?> <stoichiometry (e.g. Mn 1 O 2)>");
 		System.out.println("   --compositionSpace <numElements> <Sym>* (<Num>*)*          System composition");
 		System.out.println("   --optimizeDensity <weight of adaptation> <num orgs to avg. over>");
