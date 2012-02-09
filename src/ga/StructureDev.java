@@ -67,8 +67,8 @@ public final class StructureDev implements Development, Serializable {
 		double minid = params.getMinInteratomicDistance();
 		double maxll = params.getMaxLatticeLength();
 		double minll = params.getMinLatticeLength();
-		double maxla = params.getMaxLatticeAngle();
-		double minla = params.getMinLatticeAngle();
+		double maxla = params.getMaxLatticeAngleDegrees();
+		double minla = params.getMinLatticeAngleDegrees();
 		int maxatoms = params.getMaxNumAtoms();
 		int minatoms = params.getMinNumAtoms();
 		
@@ -98,8 +98,10 @@ public final class StructureDev implements Development, Serializable {
 		if (minid != -1)
 			for (int i = 0; i < s.getCell().getNumSites(); i++) {
 				// it's no good if there are any other atoms in the minimum radius sphere
-				if (s.getCell().getAtomsInSphereSorted(s.getCell().getSite(i).getCoords(), minid).size() > 1) {
-					GAOut.out().stdout("Organism " + s.getID() + " failed minimum interatomic distance constraint.", GAOut.NOTICE, s.getID());
+				List<Site> sitesInSphere = s.getCell().getAtomsInSphereSorted(s.getCell().getSite(i).getCoords(), minid);
+				if (sitesInSphere.size() > 1) {
+					double interatomicDist = sitesInSphere.get(0).getCoords().getCartDistanceTo(sitesInSphere.get(1).getCoords());
+					GAOut.out().stdout("Organism " + s.getID() + " failed minimum interatomic distance constraint: i.d. = " + interatomicDist, GAOut.NOTICE, s.getID());
 					// if we've added structure to wholepop rGuard before doing relaxation and now it fails, remove it
 					//  - this was fixed by making rguard save cells instead of structureorgs
 			//		if (rGuard != null)
@@ -174,7 +176,7 @@ public final class StructureDev implements Development, Serializable {
 		}
 		
 		// check the lattice angles
-		double[] lAngles = GAUtils.anglesToDegrees(structure.getCellAngles());
+		double[] lAngles = structure.getCellAnglesDegrees();
 		for(int i = 0; i <= 2 ; i++) {
 			if(minla != -1 && lAngles[i] < minla) {
 				GAOut.out().stdout("Organism " + s.getID() + " failed min lattice angle constraint (lAngles["

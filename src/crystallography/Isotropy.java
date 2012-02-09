@@ -173,10 +173,10 @@ public class Isotropy {
 		double a = Double.parseDouble(lParms[1]);
 		double b = Double.parseDouble(lParms[2]);
 		double c = Double.parseDouble(lParms[3]);
-		double alpha = Double.parseDouble(lParms[4]) / 180 * Math.PI;
-		double beta = Double.parseDouble(lParms[5]) / 180 * Math.PI;
-		double gamma = Double.parseDouble(lParms[6]) / 180 * Math.PI;
-		List<Vect> basis = Cell.getVectorsfromLParams(a,b,c,alpha,beta,gamma);		
+		double alpha = Double.parseDouble(lParms[4]);
+		double beta = Double.parseDouble(lParms[5]);
+		double gamma = Double.parseDouble(lParms[6]);
+		List<Vect> basis = Cell.getVectorsfromLParamsDegrees(a,b,c,alpha,beta,gamma);		
 		
 		// get wyckoff positions
 		boolean positionsStarted = false;

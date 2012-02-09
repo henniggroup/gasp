@@ -316,18 +316,15 @@ public class UnitsSOCreator implements StructureOrgCreator {
 		}
 		
 		// Generates random angles (degrees)
-		double randx = RandomNumbers.getUniformDoubleBetween(0, 360);
-		double randy = RandomNumbers.getUniformDoubleBetween(0, 360);
-		double randz = RandomNumbers.getUniformDoubleBetween(0, 360);
-		
-		// Change from degrees to radians
-		randx = randx*(Math.PI/180); randy = randy*(Math.PI/180); randz = randz*(Math.PI/180);
+		double randxRadians = RandomNumbers.getUniformDoubleBetween(0, 2 * Math.PI);
+		double randyRadians = RandomNumbers.getUniformDoubleBetween(0, 2 * Math.PI);
+		double randzRadians = RandomNumbers.getUniformDoubleBetween(0, 2 * Math.PI);
 		
 		// Initialize X,Y,Z rotation matrices
 		Matrix X = new Matrix(dim,dim); Matrix Y = new Matrix(dim,dim); Matrix Z = new Matrix(dim,dim);
-		X.set(0,0,1); X.set(0,1,0); X.set(0,2,0); X.set(1,0,0); X.set(1,1,Math.cos(randx)); X.set(1,2,-Math.sin(randx)); X.set(2,0,0); X.set(2,1,Math.sin(randx)); X.set(2,2,Math.cos(randx));
-		Y.set(0,0,Math.cos(randy)); Y.set(0,1,0); Y.set(0,2,Math.sin(randy)); Y.set(1,0,0); Y.set(1,1,1); Y.set(1,2,0); Y.set(2,0,-Math.sin(randy)); Y.set(2,1,0); Y.set(2,2,Math.cos(randy));
-		Z.set(0,0,Math.cos(randz)); Z.set(0,1,-Math.sin(randz)); Z.set(0,2,0); Z.set(1,0,Math.sin(randz)); Z.set(1,1,Math.cos(randz)); Z.set(1,2,0); Z.set(2,0,0); Z.set(2,1,0); Z.set(2,2,1);
+		X.set(0,0,1); X.set(0,1,0); X.set(0,2,0); X.set(1,0,0); X.set(1,1,Math.cos(randxRadians)); X.set(1,2,-Math.sin(randxRadians)); X.set(2,0,0); X.set(2,1,Math.sin(randxRadians)); X.set(2,2,Math.cos(randxRadians));
+		Y.set(0,0,Math.cos(randyRadians)); Y.set(0,1,0); Y.set(0,2,Math.sin(randyRadians)); Y.set(1,0,0); Y.set(1,1,1); Y.set(1,2,0); Y.set(2,0,-Math.sin(randyRadians)); Y.set(2,1,0); Y.set(2,2,Math.cos(randyRadians));
+		Z.set(0,0,Math.cos(randzRadians)); Z.set(0,1,-Math.sin(randzRadians)); Z.set(0,2,0); Z.set(1,0,Math.sin(randzRadians)); Z.set(1,1,Math.cos(randzRadians)); Z.set(1,2,0); Z.set(2,0,0); Z.set(2,1,0); Z.set(2,2,1);
 		
 		// Creates full 3D rotation matrix
 		Matrix R = X.times(Y).times(Z);

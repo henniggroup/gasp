@@ -106,9 +106,9 @@ public class Utility {
 		return answer;
 	}
 	
-	// rotate an angle theta aroudn vector vect
+	// rotate an angle theta around vector vect
 	// see http://inside.mines.edu/~gmurray/ArbitraryAxisRotation/
-	public static Matrix getRotationMatrix(double theta, Vect vect) {
+	public static Matrix getRotationMatrixDegrees(double theta, Vect vect) {
 		double u = vect.getCartesianComponents().get(0);
 		double v = vect.getCartesianComponents().get(1);
 		double w = vect.getCartesianComponents().get(2);
@@ -117,8 +117,8 @@ public class Utility {
 		double w2 = w*w;
 		double mag = vect.length();
 		double mag_sq = mag*mag;
-		double cost = Math.cos(theta);
-		double sint = Math.sin(theta);
+		double cost = Math.cos(theta * Math.PI / 180);
+		double sint = Math.sin(theta * Math.PI / 180);
 		
 		double result[][] = new double[Constants.numDimensions][Constants.numDimensions];
 

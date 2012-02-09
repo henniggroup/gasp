@@ -48,14 +48,14 @@ public class RandomSOCreator implements StructureOrgCreator {
 	public static List<Vect> makeRandomLattice() {
 		GAParameters params = GAParameters.getParams();
 		
-		if (params.getMaxLatticeAngle() == -1 || params.getMinLatticeAngle() == -1
+		if (params.getMaxLatticeAngleDegrees() == -1 || params.getMinLatticeAngleDegrees() == -1
 				|| params.getMaxLatticeLength() == -1 || params.getMinLatticeLength() == -1)
 			GAParameters.usage("Error: Must set lattice parameter constraints to use makeRandomLattice().", true);
 		
 		double maxll = params.getMaxLatticeLength();
 		double minll = params.getMinLatticeLength();
-		double maxla = params.getMaxLatticeAngle();
-		double minla = params.getMinLatticeAngle();
+		double maxla = params.getMaxLatticeAngleDegrees();
+		double minla = params.getMinLatticeAngleDegrees();
 		
 		Random rand = params.getRandom();
 		
@@ -64,14 +64,14 @@ public class RandomSOCreator implements StructureOrgCreator {
 		double lc = rand.nextDouble()*(maxll-minll)+minll;
 		
 		// sum of the angles needs to be < 360 degrees
-		double arad, brad, grad;
+		double adeg, bdeg, gdeg;
 		do {
-			arad = (rand.nextDouble()*(maxla-minla)+minla)*Math.PI/180.0;
-			brad = (rand.nextDouble()*(maxla-minla)+minla)*Math.PI/180.0;
-			grad = (rand.nextDouble()*(maxla-minla)+minla)*Math.PI/180.0;
-		} while (!GAUtils.satisfiesTriangleInequality(arad, brad, grad) || arad + brad + grad >= 2*Math.PI);
+			adeg = (rand.nextDouble()*(maxla-minla)+minla);
+			bdeg = (rand.nextDouble()*(maxla-minla)+minla);
+			gdeg = (rand.nextDouble()*(maxla-minla)+minla);
+		} while (!GAUtils.satisfiesTriangleInequality(adeg, bdeg, gdeg) || adeg + bdeg + gdeg >= 360);
 			
-		return (new Cell(la,lb,lc,arad,brad,grad,null,null)).getLatticeVectors();
+		return (new Cell(la,lb,lc,adeg,bdeg,gdeg,null,null)).getLatticeVectors();
 	}
 	
 	// fills up the population with random organisms (provided they satisfy the

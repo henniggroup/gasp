@@ -250,8 +250,9 @@ public class Vect implements Serializable {
 		return result.toString();
 	}
 	
-	public Double angleToInRadians(Vect another) {
-		return Math.acos((this.dot(another))/(this.length()*another.length()));
+	public Double angleToInDegrees(Vect another) {
+		return Math.acos((this.dot(another))/(this.length()*another.length()))
+				* 180.0 / Math.PI;
 	}
 	
 	public Vect getVectShiftedIntoBasis(List<Vect> b) {

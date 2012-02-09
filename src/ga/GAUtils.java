@@ -98,6 +98,7 @@ public class GAUtils {
 		return -1;
 	}
 	
+	/*
 	// take an array of angles in radians and returns those angles in degrees
 	public static double[] anglesToDegrees(double[] anglesRad) {
 		double[] anglesDeg = new double[anglesRad.length];
@@ -106,7 +107,7 @@ public class GAUtils {
 			anglesDeg[i] = anglesRad[i] * 180.0 / Math.PI;
 		
 		return anglesDeg;
-	}
+	} */
 	
 	// heh only use this for small numbers
 	public static double renormZeroOne(double d) {

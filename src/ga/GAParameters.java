@@ -601,7 +601,7 @@ public class GAParameters implements Serializable {
 		return dev;
 	}
 
-	public double getMaxLatticeAngle() {
+	public double getMaxLatticeAngleDegrees() {
 		return maxLatticeAngle;
 	}
 
@@ -613,7 +613,7 @@ public class GAParameters implements Serializable {
 		return minInteratomicDistance;
 	}
 
-	public double getMinLatticeAngle() {
+	public double getMinLatticeAngleDegrees() {
 		return minLatticeAngle;
 	}
 

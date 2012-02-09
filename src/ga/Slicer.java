@@ -121,8 +121,8 @@ public final class Slicer implements Variation {
 		}
 				
 		//average parents' bases to create a new basis
-		double[] aAngles = a.getCellAngles();
-		double[] bAngles = b.getCellAngles();
+		double[] aAngles = a.getCellAnglesDegrees();
+		double[] bAngles = b.getCellAnglesDegrees();
 		double[] aLengths = a.getCellLengths();
 		double[] bLengths = b.getCellLengths();
 		double[] newAngles = new double[3];

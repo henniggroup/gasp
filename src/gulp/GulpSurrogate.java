@@ -107,10 +107,10 @@ public class GulpSurrogate implements Serializable {
 		for (IComputedEntry ent : entries) {
 			result.append("# Entry" + nl);
 			result.append("cell" + nl);
-			List<Double> lps = ent.getCell().getLatticeParameters();
+			List<Double> lps = ent.getCell().getLatticeParametersDegrees();
 			//  need to convert radians->degrees
 			result.append(format.format(lps.get(0)) + " " + format.format(lps.get(1)) + " " + format.format(lps.get(2)) + " " +
-					format.format(lps.get(3)*180/Math.PI) + " " + format.format(lps.get(4)*180/Math.PI) + " " + format.format(lps.get(5)*180/Math.PI) + nl);
+					format.format(lps.get(3)) + " " + format.format(lps.get(4)) + " " + format.format(lps.get(5)) + nl);
 			result.append("fractional" + nl);
 			for (Site s : ent.getCell().getSites()) {
 				List<Double> fcoords = s.getCoords().getComponentsWRTBasis(ent.getCell().getLatticeVectors());

@@ -1,5 +1,6 @@
 package crystallography;
 
+import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
 import ga.Generation;
@@ -56,7 +57,7 @@ public class Cell implements Serializable {
 	}
 */	
 	public Cell (Double _a, Double _b, Double _c, Double _alpha, Double _beta, Double _gamma, List<Site> _basis, String _label){
-		this(getVectorsfromLParams(_a, _b, _c, _alpha, _beta, _gamma), _basis, _label);
+		this(getVectorsfromLParamsDegrees(_a, _b, _c, _alpha, _beta, _gamma), _basis, _label);
 	}
 	
 	public Cell (List<Vect> _vectors, List<Site> _basis) {
@@ -92,15 +93,15 @@ public class Cell implements Serializable {
 	/* Returns a list of length 6 containing
 	 * a,b,c,alpha,beta,gamma
 	 * in that order, where gamma is the angle between a and b, etc,
-	 * and the angles are in RADIANS.
+	 * and the angles are in degrees.
 	 */
-	public List<Double> getLatticeParameters() {
+	public List<Double> getLatticeParametersDegrees() {
 		List<Double> result = new LinkedList<Double>();
 		for (Vect v : latticeVectors)
 			result.add(v.length());
-		result.add(latticeVectors.get(1).angleToInRadians(latticeVectors.get(2)));
-		result.add(latticeVectors.get(0).angleToInRadians(latticeVectors.get(2)));
-		result.add(latticeVectors.get(0).angleToInRadians(latticeVectors.get(1)));
+		result.add(latticeVectors.get(1).angleToInDegrees(latticeVectors.get(2)));
+		result.add(latticeVectors.get(0).angleToInDegrees(latticeVectors.get(2)));
+		result.add(latticeVectors.get(0).angleToInDegrees(latticeVectors.get(1)));
 		return result;
 	}
 	
@@ -111,11 +112,11 @@ public class Cell implements Serializable {
 		return result;
 	}
 	
-	public double[] getCellAngles() {
+	public double[] getCellAnglesDegrees() {
 		double[] result = new double[Constants.numDimensions];
-		result[0] = (latticeVectors.get(1).angleToInRadians(latticeVectors.get(2)));
-		result[1] = (latticeVectors.get(0).angleToInRadians(latticeVectors.get(2)));
-		result[2] = (latticeVectors.get(0).angleToInRadians(latticeVectors.get(1)));
+		result[0] = (latticeVectors.get(1).angleToInDegrees(latticeVectors.get(2)));
+		result[1] = (latticeVectors.get(0).angleToInDegrees(latticeVectors.get(2)));
+		result[2] = (latticeVectors.get(0).angleToInDegrees(latticeVectors.get(1)));
 		return result;
 	}
 	
@@ -248,16 +249,16 @@ public class Cell implements Serializable {
 		return result;
 	}
 	
-	public static List<Vect> getVectorsfromLParams(double a, double b, double c, double alpha, double beta, double gamma) {
+	public static List<Vect> getVectorsfromLParamsDegrees(double a, double b, double c, double alpha, double beta, double gamma) {
 		// make new axes:
 		List<Vect> newCellVectors = new LinkedList<Vect>();
 		// make \vec{a}:
 		newCellVectors.add(new Vect(a,0.0,0.0));
 		// make \vec{b}:
-		newCellVectors.add(new Vect(b*Math.cos(gamma),b*Math.sin(gamma),0.0));
+		newCellVectors.add(new Vect(b*Math.cos(gamma*Math.PI/180),b*Math.sin(gamma*Math.PI/180),0.0));
 		// make \vec{c}:
-		double c1 = c * Math.cos(beta);
-		double c2 = (c*Math.cos(alpha) - Math.cos(gamma)*c*Math.cos(beta))/(Math.sin(gamma));
+		double c1 = c * Math.cos(beta*Math.PI/180);
+		double c2 = (c*Math.cos(alpha*Math.PI/180) - Math.cos(gamma*Math.PI/180)*c*Math.cos(beta*Math.PI/180))/(Math.sin(gamma*Math.PI/180));
 		double c3 = Math.sqrt(c*c - c1*c1 - c2*c2);
 		newCellVectors.add(new Vect(c1,c2,c3));
 		
@@ -282,14 +283,14 @@ public class Cell implements Serializable {
 		// and just make new axes with the same lengths/angles but in
 		// better directions
 		
-		List<Double> lParams = getLatticeParameters();
+		List<Double> lParams = getLatticeParametersDegrees();
 		double a = lParams.get(0);
 		double b = lParams.get(1);
 		double c = lParams.get(2);
 		double alpha = lParams.get(3);
 		double beta = lParams.get(4);
 		double gamma = lParams.get(5);
-		List<Vect> newCellVectors = getVectorsfromLParams(a, b, c, alpha, beta, gamma);
+		List<Vect> newCellVectors = getVectorsfromLParamsDegrees(a, b, c, alpha, beta, gamma);
 		
 		// make new sites with the same fractional coords in the new cell
 		List<Site> newBasis = new LinkedList<Site>();
@@ -330,13 +331,13 @@ public class Cell implements Serializable {
 		result.append("_symmetry_Int_Tables_number 1\n");
 		result.append("_symmetry_cell_setting triclinic\n\n");
 		// Write lattice params 
-		List<Double> latticeParams = getLatticeParameters();
+		List<Double> latticeParams = getLatticeParametersDegrees();
 		result.append("_cell_length_a " + latticeParams.get(0) + "\n");
 		result.append("_cell_length_b " + latticeParams.get(1) + "\n");
 		result.append("_cell_length_c " + latticeParams.get(2) + "\n");
-		result.append("_cell_angle_alpha " + latticeParams.get(3)*180/Math.PI + "\n");
-		result.append("_cell_angle_beta " + latticeParams.get(4)*180/Math.PI + "\n");
-		result.append("_cell_angle_gamma " + latticeParams.get(5)*180/Math.PI + "\n\n");
+		result.append("_cell_angle_alpha " + latticeParams.get(3) + "\n");
+		result.append("_cell_angle_beta " + latticeParams.get(4) + "\n");
+		result.append("_cell_angle_gamma " + latticeParams.get(5) + "\n\n");
 		// Write sites 
 		result.append("loop_\n");
 		result.append("_atom_site_label\n");
@@ -477,9 +478,9 @@ public class Cell implements Serializable {
         indat[0] = this.getCellLengths()[0];
         indat[1] = this.getCellLengths()[1];
         indat[2] = this.getCellLengths()[2];
-        indat[3] = latticeVectors.get(1).angleToInRadians(latticeVectors.get(2));
-        indat[4] = latticeVectors.get(0).angleToInRadians(latticeVectors.get(2));
-        indat[5] = latticeVectors.get(0).angleToInRadians(latticeVectors.get(1));
+        indat[3] = latticeVectors.get(1).angleToInDegrees(latticeVectors.get(2)) * Math.PI / 180;
+        indat[4] = latticeVectors.get(0).angleToInDegrees(latticeVectors.get(2)) * Math.PI / 180;
+        indat[5] = latticeVectors.get(0).angleToInDegrees(latticeVectors.get(1)) * Math.PI / 180;
         double a = indat[0] * indat[0];
         double b = indat[1] * indat[1];
         double c = indat[2] * indat[2];
@@ -654,9 +655,9 @@ public class Cell implements Serializable {
         poutdat[0] = result.getCellLengths()[0];
         poutdat[1] = result.getCellLengths()[1];
         poutdat[2] = result.getCellLengths()[2];
-        poutdat[3] = result.getCellAngles()[0];
-        poutdat[4] = result.getCellAngles()[1];
-        poutdat[5] = result.getCellAngles()[2];
+        poutdat[3] = result.getCellAnglesDegrees()[0] * Math.PI / 180;
+        poutdat[4] = result.getCellAnglesDegrees()[1] * Math.PI / 180;
+        poutdat[5] = result.getCellAnglesDegrees()[2] * Math.PI / 180;
             		
         int flag = 0;
         for (int i = 0; i < 6; i++) {
@@ -686,9 +687,9 @@ public class Cell implements Serializable {
         } */
         
         if (this.getBasisSize() != result.getBasisSize()) {
-        	System.out.println("ERROR: Niggli cell reduction gained or lost atoms");
-        	System.out.println(this);
-        	System.out.println(result);
+        	GAOut.out().stdout("ERROR: Niggli cell reduction gained or lost atoms", GAOut.CRITICAL);
+        	GAOut.out().stdout(this.toString(), GAOut.CRITICAL);
+        	GAOut.out().stdout(result.toString(), GAOut.CRITICAL);
         	(new Exception()).printStackTrace();
         }
         
@@ -781,9 +782,9 @@ public class Cell implements Serializable {
 		// get rotation matrix to rotate p1 onto the x axis
 		// this is a rotation of angle cos^-1 ( (p1 . x-axis) / (2 * |p1| * |xaxis|  ) 
 		//     about the vector (p1 x xaxis)   (<- x = cross product)
-		double p1_rot_angle = p1.angleToInRadians(Vect.xHat());
+		double p1_rot_angle = p1.angleToInDegrees(Vect.xHat());
 		Vect p1_rot_vect = p1.cross(Vect.xHat());
-		Matrix p1_rot_mat = Utility.getRotationMatrix(p1_rot_angle, p1_rot_vect);
+		Matrix p1_rot_mat = Utility.getRotationMatrixDegrees(p1_rot_angle, p1_rot_vect);
 		
 		// make p2 by v1 translated by centroid and by the first rotation
 		// get rotation matrix to then rotate p2 onto the x-y plane
@@ -791,13 +792,13 @@ public class Cell implements Serializable {
 		// - project p2 into the y-z plane, and find the angle between the y-axis and that projection
 		Vect p2 = v2.plus(minusCentroid).leftMultByMatrix(p1_rot_mat);
 		Vect p2proj = new Vect(0.0, p2.getCartesianComponents().get(1), p2.getCartesianComponents().get(2));
-		double p2_rot_angle = p2proj.angleToInRadians(Vect.yHat());
+		double p2_rot_angle_deg = p2proj.angleToInDegrees(Vect.yHat());
 		
 		Matrix p2_rot_mat;
 		if (p2.getCartesianComponents().get(2) < 0) // make sure we're rotating into the POSITIVE quadrant of the x-y plane
-			p2_rot_mat = Utility.getRotationMatrix(p2_rot_angle, Vect.xHat());
+			p2_rot_mat = Utility.getRotationMatrixDegrees(p2_rot_angle_deg, Vect.xHat());
 		else
-			p2_rot_mat = Utility.getRotationMatrix(2*Math.PI - p2_rot_angle, Vect.xHat());
+			p2_rot_mat = Utility.getRotationMatrixDegrees(360.0 - p2_rot_angle_deg, Vect.xHat());
 		
 		Matrix total_rot = p2_rot_mat.times(p1_rot_mat);
 		
@@ -924,15 +925,15 @@ public class Cell implements Serializable {
 		
 		//for (each of the choices of others lattice vectors being considered a, b, and c)
 		for (Cell n1rotated : n1.getCellWithAlternateAxesLabeling()) { 
-			List<Double> parms1 = n1rotated.getLatticeParameters();
-			List<Double> parms2 = n2.getLatticeParameters();
+			List<Double> parms1 = n1rotated.getLatticeParametersDegrees();
+			List<Double> parms2 = n2.getLatticeParametersDegrees();
 			//	if (lattices dont match up to tolerance), continue
 			if (Math.abs(parms1.get(0) - parms2.get(0)) > lengthMisfit
 				|| Math.abs(parms1.get(1) - parms2.get(1)) > lengthMisfit
 				|| Math.abs(parms1.get(2) - parms2.get(2)) > lengthMisfit
-				|| Math.abs(parms1.get(3) - parms2.get(3)) > angleMisfit*Math.PI/180
-				|| Math.abs(parms1.get(4) - parms2.get(4)) > angleMisfit*Math.PI/180
-				|| Math.abs(parms1.get(5) - parms2.get(5)) > angleMisfit*Math.PI/180)
+				|| Math.abs(parms1.get(3) - parms2.get(3)) > angleMisfit
+				|| Math.abs(parms1.get(4) - parms2.get(4)) > angleMisfit
+				|| Math.abs(parms1.get(5) - parms2.get(5)) > angleMisfit)
 				continue;
 			
 			// for (each choice of atom in other cell being at the origin) 
@@ -970,15 +971,15 @@ public class Cell implements Serializable {
 		// can't think of a good way to do this in a loop...
 		List<Vect> vects;
 		List<Site> sites = new LinkedList<Site>();
-		double a = this.getLatticeParameters().get(0);
-		double b = this.getLatticeParameters().get(1);
-		double c = this.getLatticeParameters().get(2);
-		double alpha = this.getLatticeParameters().get(3);
-		double beta = this.getLatticeParameters().get(4);
-		double gamma = this.getLatticeParameters().get(5);
+		double a = this.getLatticeParametersDegrees().get(0);
+		double b = this.getLatticeParametersDegrees().get(1);
+		double c = this.getLatticeParametersDegrees().get(2);
+		double alpha = this.getLatticeParametersDegrees().get(3);
+		double beta = this.getLatticeParametersDegrees().get(4);
+		double gamma = this.getLatticeParametersDegrees().get(5);
 		
 		// make a new cell by switching a,c
-		vects = getVectorsfromLParams(c, b, a, gamma, beta, alpha);
+		vects = getVectorsfromLParamsDegrees(c, b, a, gamma, beta, alpha);
 		sites.clear();
 		for (Site s : this.getSites()) {
 			List<Double> coords = s.getCoords().getComponentsWRTBasis(this.getLatticeVectors());
@@ -990,7 +991,7 @@ public class Cell implements Serializable {
 		result.add(new Cell(vects, sites));
 		
 		// make a new cell by switching a,b
-		vects = getVectorsfromLParams(b, a, c, beta, alpha, gamma);
+		vects = getVectorsfromLParamsDegrees(b, a, c, beta, alpha, gamma);
 		sites.clear();
 		for (Site s : this.getSites()) {
 			List<Double> coords = s.getCoords().getComponentsWRTBasis(this.getLatticeVectors());
@@ -1002,7 +1003,7 @@ public class Cell implements Serializable {
 		result.add(new Cell(vects, sites));
 		
 		// make a new cell by switching b,c
-		vects = getVectorsfromLParams(a, c, b, alpha, gamma, beta);
+		vects = getVectorsfromLParamsDegrees(a, c, b, alpha, gamma, beta);
 		sites.clear();
 		for (Site s : this.getSites()) {
 			List<Double> coords = s.getCoords().getComponentsWRTBasis(this.getLatticeVectors());
@@ -1080,7 +1081,7 @@ public class Cell implements Serializable {
 						Vect trialCoords = s.getCoords().plus(latticeVectors.get(0).scalarMult((double)i))
 										    .plus(latticeVectors.get(1).scalarMult((double)j))
 										    .plus(latticeVectors.get(2).scalarMult((double)k));
-						if (center.getCartDistanceTo(trialCoords) < dist) {
+						if (center.getCartDistanceTo(trialCoords) <= dist) {
 							result.add(s);
 							continue;
 						}
@@ -1307,11 +1308,11 @@ public class Cell implements Serializable {
 					else if (firstWord.equals("_cell_length_c"))
 						lc = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_alpha"))
-						a = Math.toRadians(Double.parseDouble(t.nextToken()));
+						a = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_beta"))
-						b = Math.toRadians(Double.parseDouble(t.nextToken()));
+						b = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_gamma"))
-						g = Math.toRadians(Double.parseDouble(t.nextToken()));
+						g = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_atom_site_occupancy")) {
 						readingInAtoms = true;
 						latVects = (new Cell(la,lb,lc,a,b,g,null,null)).getLatticeVectors();
@@ -1369,11 +1370,11 @@ public class Cell implements Serializable {
 					else if (firstWord.equals("_cell_length_c"))
 						lc = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_alpha"))
-						a = Math.toRadians(Double.parseDouble(t.nextToken()));
+						a = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_beta"))
-						b = Math.toRadians(Double.parseDouble(t.nextToken()));
+						b = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_cell_angle_gamma"))
-						g = Math.toRadians(Double.parseDouble(t.nextToken()));
+						g = Double.parseDouble(t.nextToken());
 					else if (firstWord.equals("_atom_site_Cartn_z")) {
 						readingInAtoms = true;
 						latVects = (new Cell(la,lb,lc,a,b,g,null,null)).getLatticeVectors();
@@ -1420,7 +1421,7 @@ public class Cell implements Serializable {
 	
 	// just for testing
 	public static void main(String args[]) {
-		Cell a = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/lj_cluster_test/garun_lj_cluster/4363.cif"));
+/*		Cell a = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/lj_cluster_test/garun_lj_cluster/4363.cif"));
 	//	Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_HCP");
 		Cell b = Cell.parseCif(new File("/home/wtipton/projects/ga_for_crystals/test_runs/lj_cluster_test/garun_lj_cluster/4387.cif"));
 
@@ -1429,7 +1430,7 @@ public class Cell implements Serializable {
 		System.out.println(arot.getSite(1).getCoords());
 
 		System.out.println(a.matchesCellNoPBCs(b, .1));
-
+*/
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 		/*Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
 		Cell b = Cell.parseCif(new File("/home/wtipton/andysexamples/29.cif"));
@@ -1447,17 +1448,19 @@ public class Cell implements Serializable {
 		System.out.println(b.matchesCell(b, 0.1, 0.05, 0.05));
 		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
 		
-		/*
-		Cell a = Cell.parseCif(new File("/home/wtipton/bob.cif"));
 		
-		a.getNigliReducedCell();
+		Cell a = Cell.parseCif(new File("/home/wtipton/lisi_pd/cifs/90.cif"));
+		System.out.println(a.toString());
+	//	a.getNigliReducedCell();
 		
 		for (int i = 0; i < a.getNumSites(); i++) {
 			// it's no good if there are any other atoms in the minimum radius sphere
-			if (a.getAtomsInSphereSorted(a.getSite(i).getCoords(), .8).size() > 1) {
-				System.out.println("Organism failed minimum interatomic distance constraint.");
+			System.out.println(a.getSite(i).toString());
+			List<Site> sitesList = a.getAtomsInSphereSorted(a.getSite(i).getCoords(), .1);
+			if (sitesList.size() > 1) {
+				System.out.println("Organism failed minimum interatomic distance constraint: " + sitesList.size());
 			}
-		} */
+		} 
 
 		
 //		a.writeCIF("test");

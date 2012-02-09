@@ -89,7 +89,7 @@ public class GulpEnergy implements Energy {
 		for (int i = 0; i < 3; i++)
 			result.append(df.format(lLengths[i]) + " ");
 		// angles in degrees
-		double[] lAngles = GAUtils.anglesToDegrees(c.getCellAngles());
+		double[] lAngles = c.getCellAnglesDegrees();
 		for (int i = 0; i < 3; i++)
 			result.append(df.format(lAngles[i]) + " ");
 		result.append(newline);
