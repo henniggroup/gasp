@@ -270,9 +270,12 @@ public class QHullCaller implements IExternalProcess {
     }
 
     public void cleanUp(){
-        if(this.m_p != null) this.m_p.destroy();
+        if(this.m_p != null) 
+        	this.m_p.destroy();
         this.m_p = null;
         this.m_output = null; 
+        if (m_inputfile.exists())
+        	m_inputfile.delete();
     }
     
 }
