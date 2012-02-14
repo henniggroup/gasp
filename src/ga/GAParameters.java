@@ -800,7 +800,10 @@ public class GAParameters implements Serializable {
 	public void setCompSpace(CompositionSpace c) {
 		compSpace = c;
 	}
-	
+	public void setVerbosity(int v) {
+		verbosity = v;
+	}
+		
 	public class GARecord implements Serializable {
 		
 		static final long serialVersionUID = 1;
