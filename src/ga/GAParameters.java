@@ -182,11 +182,12 @@ public class GAParameters implements Serializable {
 	
 	// print out a usage statement
 	public static void usage(String errorStr, Boolean die) {
+		System.out.println("GASP: built " + utility.BuildDate.buildDate);
 		if (!errorStr.equals("")) {
 			System.out.println(errorStr);
 			System.out.println("");
 		}
-		System.out.println("Usage: GeneticAlgorithm <options> (--f <input-file> OR --r <resume-file>)");
+		System.out.println("Usage: ga <options> (--f <input-file> OR --r <resume-file>)");
 		System.out.println("Arguments are case-insensitive.  All arguments can be passed in the input-file.");
 		System.out.println("Optional flags [Current value]:");
 		System.out.println("   --help : displays this message with parameters' default values");
@@ -260,7 +261,8 @@ public class GAParameters implements Serializable {
 	// command-line arguments so that the command-line arguments take 
 	// precedence over those in the input file.  thus we can
 	// use the same code to set the private variables.
-	public void setArgs(String[] args) {
+	public void setArgs(String[] args) {		
+		
 		// parse the input arguments
 		ArgumentParser aParser;
 		String inputFileName = null;

@@ -30,8 +30,11 @@ public class CrystalGA {
 	}
 	
 	public static void main(String[] args) {
+		// if no args, print usage statement and exit
+		if (args.length == 0)
+			GAParameters.usage("", true);
+		
 		// Parse command-line arguments
-
 		ArgumentParser aParser = new ArgumentParser(args);
 		if (aParser.hasArguments("r")) {
 			System.out.println("Resuming from " +  aParser.getArgument("r"));
