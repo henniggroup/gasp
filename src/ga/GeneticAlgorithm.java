@@ -62,6 +62,7 @@ public class GeneticAlgorithm {
 				try {
 					for (Thread t : threads)
 						t.join();
+				
 				} catch (InterruptedException x) {
 					GAOut.out().stdout("InterruptedException in energy calc thread: " + x.getMessage(), GAOut.WARNING);
 				}

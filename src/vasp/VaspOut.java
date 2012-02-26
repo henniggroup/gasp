@@ -27,7 +27,7 @@ import chemistry.Element;
  *    create a VaspData object which holds all the parameters, etc. that
  *    go into a vasp run.  Then VaspOut can take a VaspData file and 
  *    write vasp input files to disk.
- */
+ */ 
 
 //NB: Convention: when runs fail, energy should evaluate to Double.POSITIVE_INFINITY
 
@@ -43,8 +43,9 @@ public class VaspOut {
 		List<Site> basis = new LinkedList<Site>();
 		
 		StringTokenizer tokens = null;
+		BufferedReader poscarReader = null;
 		try {
-			BufferedReader poscarReader = new BufferedReader(new FileReader(poscarInFile));
+			poscarReader = new BufferedReader(new FileReader(poscarInFile));
 			/* Read the comment line */
 			description = poscarReader.readLine(); 
 			/* Get the scaling factor */
@@ -95,13 +96,59 @@ public class VaspOut {
 			GAOut.out().stdout("Warning: VaspOut.getCell() failed: " + x.getMessage(), GAOut.NOTICE);
 
 			return null;
-		} 
+		} finally {
+			if (poscarReader != null)
+				try {
+					poscarReader.close();
+				} catch (IOException x) {
+					GAOut.out().stdout("Warning: VaspOut.getCell() failed to close poscarReader: " + x.getMessage(), GAOut.NOTICE);
+				}
+		}
 		
 		/* Make the VaspData object which for now just has a Cell */
 		return new Cell(latticeVectors, basis, null);
 
 	}
 	
+	public static double getFinalEnergy(String outcarFileName, boolean cautious) {
+		
+		double energy = Double.POSITIVE_INFINITY;
+		boolean runConvergedSuccessfully = false;
+		
+		BufferedReader outcarReader = null;
+		try {
+			outcarReader = new BufferedReader(new FileReader(outcarFileName));
+			String line;
+			String energyRegexp = "TOTEN *= *[-\\.0-9]* eV";
+			Pattern energyPattern = Pattern.compile(energyRegexp);
+			while ((line = outcarReader.readLine()) != null) {
+				Matcher energyMatcher = energyPattern.matcher(line);
+				if (energyMatcher.find()) {
+					StringTokenizer energyLineTok = new StringTokenizer(energyMatcher.group(energyMatcher.groupCount()));
+					energyLineTok.nextToken();energyLineTok.nextToken();
+					energy = Double.parseDouble(energyLineTok.nextToken());
+				}
+				if (line.contains(vaspSuccessString))
+					runConvergedSuccessfully = true;
+			}
+		} catch (Exception x) {
+			GAOut.out().stdout("Warning: VaspOut.getCell() failed: " + x.getMessage(), GAOut.NOTICE);
+		} finally {
+			if (outcarReader != null)
+				try {
+					outcarReader.close();
+				} catch (IOException x) {
+					GAOut.out().stdout("Warning: VaspOut.getCell() failed to close outcarReader: " + x.getMessage(), GAOut.NOTICE);
+				}
+		}		
+		
+		
+		if (cautious && !runConvergedSuccessfully)
+			return Double.POSITIVE_INFINITY;
+		
+		return energy;
+	}
+	/*
 	public static double getFinalEnergy(String outcarFile, boolean cautious) {
 		String outcar = Utility.readStringFromFile(outcarFile);
 		
@@ -124,10 +171,14 @@ public class VaspOut {
 		}
 		
 		return energy;
-	}
+	}*/
 	
+	/*
 	public static boolean vaspRunConverged(String outcar) {
 		return outcar.contains(vaspSuccessString);
-	}
+	} */
 
+	public static void main(String args[]) {
+		System.out.println(getFinalEnergy("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/OUTCAR", false));
+	}
 }
