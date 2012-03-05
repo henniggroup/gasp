@@ -34,7 +34,8 @@ public class PDObjFcn extends ObjectiveFunction {
 			return null;
 		
 		// another total energy calculation:
-		numCalculations++;
+		// not necessary to increment here since it's done when we use EnergyPerAtom under the covers
+	//	numCalculations++;
 		
 		// start the calculation and return the Thread
 		Thread t = new Thread(this);
