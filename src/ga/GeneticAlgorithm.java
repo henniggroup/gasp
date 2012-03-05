@@ -71,18 +71,18 @@ public class GeneticAlgorithm {
 					StructureOrg s = (StructureOrg)o.getFirst();
 					if (dev != null && !dev.doDevelop(offspring, s)) {
 						s.setSOCreator(null);
-						continue;
+					} else {
+						GAOut.out().stdout("Adding organism " + s.getID() + " to generation " + params.getRecord().getGenNum() + ".", GAOut.NOTICE, s.getID());
+	
+						offspring.addOrganism(s);
+						// if it was in the first gen, mark its creator as having successfully created
+						StructureOrgCreator soc;
+						if ((soc = s.getSOCreator()) != null) {
+							decrementSOCUsageCount(soc);
+							// get rid of the references to SoC's once theyre no longer needed so we dont serialize them
+							s.setSOCreator(null);
+						}		
 					}
-					GAOut.out().stdout("Adding organism " + s.getID() + " to generation " + params.getRecord().getGenNum() + ".", GAOut.NOTICE, s.getID());
-
-					offspring.addOrganism(s);
-					// if it was in the first gen, mark its creator as having successfully created
-					StructureOrgCreator soc;
-					if ((soc = s.getSOCreator()) != null) {
-						decrementSOCUsageCount(soc);
-						// get rid of the references to SoC's once theyre no longer needed so we dont serialize them
-						s.setSOCreator(null);
-					}		
 					// write Hartke output if required
 					if (GAParameters.getParams().getWriteHartkeFile()) {
 						String hLine = s.getID() + " " + o.getSecond() + " " 
@@ -90,6 +90,7 @@ public class GeneticAlgorithm {
 									   + " " + offspring.contains(s) + "\n";
 						Utility.writeStringToFile(hLine, GAParameters.getParams().getHartkeOutFile(), true);
 					}
+					
 				}
 			}
 			
