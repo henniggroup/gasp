@@ -81,6 +81,8 @@ public class PDBuilder implements Serializable {
         Convexhull chull = new Convexhull(convexableData, false);
         List<List<Integer>> facets = chull.getFaLists();
         
+        newPDData.setCHullVolume(chull.getVolume());
+        
         // remove vertical facets:
         // note that the PDk option in qconvex is not good for this as it is susceptible
         // to precision error

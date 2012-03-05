@@ -569,10 +569,11 @@ public class PDAnalyzer implements IPDAnalyzer {
      * @param b
      * @return
      */
+    /*
     public Map<Composition, Double> getVolumeTrace(Composition a, Composition b) {
         //TODO
         return null;
-    }
+    }*/
 
     /**
      * Note that the definition for the inverse distance to the hull
@@ -600,6 +601,21 @@ public class PDAnalyzer implements IPDAnalyzer {
         //TODO
         return null;
     }
+    
+ /*   public double getCHullVolume() {
+    	double volume = 0.0;
+    	
+    	for (List<Integer> facet : pdd.getIndxFacets()) {
+    		
+    		double sumEnergies = 0.0;
+    		for (Integer vertex : facet) 
+    			sumEnergies += pdd.getEntry(vertex).getEnergyPerAtom();
+    		double avgEnergy = sumEnergies / facet.size();
+    		
+    	}
+    	
+    	return volume;
+    }*/
 
     /**
      * just spits out a report with all the info you wanted about the phases

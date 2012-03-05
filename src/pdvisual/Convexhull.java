@@ -36,6 +36,7 @@ public class Convexhull {
 	the line are facets and columns are the vertices in the facet
 	there is a nb of facet lines and a dim column */
 	int[][] facets;
+	double volume;
 
 	public Convexhull(Convexable allVertices, boolean removeTopFaces)
 	{
@@ -44,9 +45,9 @@ public class Convexhull {
 
 		QHullCaller qhcaller;
 		if (removeTopFaces)
-			qhcaller = new QHullCaller(QHullCaller.QHullExe.QCVXFACETS, "Fn PD" + (dim - 1) + " ");  
+			qhcaller = new QHullCaller(QHullCaller.QHullExe.QCVXFACETS, "Fn FS PD" + (dim - 1) + " ");  
 		else
-			qhcaller = new QHullCaller(QHullCaller.QHullExe.QCVXFACETS, "Fn ");  
+			qhcaller = new QHullCaller(QHullCaller.QHullExe.QCVXFACETS, "Fn FS");  
 		
 
 		//format the input for qconvex
@@ -89,6 +90,11 @@ public class Convexhull {
             // actually, we're going to compute this ourselves later since we have to
             // remove some facets first
             
+            // skip adjacency list info
+            numFacets = Integer.parseInt(br.readLine());
+            for (int i = 0; i < numFacets; i++) 
+            	output = br.readLine();
+            
     /*    	numFacets = Integer.parseInt(br.readLine());
             adjacencyList = new LinkedList<List<Integer>>();
             // parse facets
@@ -110,7 +116,16 @@ public class Convexhull {
                 	}
                 }
             }
+            
       */
+            
+            // read volume info
+        	output = br.readLine();
+        	output = br.readLine();
+            StringTokenizer token = new StringTokenizer(output);
+            token.nextToken();token.nextToken();
+            volume = Double.parseDouble(token.nextToken());
+
         }catch(IOException ioe){
             System.err.println("IOException in Convexhull.processOutput:" + ioe.getLocalizedMessage());            
         }
@@ -135,8 +150,13 @@ public class Convexhull {
         }
         ps.close();
 	    
+       
 	}
 	
+	public double getVolume() {
+		return volume;
+	}
+
 	public int[][] getFacets()
 	{
 		return this.facets;

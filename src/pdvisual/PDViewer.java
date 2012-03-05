@@ -1,12 +1,16 @@
 package pdvisual;
 
+import ga.StructureOrg;
+
 import java.util.*;
 
 import chemistry.Element;
 
 import crystallography.Cell;
+import crystallography.Site;
 import utility.ArgumentParser;
 import utility.Utility;
+import utility.Vect;
 import vasp.VaspOut;
 
 public class PDViewer {
@@ -15,6 +19,7 @@ public class PDViewer {
 		System.out.println("Usage: pdviewer --i <input.pdb.tgz>");
 		System.out.println("       --removeZeroEnergies");
 		System.out.println("       --m POSCAR1 ENERGY1 POSCAR2 ENERGY2...");
+		System.out.println("       --v    - just print volume and exit");
 	}
 	
 	public static void main(String[] args) {
@@ -58,8 +63,31 @@ public class PDViewer {
 				System.out.println("Using ManualComputedEntry with composition " + cell.getComposition() + " and total energy " + energy);
 			}
 		}
+		
+		PDBuilder pdb = new PDBuilder(entries, elements, chempots);
+		PDData pdd = pdb.getPDData();
 				
-		new TernPD3D((new PDBuilder(entries, elements, chempots)).getPDData());
+		if (aparser.hasOption("v")) {
+			// remove entries with energy > 0 and add dummy entries w/ energy = 0 at each vertex
+			
+			java.util.List<IComputedEntry> newEntries = new ArrayList<IComputedEntry>();
+			for (IComputedEntry e : entries)
+				if (e.getEnergyPerAtom() <= 0)
+					newEntries.add(e);
+			
+			for (Element e : elements) {
+				List<Site> els = new ArrayList<Site>();
+				els.add(new Site(e, new Vect(0.0,0.0,0.0)));
+				StructureOrg dummy = new StructureOrg(new Cell(1.,1.,1.,90.,90.,90.,els,""));
+				dummy.setTotalEnergy(0);
+				newEntries.add(dummy);
+			}
+			
+			System.out.println((new PDBuilder(newEntries, elements, chempots)).getPDData().getCHullVolume());
+			System.exit(0);
+		}
+		
+		new TernPD3D(pdd);
 	}
 
 }

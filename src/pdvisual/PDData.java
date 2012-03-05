@@ -47,6 +47,7 @@ public class PDData implements Serializable, IPDPlottable {
     private List<Element> elements;
     private List<Integer> basisIndxs;
     private List<Integer> indxUnstableEntries;
+    private double chullVolume;
     /*
      *  Keep a mapping to tell us the chemical potential of each of the elements.
      *  
@@ -213,6 +214,10 @@ public class PDData implements Serializable, IPDPlottable {
             indxStable.addAll(facet);
         }
         return indxStable;
+    }
+    
+    public void setCHullVolume(double vol) {
+    	chullVolume = vol;
     }
 
     /**
@@ -453,6 +458,10 @@ public class PDData implements Serializable, IPDPlottable {
 
     public int getNumEntries() {
         return allICEs.size();
+    }
+    
+    public double getCHullVolume() {
+    	return chullVolume;
     }
 
     public List<Composition> getCompositions() {
