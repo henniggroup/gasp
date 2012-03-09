@@ -18,7 +18,7 @@ public class Isotropy {
 	//  in case program bombs, try again w/ different accuracy
 	public static double accuracies[] = {.1,0.04,0.01,0.005,0.001,0.0005};
 	
-	public static String getFindsymInput(Cell c, double accuracy) {
+	private static String getFindsymInput(Cell c, double accuracy) {
 		StringBuilder result = new StringBuilder();
 		result.append("title \n");
 		result.append(accuracy + "  accuracy\n");
@@ -113,7 +113,8 @@ public class Isotropy {
 		return -1;
 	}
 	
-	public static String getFindsymOutput(Cell cell) {
+	// NB: call Cell.getFSOOutput instead to use cached version
+	public static String getFindsymOut(Cell cell) {
 		
 		// the idea here is to run findsym w/ a variety of different tolerance parameters
 		// and use the result that finds the highest symmetry
@@ -205,7 +206,7 @@ public class Isotropy {
 	public static Cell getWyckoffCell(Cell cell) {
 		Cell answer = null;
 
-		String output = getFindsymOutput(cell);
+		String output = cell.getFSOOutput();
 		try {
 			answer = parseWyckoffCell(output,cell);
 		} catch (Exception x) {
@@ -233,7 +234,7 @@ public class Isotropy {
 		
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
-		System.out.println(getFindsymOutput(c));		
+		System.out.println(c.getFSOOutput());		
 //		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
 	//	b.getNigliReducedCell().writeCIF("/home/wtipton/11134.nig.cif");
 	//	System.out.println(getWyckoffCell(c));

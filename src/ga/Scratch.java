@@ -18,9 +18,9 @@ public class Scratch {
 		
 		Cell c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR_SC");
 		String largs[] = {"/home/wtipton/projects/cacd6/potlfile"};
-		LammpsEnergy leng = new LammpsEnergy(largs);
+	//	LammpsEnergy leng = new LammpsEnergy(largs);
 		
-		System.out.println(leng.getEnergy(new StructureOrg(c)));
+	//	System.out.println(leng.getEnergy(new StructureOrg(c)));
 		
 //		System.loadLibrary("example");
 //	    System.out.println(example.fact(5));

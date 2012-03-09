@@ -228,11 +228,11 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> dftpp <dftpp_inputs> <cautious?> <element ppFile.fhi>*");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
-		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?>");
+		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?> <doublingProb>");
 		System.out.println("   --variation2 <percentage> <percentage> structureMut <rate> <sigmaAtoms> <sigmaLattice>");
 		System.out.println("   --variation3 <percentage> <percentage> permutation <meanSwaps> <sigmaSwaps> <pairsToSwap (e.g. Mn-O)>");
 		System.out.println("   --variation4 <percentage> <percentage> numStoichsMut <meanNumAtoms> <sigmaNumAtoms>");
-		System.out.println("   --variation5 <percentage> <percentage> supercell <re-relax children?>");
+//		System.out.println("   --variation5 <percentage> <percentage> supercell <re-relax children?>");
 		System.out.println("Selection Algorithms");
 		System.out.println("   --selection probDist <numParents> <selectionPower>");
 		System.out.println("Convergence Criteria");
@@ -377,8 +377,8 @@ public class GAParameters implements Serializable {
 					vars.add(new Permutation(Utility.subList(arguments, 3)));
 				else if (variation.equalsIgnoreCase("numStoichsMut")) 
 					vars.add(new NumStoichsMut(Utility.subList(arguments, 3)));
-				else if (variation.equalsIgnoreCase("supercell")) 
-					vars.add(new SupercellVariation(Utility.subList(arguments, 3)));
+		//		else if (variation.equalsIgnoreCase("supercell")) 
+		//			vars.add(new SupercellVariation(Utility.subList(arguments, 3)));
 				else 
 					usage("Unknown variation function " + variation, true);
 			}
@@ -920,7 +920,7 @@ public class GAParameters implements Serializable {
 				VaspIn.writePoscar(s.getCell(), makePOSCARPath(s), false);
 				// save the findsym output
 				File outFindSym = new File(makeFindSymPath(s));
-				GAUtils.writeStringToFile(Isotropy.getFindsymOutput(s.getCell()), outFindSym, false);
+				GAUtils.writeStringToFile(s.getCell().getFSOOutput(), outFindSym, false);
 			}
 			
 			// write energy-sorted index (i.e. lowest to highest)

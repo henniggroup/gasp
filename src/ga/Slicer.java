@@ -12,6 +12,7 @@ import crystallography.SupercellOptimizer;
 
 import java.io.*;
 
+import utility.Constants;
 import utility.Vect;
 
 // Slicer is a Variation operation.  It selects two organisms
@@ -49,6 +50,7 @@ public final class Slicer implements Variation {
 	private double thickness;
 	private int axis;
 	private boolean growParents;
+	private double doublingProb;
 	
 	public Slicer(List<String> args) {
 		if (args == null || args.size() < 6)
@@ -67,6 +69,11 @@ public final class Slicer implements Variation {
 			growParents = Boolean.parseBoolean(args.get(6));
 		else
 			growParents = false;
+		
+		if (args.size() >= 8)
+			doublingProb = Double.parseDouble(args.get(7));
+		else
+			doublingProb = 0;
 	}
 	
 	public String toString() {
@@ -75,6 +82,43 @@ public final class Slicer implements Variation {
 		result.append("Slicer variation. major: " + mainShiftFrac + " minor: " + minorShiftFrac);
 		
 		return result.toString();
+	}
+	
+	/*
+	 	private Cell doubleCell(Cell c) {
+		Random rand = GAParameters.getParams().getRandom();
+
+		// make identity matrix
+		List<List<Integer>> coefs = new ArrayList<List<Integer>>();
+		for (int i = 0; i < Constants.numDimensions; i++) {
+			List<Integer> newVect = new ArrayList<Integer>();
+			newVect.add(0); newVect.add(0); newVect.add(0);
+			newVect.set(i, 1);
+			coefs.add(newVect);
+		}
+		
+		// double one of the dimensions
+		int doubleDim = rand.nextInt(Constants.numDimensions);
+		for (int i = 0; i < Constants.numDimensions; i++)
+			coefs.get(doubleDim).set(i, coefs.get(doubleDim).get(i) * 2);
+				
+		// make the new offspring
+		return Cell.getSupercell(c, coefs);
+	}
+	 */
+	private Cell doubleCell(Cell c) {
+		Random rand = GAParameters.getParams().getRandom();
+		int doubleDim = rand.nextInt(Constants.numDimensions);
+		
+		List<Vect> newVects = new ArrayList<Vect>(c.getLatticeVectors());
+		newVects.set(doubleDim, newVects.get(doubleDim).scalarMult(2.0));
+		
+		List<Site> newSites = new ArrayList<Site>(c.getSites());
+		
+		for (Site s : c.getSites())
+			newSites.add(new Site(s.getElement(), s.getCoords().plus(c.getLatticeVectors().get(doubleDim))));
+		
+		return new Cell(newVects, newSites, c.getLabel());
 	}
 
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {
@@ -102,20 +146,31 @@ public final class Slicer implements Variation {
 				+ a.getNumSites()+ " atoms) with " + ps[1].getID() +" (fitness "
 				+ ps[1].getFitness() + ", " + b.getNumSites() + " atoms)... ", GAOut.NOTICE);
 		
+		// possibly double one of the parents
+		if (rand.nextDouble() < doublingProb) {
+			if (rand.nextBoolean()) {
+				GAOut.out().stdout("(actually doubling first parent).", GAOut.NOTICE);
+				a = doubleCell(a);
+			} else {
+				GAOut.out().stdout("(actually doubling second parent).", GAOut.NOTICE);
+				b = doubleCell(b);
+			}
+		}
+		
 		// possibly take a supercell of one of the parents
 		if (growParents) {
 			if (a.getBasisSize() > b.getBasisSize()) {
 				int sizeMultiple = a.getBasisSize() / b.getBasisSize(); // integer division
 				// TODO: make be input options and similarly below
 				if (sizeMultiple > 1) {
-					b = Cell.getSupercell(b, SupercellOptimizer.getOptimalSupercell(b, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
 					GAOut.out().stdout("(actually using supercell of second parent with " + b.getNumSites() + "atoms).", GAOut.NOTICE);
+					b = Cell.getSupercell(b, SupercellOptimizer.getOptimalSupercell(b, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
 				}
 			} else {
 				int sizeMultiple = b.getBasisSize() / a.getBasisSize();
 				if (sizeMultiple > 1) {
-					a = Cell.getSupercell(a, SupercellOptimizer.getOptimalSupercell(a, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
 					GAOut.out().stdout("(actually using supercell of second parent with " + a.getNumSites() + "atoms).", GAOut.NOTICE);
+					a = Cell.getSupercell(a, SupercellOptimizer.getOptimalSupercell(a, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
 				}
 			}
 		}

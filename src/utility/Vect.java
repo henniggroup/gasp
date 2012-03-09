@@ -7,6 +7,8 @@ import Jama.*;
 /*  Represents a vector.
  *  Immutable!
  * 
+ *  Represent everything in cartesian coords under the covers.
+ * 
  *  TODO:
  *  - maybe refactor this stuff to use Jama more extensively under the covers
  */
@@ -19,36 +21,35 @@ public class Vect implements Serializable {
 	//private Double u,v,w;
 	List<Double> u ;
 	/* basis given in cartesian coordinates */
-	private List<Vect> basis;
+	//private List<Vect> basis;
 	
 	public Vect(List<Double> cartComps) {
 		this(cartComps, null);
 	}
 	
 	public Vect (List<Double> cartComps, List<Vect> _basis) {
-		u = new LinkedList<Double>(cartComps);
 		
-		if (_basis == null)
-			basis = null;
+		if (_basis != null)
+			u = getCartCompsFromNoncartComps(cartComps,_basis);
 		else
-			basis = new LinkedList<Vect>(_basis);
+			u = new ArrayList<Double>(cartComps);
 	}
 	public Vect(Double _u, Double _v, Double _w) {
 		this(_u,_v,_w,null);	
 	}
 	
 	public Vect(Double _u, Double _v, Double _w, List<Vect> _basis) {
-		u = new LinkedList<Double>();
+		u = new ArrayList<Double>();
 		u.add(_u); u.add(_v); u.add(_w);
 
 		if (_basis != null) {
-			/* A null basis indicates that u,v,and w are cartesian coords,
-			 * e.g. the basis is the standard unit vectors */
-			/* Make sure our basis has three vectors */
+			// A null basis indicates that u,v,and w are cartesian coords,
+			// i.e. the basis is the standard unit vectors 
+			// Make sure our basis has three vectors 
 			if (_basis.size() != 3)
 				throw new IllegalArgumentException("ThreeVector given basis with other than 3 vectors.");
+			u = getCartCompsFromNoncartComps(u,_basis);
 		}
-		basis = _basis;
 	}
 	
 	public Vect(double[] ds) {
@@ -71,19 +72,23 @@ public class Vect implements Serializable {
 	}
 
 	public List<Double> getCartesianComponents() {
-		if (basis == null) {
-			return new LinkedList<Double>(u);
-		} else {
-			int dim = getDimension();
-			List<Double> result = new LinkedList<Double>();
-			for (int i = 0; i < dim; i++){
-				double entry = 0;
-				for (int j = 0; j < dim; j++)
-					entry += u.get(j) * basis.get(j).getCartesianComponents().get(i);
-				result.add(entry);
-			}
-			return result;
+		return new ArrayList<Double>(u);
+	}
+	
+	private static List<Double> getCartCompsFromNoncartComps(List<Double> coefs, List<Vect> basis) {
+		if (basis.isEmpty() || coefs.size() != basis.get(0).getDimension())
+			throw new RuntimeException("Vect.getCartCompsFromNoncartComps");
+		
+		int dim = basis.get(0).getDimension();
+		List<Double> result = new ArrayList<Double>();
+		for (int i = 0; i < dim; i++){
+			double entry = 0;
+			for (int j = 0; j < dim; j++)
+				entry += coefs.get(j) * basis.get(j).getCartesianComponents().get(i);
+			result.add(entry);
 		}
+		return result;
+	
 	}
 	
 	public Vect plusWRT(Vect shift, List<Vect> basis) {
@@ -116,7 +121,7 @@ public class Vect implements Serializable {
 	public Vect plus(Vect v) {
 		List<Double> vComps = v.getCartesianComponents();
 		List<Double> ourComps = getCartesianComponents();
-		List<Double> newComps = new LinkedList<Double>();
+		List<Double> newComps = new ArrayList<Double>();
 		
 		if (vComps.size() != ourComps.size())
 			throw new RuntimeException("Vector: trying to add vectors of different lengths");
@@ -130,7 +135,7 @@ public class Vect implements Serializable {
 	public Vect subtract(Vect v) {
 		List<Double> vComps = v.getCartesianComponents();
 		List<Double> ourComps = getCartesianComponents();
-		List<Double> newComps = new LinkedList<Double>();
+		List<Double> newComps = new ArrayList<Double>();
 		
 		if (vComps.size() != ourComps.size())
 			throw new RuntimeException("Vector: trying to subtract vectors of different lengths");
@@ -142,11 +147,11 @@ public class Vect implements Serializable {
 	}
 	
 	public Vect scalarMult(Double s) {
-		List<Double> newV = new LinkedList<Double>();
+		List<Double> newV = new ArrayList<Double>();
 		for (int i = 0; i < getDimension(); i++)
 			newV.add(s * u.get(i));
 
-		return new Vect(newV,basis);
+		return new Vect(newV);
 	}
 	
 	private static Vect xhat = null;
@@ -201,7 +206,7 @@ public class Vect implements Serializable {
 		
 		Matrix A = B.inverse().times(X);
 		
-		List<Double> result = new LinkedList<Double>();
+		List<Double> result = new ArrayList<Double>();
 		for (int i = 0; i < dim; i++)
 			result.add(A.get(i, 0));
 		
@@ -317,7 +322,7 @@ public class Vect implements Serializable {
 	} 
 	
 	public static Vect getNullVect(int numDims) {
-		List<Double> comps = new LinkedList<Double>();
+		List<Double> comps = new ArrayList<Double>();
 		for (int i = 0; i < numDims; i++)
 			comps.add(0.0);
 		return new Vect(comps);
@@ -332,7 +337,7 @@ public class Vect implements Serializable {
 		Vect e1 = new Vect(3.0, 0.0, 0.0);
 		Vect e2 = new Vect(0.0, 3.0, 0.0);
 		Vect e3 = new Vect(0.0, 0.0, 3.0);
-		List<Vect> basis = new LinkedList<Vect>();
+		List<Vect> basis = new ArrayList<Vect>();
 		basis.add(e1);
 		basis.add(e2);
 		basis.add(e3);

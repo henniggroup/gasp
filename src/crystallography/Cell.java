@@ -743,6 +743,13 @@ public class Cell implements Serializable {
 		return true;
 		
 	}
+	
+	private String fsoOutput;
+	public String getFSOOutput() {
+		if (fsoOutput == null)
+			fsoOutput = Isotropy.getFindsymOut(this);
+		return fsoOutput;
+	}
 
 
 	private Cell wyckoffCell;
