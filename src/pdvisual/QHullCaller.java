@@ -208,7 +208,23 @@ public class QHullCaller implements IExternalProcess {
 			r.reset();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		} finally {
+	    	  try {
+	    		  m_p.getErrorStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
+	    	  try {
+	    		  m_p.getOutputStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
+	    	  try {
+	    		  m_p.getInputStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
+		}
 		return r;
     }
         

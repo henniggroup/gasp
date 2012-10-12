@@ -296,6 +296,11 @@ public class OhmmsEnergy implements Energy {
 		return finalEnergy;
 	}
 	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
+	
 	// just for testing:
 	public static void main(String[] args) {
 		/*

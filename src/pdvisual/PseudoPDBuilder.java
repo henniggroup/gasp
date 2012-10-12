@@ -234,7 +234,6 @@ public class PseudoPDBuilder {
 					facet2subspace.add(pdd.getEntry(i).getComposition());
 				if (!linearComboIsPositive(pdd.getElements(), facet2subspace, min))
 					continue;	
-				
 				// ok, we're good. add it
 				result.add(min);
 			}	

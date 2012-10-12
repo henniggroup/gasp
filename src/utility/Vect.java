@@ -328,6 +328,12 @@ public class Vect implements Serializable {
 		return new Vect(comps);
 	}
 	
+	public static boolean pointsAreCollinear(Vect p1, Vect p2, Vect p3, double epsilon) {
+		Vect v1 = p2.subtract(p1);
+		Vect v2 = p3.subtract(p1);
+		return v1.cross(v2).length() < epsilon;
+	}
+	
 	/*
 	 * For the sake of testing the ThreeVector class
 	 */
@@ -352,7 +358,10 @@ public class Vect implements Serializable {
 		System.out.println(components.get(0) + " " + components.get(1) + " " + components.get(2));
 		
 		System.out.println(e1.cross(e2));
+		System.out.println(Vect.pointsAreCollinear(e1, e2, e3, 0.0001));
 	}
+
+
 
 
 }

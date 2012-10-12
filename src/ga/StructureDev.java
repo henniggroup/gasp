@@ -38,9 +38,9 @@ public final class StructureDev implements Development, Serializable {
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
 		usePerGenRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("perGeneration"));
 		if (useWholePopRG) {
-			String useStructureFitter = "true";
+	//		String useStructureFitter = "true";
 			List<String> wprgArgs = params.getRedundancyGuardArgs();
-			wprgArgs.add(useStructureFitter);
+	//		wprgArgs.add(useStructureFitter);
 			rGuard = new RedundancyGuard(wprgArgs);
 		}
 		

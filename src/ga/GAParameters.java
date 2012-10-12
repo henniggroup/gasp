@@ -103,6 +103,8 @@ public class GAParameters implements Serializable {
 	private boolean useNiggliReducedCell = false;
 	private boolean writeHartkeFile = false;
 	
+	private boolean colorOutput = true;
+	
 	// default output dir is set in setArgs after we know the runTitle
 	private String outDirName;
 	private Boolean keepTempFiles = true;
@@ -201,13 +203,15 @@ public class GAParameters implements Serializable {
 		System.out.println("   --popSize <n> : use a non-initial population size of n");
 		System.out.println("   --promotion <n> : promote n best structures (or the whole CH) to next gen");
 //		System.out.println("   --constituents <fix stoichiometry?> <stoichiometry (e.g. Mn 1 O 2)>");
-		System.out.println("   --compositionSpace <numElements> <Sym>* (<Num>*)*          System composition");
+		System.out.println("   --compositionSpace <numElements> <Sym>*  :     System composition for phase diagram search");
+		System.out.println("                   or <numElements> <Sym>* <amount of element1> <amount of element2> etc.");
 		System.out.println("   --optimizeDensity <weight of adaptation> <num orgs to avg. over>");
 		System.out.println("   --useRedundancyGuard <wholePopulation|perGeneration|both> <atomic misfit> <lattice misfit> <angle misfit> <use PBCs?>");
 		System.out.println("   --useSurrogateModel <gulp header file> <potentials_specification file> <refit frequency>");
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
 		System.out.println("   --writeHartkeFile <boolean>");
+		System.out.println("   --colorOutput <boolean>");
 		System.out.println("Initial Population");
 		System.out.println("   --initialPopulation <num> random givenVol <volumeperatom>");
 		System.out.println("   --initialPopulation <num> random randomVol");
@@ -226,21 +230,22 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> dlpoly <loc> <potl>");
 		System.out.println("   --objectiveFunction <epa/pd> mopac <execpath>");
 		System.out.println("   --objectiveFunction <epa/pd> dftpp <dftpp_inputs> <cautious?> <element ppFile.fhi>*");
+		System.out.println("   --objectiveFunction <epa/pd> generic");
 		System.out.println("   --parallelize <numCalcsInParallel> <minPopSize>");
 		System.out.println("Variation Algorithms");
-		System.out.println("   --variation1 <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?> <doublingProb>");
-		System.out.println("   --variation2 <percentage> <percentage> structureMut <rate> <sigmaAtoms> <sigmaLattice>");
-		System.out.println("   --variation3 <percentage> <percentage> permutation <meanSwaps> <sigmaSwaps> <pairsToSwap (e.g. Mn-O)>");
-		System.out.println("   --variation4 <percentage> <percentage> numStoichsMut <meanNumAtoms> <sigmaNumAtoms>");
-//		System.out.println("   --variation5 <percentage> <percentage> supercell <re-relax children?>");
+		System.out.println("   --variation <percentage> <percentage> slicer <thicknessMean> <thicknessSigma> <majorShiftFrac> <minorShiftFrac> <maxAmplitude> <maxFreq> <growParents?> <doublingProb>");
+		System.out.println("   --variation <percentage> <percentage> structureMut <rate> <sigmaAtoms> <sigmaLattice>");
+		System.out.println("   --variation <percentage> <percentage> permutation <meanSwaps> <sigmaSwaps> <pairsToSwap (e.g. Mn-O)>");
+		System.out.println("   --variation <percentage> <percentage> numStoichsMut <meanNumAtoms> <sigmaNumAtoms>");
+//		System.out.println("   --variation <percentage> <percentage> supercell <re-relax children?>");
 		System.out.println("Selection Algorithms");
 		System.out.println("   --selection probDist <numParents> <selectionPower>");
 		System.out.println("Convergence Criteria");
-		System.out.println("   --convergenceCriterion1 maxFunctionEvals <n>");
-		System.out.println("   --convergenceCriterion2 maxNumGens <n>");
-		System.out.println("   --convergenceCriterion3 maxNumGensWOImpr <n> <dValue>");
-		System.out.println("   --convergenceCriterion4 valueAchieved <maximum acceptable energy>");
-		System.out.println("   --convergenceCriterion5 foundStructure <CIF filename> <rGuard misfits>");
+		System.out.println("   --convergenceCriterion maxFunctionEvals <n>");
+		System.out.println("   --convergenceCriterion maxNumGens <n>");
+		System.out.println("   --convergenceCriterion maxNumGensWOImpr <n> <dValue>");
+		System.out.println("   --convergenceCriterion valueAchieved <maximum acceptable energy>");
+		System.out.println("   --convergenceCriterion foundStructure <CIF filename> <rGuard misfits>");
 		System.out.println("Hard Constraints");
 		System.out.println("   --minInteratomicDistance d : minimum interatomic distance (Angstroms)");
 		System.out.println("   --maxLatticeLength d : maximum lattice vector length (Angstroms)");
@@ -426,6 +431,8 @@ public class GAParameters implements Serializable {
 				compSpace = new CompositionSpace(csArgs, false);
 			} else if (flag.equalsIgnoreCase("writeHartkeFile")) {
 				writeHartkeFile = Boolean.parseBoolean(arguments.get(0));
+			} else if (flag.equalsIgnoreCase("colorOutput")) {
+				colorOutput = Boolean.parseBoolean(arguments.get(0));
 			}
 			// we deal with the input file separately
 			else if (!flag.equalsIgnoreCase("f") && verbosity >= 1)
@@ -1034,6 +1041,10 @@ public class GAParameters implements Serializable {
 		return writeHartkeFile;
 	}
 
+	public boolean getColorOutput() {
+		return colorOutput;
+	}
+	
 	public String getHartkeOutFile() {
 		return outDirName + "/hartke.txt";
 	}

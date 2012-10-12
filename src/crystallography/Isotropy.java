@@ -50,12 +50,13 @@ public class Isotropy {
 	private static String runFindsym(String input) {
 		StringBuilder outBuilder = new StringBuilder();
 
+		Process p = null;
 		try {
 	        String line;
 	      //  String env[] = new String[1];
 	    //    env[0] = "ISODATA=" + findsymDir;
 	     //   Process p = Runtime.getRuntime().exec(findsymDir + "/" + findsymBin, env);
-	        Process p = Runtime.getRuntime().exec("callfindsym");
+	        p = Runtime.getRuntime().exec("callfindsym");
 	        
 	        OutputStreamWriter inw = new OutputStreamWriter(p.getOutputStream());
 	        BufferedWriter in = new BufferedWriter(inw);
@@ -91,9 +92,25 @@ public class Isotropy {
 		        eoutw.close();
 	        }
 	        
-	      }
-	      catch (Exception err) {
+	      } catch (Exception err) {
 	        err.printStackTrace();
+	      } finally {
+	    	  try {
+	    		  p.getErrorStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
+	    	  try {
+	    		  p.getOutputStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
+	    	  try {
+	    		  p.getOutputStream().close();
+	    		  p.getInputStream().close();
+	    	  } catch (IOException e) {
+	    		  e.printStackTrace();
+	    	  }
 	      }
 
 	      return outBuilder.toString();

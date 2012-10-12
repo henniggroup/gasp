@@ -107,21 +107,34 @@ public class ArgumentParser {
 			while ((line = in.readLine()) != null) {
     			StringTokenizer t = new StringTokenizer(line);
     			// skip empty lines:
-    			if (!t.hasMoreTokens())
-    				continue;
-    			String key = t.nextToken();
-    			// allow for comment lines starting with #
-    			if (key.charAt(0) == '#')
-    				continue;
-    			// read in all the values associated with the key
-    			ArrayList<String> valuesList = new ArrayList<String>();
-    			while (t.hasMoreTokens())
-    				valuesList.add(t.nextToken());
+//    			if (!t.hasMoreTokens())
+ //   				continue;
+  //  			String key = t.nextToken();
+
+    			// read in all the tokens on the line 
+    			ArrayList<String> tokensList = new ArrayList<String>();
+    			while (t.hasMoreTokens()) {
+    				String nextTok = t.nextToken();
+    				// stop reading in args if we see a `#' and deal w/ dumb cases where it's in the middle of a token
+    				int poundLoc = nextTok.indexOf("#");
+    				if (poundLoc != -1) {
+    					if (poundLoc > 0)
+    						tokensList.add(nextTok.substring(0, poundLoc));
+    					break;
+    				}
+    				tokensList.add(nextTok);
+    			}
     			
+    			if (tokensList.size() < 1) // skip empty lines here. else, the key is the first token.
+    				continue;
+    			String key = tokensList.get(0);
+    			List<String> valuesList = new ArrayList<String>();
+    			if (tokensList.size() > 1)	
+    				valuesList = Utility.subList(tokensList, 1);
     			options.add(new Pair<String,List<String>>(key,valuesList));
     			//result.put(key, values);
 
-    			// some debug output
+    			// some debug output - fwiw, this probably never gets printed out b/c verbosity isnt set til after input file is read
 				StringBuilder outStrB = new StringBuilder();
 				outStrB.append("Parsed from input file: " + key + " ");
 				for (int i = 0; i < valuesList.size(); i++)

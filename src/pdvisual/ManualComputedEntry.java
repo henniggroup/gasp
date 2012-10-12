@@ -1,9 +1,12 @@
 package pdvisual;
 
+import java.io.Serializable;
+
 import chemistry.Composition;
 import crystallography.Cell;
 
-public class ManualComputedEntry implements IComputedEntry {
+public class ManualComputedEntry implements IComputedEntry,Serializable {
+	static final long serialVersionUID = 1;
 	
 	double totalEnergy;
 	Cell cell;

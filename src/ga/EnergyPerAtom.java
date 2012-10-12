@@ -44,6 +44,8 @@ public class EnergyPerAtom extends ObjectiveFunction {
 			energyFcn = new MopacEnergy(Utility.subList(args, 1));
 		else if (energyType.equalsIgnoreCase("dftpp"))
 			energyFcn = new DFTPPEnergy(Utility.subList(args, 1));
+		else if (energyType.equalsIgnoreCase("generic"))
+			energyFcn = new GenericEnergy(Utility.subList(args, 1));
 		else
 			throw new RuntimeException("Unknown energy function in EnergyPerAtom: " + energyType);
 		
@@ -63,6 +65,14 @@ public class EnergyPerAtom extends ObjectiveFunction {
 		// short circuit here if we've done the calculation already
 		if (org.knowsValue())
 			return null;
+		
+		// 
+		if (energyFcn.cannotCompute(org)) {
+			GAOut.out().stdout("Energy function could not compute " + org.getID() + ".", GAOut.NOTICE, org.getID());
+			org.setTotalEnergy(Double.POSITIVE_INFINITY);
+			org.setValue(Double.POSITIVE_INFINITY);
+			return null;
+		}
 		
 		// another total energy calculation:
 		numCalculations++;

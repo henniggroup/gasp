@@ -34,12 +34,15 @@ public class GAOut implements Serializable {
 		stdout(message, level, -1);
 	}
 	
-	private String colorifyStringByStructID(String s, int id) {
+	private String possiblyColorifyStringByStructID(String s, int id) {
 		
 		// valid ansi color codes go from 30 to 38
 		int colorNum = (id % 9) + 30;
-		
-		return "\033[1;" + colorNum + "m" + s + "\033[m";
+		if (GAParameters.getParams().getColorOutput())		
+			return "\033[1;" + colorNum + "m" + s + "\033[m";
+		else
+			return s;
+
 	}
 	
 	public void stdout(String message, int level, int structureID) {
@@ -47,9 +50,9 @@ public class GAOut implements Serializable {
 			if (structureID > 0) {
 				if (!orgsSeen.contains(structureID)) {
 					orgsSeen.add(structureID);
-					System.out.println(colorifyStringByStructID("Organism " + structureID,structureID));
+					System.out.println(possiblyColorifyStringByStructID("Organism " + structureID,structureID));
 				}
-				System.out.println(colorifyStringByStructID("   " + message,structureID));
+				System.out.println(possiblyColorifyStringByStructID("   " + message,structureID));
 			} else {
 				System.out.println(message);
 			}

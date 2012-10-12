@@ -92,6 +92,11 @@ Atoms
 		
 		// The parallelepiped has its "origin" at (xlo,ylo,zlo) and is defined by 3 edge vectors 
 		// starting from the origin given by A = (xhi-xlo,0,0); B = (xy,yhi-ylo,0); C = (xz,yz,zhi-zlo).
+		//
+		// Basically, if the 3 lattice vectors are (a1,a2,a3),(b1,b2,b3),(c1,c2,c3), then we're now
+		// writing them as (a1,0,0),(b1,b2,0),(c1,c2,c3) which is not a problem since we called
+		// cell.getCellRotatedIntoPrincDirections() so that a2=a3=b3=0.
+		
 		double xlo = 0, xhi = cell.getLatticeVectors().get(0).getCartesianComponents().get(0);
 		double ylo = 0, yhi = cell.getLatticeVectors().get(1).getCartesianComponents().get(1);
 		double zlo = 0, zhi = cell.getLatticeVectors().get(2).getCartesianComponents().get(2);
@@ -115,7 +120,8 @@ Atoms
         for (int i = 0; i < cell.getSites().size(); i++) {
         	Site s = cell.getSites().get(i);
         	
-        	result.append((i+1) + " " + (1 + compSpace.getElements().indexOf(cell.getSite(i).getElement())) + " ");
+        	int charge = 0; //TODO: change?
+        	result.append((i+1) + " " + (1 + compSpace.getElements().indexOf(cell.getSite(i).getElement())) + " " + charge + " ");
         	//for (double d : s.getCoords().getComponentsWRTBasis(c.getCell().getLatticeVectors()))
         	for (double d : s.getCoords().getCartesianComponents())
         		result.append(df.format(d) + " ");
@@ -129,9 +135,11 @@ Atoms
 		StringBuilder ans = new StringBuilder();
 		String newline = GAUtils.newline();
 
-		ans.append("units		metal" + newline);
+		//ans.append("units		metal" + newline);
+		ans.append("units		real" + newline);
 		ans.append("dimension	3" + newline);
-		ans.append("atom_style	atomic" + newline);
+		//ans.append("atom_style	atomic" + newline);
+		ans.append("atom_style	charge" + newline);
 		ans.append("boundary	p p p" + newline);
 		ans.append("read_data	" + dataFileName + newline);
 
@@ -149,6 +157,7 @@ Atoms
 		ans.append("dump myDump all atom 100000000000000 " + dumpFileName + newline);
 		ans.append("dump_modify myDump sort 1 scale no" + newline);
 		ans.append("fix 1 all box/relax tri 0 vmax 0.001" + newline);
+		ans.append("min_modify line quadratic" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		
 		return ans.toString();
@@ -185,6 +194,9 @@ Atoms
 			} finally {
 				stdInput.close();
 				stdError.close();
+			    p.getOutputStream().close();
+			    p.getInputStream().close();
+			    p.getErrorStream().close();
 			}
 
 		} catch (IOException e) {
@@ -341,6 +353,28 @@ Atoms
 		}*/
 				
 		return finalEnergy;
+	}
+	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		// make sure we don't expect the error:
+		// Triclinic box skew is too large
+	    //     The displacement in a skewed direction must be less than half the box length in that dimension. 
+		//     E.g. the xy tilt must be between -half and +half of the x box length. 
+		
+		Cell cell = o.getCell().getCellRotatedIntoPrincDirs();
+		
+		double xlo = 0, xhi = cell.getLatticeVectors().get(0).getCartesianComponents().get(0);
+		double ylo = 0, yhi = cell.getLatticeVectors().get(1).getCartesianComponents().get(1);
+		double zlo = 0, zhi = cell.getLatticeVectors().get(2).getCartesianComponents().get(2);
+		double xy = cell.getLatticeVectors().get(1).getCartesianComponents().get(0);
+		double xz = cell.getLatticeVectors().get(2).getCartesianComponents().get(0);
+		double yz = cell.getLatticeVectors().get(2).getCartesianComponents().get(1);
+		
+		if ((xhi < Math.abs(2*xy)) || (xhi < Math.abs(2*xz)) || (yhi < Math.abs(2*yz)))
+			return true;
+		
+		return false;
 	}
 	
 	// just for testing:

@@ -52,7 +52,7 @@ public class GulpEnergy implements Energy {
 		cautious = Boolean.parseBoolean(args.get(2));
 		
 		speciesWithShell = new ArrayList<String>();
-		for (int i = 4; i < args.size(); i++)
+		for (int i = 3; i < args.size(); i++)
 			speciesWithShell.add(args.get(i));
 	}
 
@@ -68,13 +68,13 @@ public class GulpEnergy implements Energy {
 	
 	public double getEnergy(StructureOrg c) {
 		Boolean relax = true;
-		return gulpRun(c, potlStr, relax, speciesWithShell);
+		return gulpRun(c, relax);
 	}
 
 	// returns a structure representation in format parse-able by GULP
-	public static String structureToString(Cell c) {
+/*	public static String structureToString(Cell c) {
 		return structureToString(c, new ArrayList<String>());
-	}
+	} */
 	public static String structureToString(Cell c, List<String> speciesWithShell) {
 		StringBuilder result = new StringBuilder();
 		String newline = GAUtils.newline();
@@ -153,7 +153,7 @@ public class GulpEnergy implements Energy {
 		out.append(newline);
 		out.append("output cif " + ans + ".cif");
 		out.append(newline);
-		out.append(structureToString(c.getCell()));
+		out.append(structureToString(c.getCell(), speciesWithShell));
 		out.append(newline);
 		out.append(potlStr);
 
@@ -170,12 +170,13 @@ public class GulpEnergy implements Energy {
 		String s = null;
 		BufferedReader stdInput = null;
 		BufferedReader stdError = null;
+		Process p = null;
 		try {
 			// run the gulp command. GULP will only take input from it's stdin,
 			// not from a file. in order to avoid having
 			// to open inputFile and feed it to GULP, we use a wrapper script,
 			// callgulp, which basically is just gulp <$1 .
-			Process p = Runtime.getRuntime().exec("callgulp " + inputFile);
+			p = Runtime.getRuntime().exec("callgulp " + inputFile);
 
 			stdInput = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -201,6 +202,21 @@ public class GulpEnergy implements Energy {
 				try{ stdInput.close(); } catch (Exception x) { } //ignore
 			if (stdError != null) 
 				try{ stdError.close(); } catch (Exception x) { } //ignore
+			try {
+				p.getErrorStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				p.getOutputStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				p.getInputStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		return gulpOutput.toString();
@@ -208,11 +224,10 @@ public class GulpEnergy implements Energy {
 
 	// Does a Lennard-Jones GULP run on the StructureOrg c. If optimize is true,
 	// we update c to be the local minimum found by GULP.
-	public double gulpRun(StructureOrg c, String potlStr,
-			Boolean relax, ArrayList<String> swShell) {
+	public double gulpRun(StructureOrg c, Boolean relax) {
 		double finalEnergy = Double.POSITIVE_INFINITY;
 		
-		speciesWithShell = swShell;
+	//	speciesWithShell = swShell;
 
 		String inputFile = gulpInputFile(c, potlStr);
 		GAOut.out().stdout("Starting GULP computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
@@ -295,9 +310,10 @@ public class GulpEnergy implements Energy {
 		//  - the GNorm check only lets us off the hook for newt-raphs optimizer.  
 		//	  however, if we have a gnorm < 0.1, then we've hopefully switched to
 		//	  the newt-raph optimizer.  The number 0.1 comes from
-		//    a suggestion in GULP's output.
+		//    a suggestion in GULP's output. Actually, lets make it somewhat smaller to be safe: 0.01.
+		// actually let's not make an exception for that.  it probably indicates mechanical instability in the best case.
 		if (cautious 
-				&& !(finalGNorm < 0.1 && gulpOutput.contains("BFGS"))
+		//		&& !(finalGNorm < 0.01 && gulpOutput.contains("BFGS"))
 				&& (gulpOutput.contains("warning") || gulpOutput.contains("failed") || gulpOutput.contains("caution")
 						|| gulpOutput.contains("Maximum number of function calls"))) {
 			GAOut.out().stdout("WARNING: Being cautious - GULP run failed.", GAOut.INFO);
@@ -412,6 +428,11 @@ public class GulpEnergy implements Energy {
 		}
 		return newLabels;
 */		
+	}
+	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
 	}
 	
 	// just for testing:

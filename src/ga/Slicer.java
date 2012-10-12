@@ -164,13 +164,23 @@ public final class Slicer implements Variation {
 				// TODO: make be input options and similarly below
 				if (sizeMultiple > 1) {
 					GAOut.out().stdout("(actually using supercell of second parent with " + b.getNumSites() + "atoms).", GAOut.NOTICE);
-					b = Cell.getSupercell(b, SupercellOptimizer.getOptimalSupercell(b, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
+					try {
+						Cell newCell = Cell.getSupercell(b, SupercellOptimizer.getOptimalSupercell(b, false, 8 , sizeMultiple, params.getMaxLatticeLength(), false));
+						b = newCell;
+					} catch (Exception x) {
+						GAOut.out().stdout("(actually supercelling of second parent failed).", GAOut.NOTICE);
+					}
 				}
 			} else {
 				int sizeMultiple = b.getBasisSize() / a.getBasisSize();
 				if (sizeMultiple > 1) {
-					GAOut.out().stdout("(actually using supercell of second parent with " + a.getNumSites() + "atoms).", GAOut.NOTICE);
-					a = Cell.getSupercell(a, SupercellOptimizer.getOptimalSupercell(a, false, 6 , sizeMultiple, params.getMaxLatticeLength(), false));
+					GAOut.out().stdout("(actually using supercell of first parent with " + a.getNumSites() + "atoms).", GAOut.NOTICE);
+					try {
+						Cell newCell = Cell.getSupercell(a, SupercellOptimizer.getOptimalSupercell(a, false, 8 , sizeMultiple, params.getMaxLatticeLength(), false));
+						a = newCell;
+					} catch (Exception x) {
+						GAOut.out().stdout("(actually supercelling of first parent failed).", GAOut.NOTICE);
+					}
 				}
 			}
 		}

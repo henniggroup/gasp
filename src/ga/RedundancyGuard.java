@@ -10,10 +10,7 @@ import crystallography.Cell;
 // RedundancyGuard is used by the algorithm to avoid considering identical
 // StructureOrgs more than once.  It stores a Map of all structures "seen"
 // to their Organism IDs.  Then, other algorithms (e.g. StructureDev) may
-// check Organisms against the list of those already seen.  Structure comparisons
-// are done first by a direct comparison of lattice parameters and atomic
-// positions and second, if necessary, by the slower but more accurate
-// StructureFitter.
+// check Organisms against the list of those already seen. 
 
 public class RedundancyGuard implements Serializable {
 	static final long serialVersionUID = 1;
@@ -21,11 +18,6 @@ public class RedundancyGuard implements Serializable {
 	// holds all the structures the algorithm has "seen"
 	// and maps them to their Organism IDs
 	Map<Cell,Integer> structures;
-
-	// 
-	//private double lAngleTol = 0.5;
-	//private double lLengthTol = 0.5;
-	//private double interval = 0.05;
 	
 	private double atomicMisfit;
 	private double latticeMisfit;
@@ -39,10 +31,6 @@ public class RedundancyGuard implements Serializable {
 		// parse args
 		if (args == null || args.size() < 3)
 			GAParameters.usage("Not enough parameters given to RedundancyGuard", true);
-		
-		//lAngleTol = Double.parseDouble(args[0]);
-		//lLengthTol = Double.parseDouble(args[1]);
-		//interval = Double.parseDouble(args[2]);
 
 		atomicMisfit = Double.parseDouble(args.get(0));
 		latticeMisfit = Double.parseDouble(args.get(1));
@@ -61,10 +49,9 @@ public class RedundancyGuard implements Serializable {
 	public void addStructureOrg(Organism o) {
 		// the Organism better be a StructureOrg
 		StructureOrg s = (StructureOrg)o;
-		
 		// ignore structures w/ no atoms. should maybe stop this from happening elsewhere?
 		if (s.getCell().getBasisSize() < 1) {
-			GAOut.out().stdout("Warning: RedundancyGuard got passed structure with no sites. Ignoring...", GAOut.NOTICE, o.getID());
+			GAOut.out().stdout("Warning: RedundancyGuard got passed structure with no sites. Ignoring it...", GAOut.NOTICE, o.getID());
 		} else {
 			structures.put(s.getCell(), new Integer(s.getID()));
 		}
@@ -78,56 +65,21 @@ public class RedundancyGuard implements Serializable {
 		structures.remove(s);
 	}*/
 	
-	// returns the ID of the matching StructureOrg if we've seen it before,
+	// returns an ID of a matching StructureOrg if we've seen it before,
 	// null otherwise
 	public Integer checkStructureOrg(StructureOrg s1) {
 		Cell s = s1.getCell();
-		Iterator<Cell> i;
-		
-		// loop through all the Structures we've seen and compare
-/*		if (useBothComparators) {
-			i = structures.keySet().iterator();
-			while (i.hasNext()) {
-				Structure t = i.next();
-				if (sOrgEquals(s,t))
+
+		for (Cell t : structures.keySet()) {
+			if (usePBCs) {
+				if (s.matchesCell(t, atomicMisfit, latticeMisfit, angleMisfit))
+					return structures.get(t);
+			} else {
+				if (s.matchesCellNoPBCs(t, atomicMisfit))
 					return structures.get(t);
 			}
-		}
-*/	
-		// if all those seem ok, do the more thorough checks:
-		i = structures.keySet().iterator();
-		while (i.hasNext()) {
-			Cell t = i.next();
-			// don't fail an organism for looking like itself
-		//	if (structures.get(t) != s1.getID() && s.matchesCell(t, atomicMisfit, latticeMisfit))
-		//		return structures.get(t);
-			
-			// temporary comparison
-	/*		double ENERGY_TOL = 0.01;
-			double VOL_TOL = 0.1;
-			Cell c1 = SpgLib.getInstance().getPrimitiveCell(s);
-			Cell c2 = SpgLib.getInstance().getPrimitiveCell(t.getCell());
-		*/	
-		//	System.out.println(SpgLib.getInstance().getSpaceGroup(c2));
-	/*		System.out.println(c1);
-			System.out.println(s);
-			
-			System.out.println(SpgLib.getInstance().getSpaceGroup(s));
-			System.out.println(SpgLib.getInstance().getSpaceGroup(t.getCell()));
-		*/	
-		/*	if (structures.get(t) != s1.getID() && 
-					(SpgLib.getInstance().getSpaceGroup(c1) == SpgLib.getInstance().getSpaceGroup(c2)) &&
-					(Math.abs(c1.getVolume() - c2.getVolume()) < VOL_TOL) &&
-					(Math.abs(t.getEnergyPerAtom() - s1.getEnergyPerAtom()) < ENERGY_TOL) &&
-					(c1.getBasisSize() == c2.getBasisSize()))
-					*/
-			if (usePBCs && s.matchesCell(t, atomicMisfit, latticeMisfit, angleMisfit))
-				return structures.get(t);
-			if (!usePBCs && s.matchesCellNoPBCs(t, atomicMisfit))
-				return structures.get(t);
 		} 
 
-		
 		return null;
 	}
 	

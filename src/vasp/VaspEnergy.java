@@ -5,6 +5,7 @@ package vasp;
 import ga.*;
 import chemistry.*;
 import java.io.*;
+
 import org.xml.sax.SAXException;
 
 import crystallography.Cell;
@@ -48,11 +49,12 @@ public class VaspEnergy implements Energy {
 		StringBuilder vaspOutput = new StringBuilder();
 
 		String s = null;
+		Process p = null;
 		try {
 			// run the vasp command. in order to avoid hard-coding things which are
 			// probably system-dependent, we call a wrapper script which is probably
 			// just "cd $1; vasp" for simple set ups
-			Process p = Runtime.getRuntime().exec("callvasp " + inputDir);
+			p = Runtime.getRuntime().exec("callvasp " + inputDir);
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -73,6 +75,21 @@ public class VaspEnergy implements Energy {
 			} finally {
 				stdInput.close();
 				stdError.close();
+		    	  try {
+		    		  p.getErrorStream().close();
+		    	  } catch (IOException e) {
+		    		  e.printStackTrace();
+		    	  }
+		    	  try {
+		    		  p.getOutputStream().close();
+		    	  } catch (IOException e) {
+		    		  e.printStackTrace();
+		    	  }
+		    	  try {
+		    		  p.getInputStream().close();
+		    	  } catch (IOException e) {
+		    		  e.printStackTrace();
+		    	  }
 			}
 
 		} catch (IOException e) {
@@ -122,6 +139,10 @@ public class VaspEnergy implements Energy {
 		return vaspRun(o);
 	}
 	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
 
 	// just for testing:
 	public static void main(String[] args) {

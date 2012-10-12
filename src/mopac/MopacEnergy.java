@@ -295,7 +295,10 @@ public class MopacEnergy implements Energy {
 		return finalEnergy;
 	}
 
-
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
 	//testing
 /*	public static void main(String[] args) {
 		String[] argsIn = {"/home/skw57/Downloads/dl_poly_4.02/execute/"};

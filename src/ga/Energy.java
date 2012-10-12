@@ -12,4 +12,5 @@ package ga;
 
 public interface Energy {
 	public abstract double getEnergy(StructureOrg o);
+	public abstract boolean cannotCompute(StructureOrg o);
 }

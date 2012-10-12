@@ -35,15 +35,19 @@ public class CrystalGA {
 			GAParameters.usage("", true);
 		
 		// Parse command-line arguments
+		
 		ArgumentParser aParser = new ArgumentParser(args);
+		if (aParser.hasArguments("seed"))
+			GAParameters.getParams().getRandom().setSeed(Long.parseLong(aParser.getArgument("seed")));
+
 		if (aParser.hasArguments("r")) {
 			System.out.println("Resuming from " +  aParser.getArgument("r"));
 			GAParameters.setParams((GAParameters)(Utility.readSerializable(aParser.getArgument("r"))));
-			GAParameters.getParams().getRandom().setSeed(System.currentTimeMillis());
+//			GAParameters.getParams().getRandom().setSeed(System.currentTimeMillis());
 		} else if (aParser.hasArguments("rc")) {
 			System.out.println("Resuming from " +  aParser.getArgument("rc") + " and clearing convergence criteria.");
 			GAParameters.setParams((GAParameters)(Utility.readSerializable(aParser.getArgument("rc"))));
-			GAParameters.getParams().getRandom().setSeed(System.currentTimeMillis());
+//			GAParameters.getParams().getRandom().setSeed(System.currentTimeMillis());
 			GAParameters.getParams().getCCs().clear();
 		} else {
 			GAParameters.getParams().setArgs(args);

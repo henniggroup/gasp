@@ -126,6 +126,10 @@ public class CastepEnergy implements Energy {
 		return castepRun(o);
 	}
 	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
+	
 
 	// just for testing:
 	public static void main(String[] args) {

@@ -24,20 +24,36 @@ public class CompositionSpace implements Serializable {
 		Iterator<String> compStrs = compTokens.iterator();
 		//  now, read the number of elements
 		int numElems = Integer.parseInt(compStrs.next());
-		if ((compTokens.size() - 1) % numElems != 0)
-			throw new IllegalArgumentException("Malformed compositionSpace passed.");
+		
+		// we can either be passed the composition space vectors. if not, we'll just assume they're the unit normals.
+		boolean compositionVectorsPassed;
+		if (compTokens.size() == 1 + numElems)
+			compositionVectorsPassed = false;
+		else if ((compTokens.size() - 1) % numElems == 0)
+			compositionVectorsPassed = true;
+		else 
+			throw new IllegalArgumentException("Malformed compositionSpace passed.");		
+		
 		// read off the elements
 		List<Element> elements = new LinkedList<Element>();
 		for (int i = 0; i < numElems; i++)
 			elements.add(Element.getElemFromSymbol(compStrs.next()));
-		// read off the compositions
+		
+		// read off the compositions, maybe
 		List<Composition> endpoints = new LinkedList<Composition>();
-		while (compStrs.hasNext()) {
-			Map<Element,Integer> compMap = new HashMap<Element,Integer>();
-			for (int i = 0; i < numElems; i++)
-				compMap.put(elements.get(i), Integer.parseInt(compStrs.next()));
-			endpoints.add(new Composition(compMap, false));
-		}	
+		if (compositionVectorsPassed) {
+			while (compStrs.hasNext()) {
+				Map<Element,Integer> compMap = new HashMap<Element,Integer>();
+				for (int i = 0; i < numElems; i++)
+					compMap.put(elements.get(i), Integer.parseInt(compStrs.next()));
+				endpoints.add(new Composition(compMap, false));
+			}	
+		} else {
+			for (Element e : elements)
+				endpoints.add(new Composition(e));
+		}
+		
+		
 		setElementsAndBasis(endpoints);
 	}
 	
@@ -114,7 +130,7 @@ public class CompositionSpace implements Serializable {
 		for (Composition c : endpoints) {
 			double fracOfThisComp = GAParameters.getParams().getRandom().nextDouble();
 			for (Element e : elements) {
-				double numOfElem = c.getStoichiometricUnit().get(e) * fracOfThisComp;
+				double numOfElem = c.getFractionalCompo(e) * fracOfThisComp;
 				sumAtoms += numOfElem;
 				if (m.keySet().contains(e))
 					m.put(e, m.get(e) + numOfElem);

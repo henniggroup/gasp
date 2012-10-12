@@ -147,6 +147,7 @@ public class TernPD3DProj extends PjProject implements ActionListener, MouseMoti
 		m_vectors.assureVertexColors();
 		
 		// if necessary, calculate maximum distance of displayed points above hull
+		// to give us a reference for the coloring
 		double maxDistAboveHull = 0.0;
 		if (m_ternpd3d.getColorSpectrum()) {
 			for (int j = 0; j < compFracs.size(); j++) {
@@ -579,7 +580,6 @@ public class TernPD3DProj extends PjProject implements ActionListener, MouseMoti
     	// don't let user move vertices!
     	init();
     }
-    
     
     // implement the focus listener for the entry selector menu.  basically, we wanna
     // make it go away when it loses focus

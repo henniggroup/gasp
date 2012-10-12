@@ -39,6 +39,11 @@ public class Composition implements Serializable {
 			components.put(elementsArray[i], values[i]);
 	}
 
+	public Composition(Element e) {
+		components = new HashMap<Element,Double>();
+		components.put(e, 1.0);
+	}
+
 	public double getNumComponents() {
 		double sum = 0;
 		for (Double i : components.values())
@@ -84,6 +89,7 @@ public class Composition implements Serializable {
 		return getNumComponents() == 0;
 	}
 	
+	/*
 	public Map<Element,Double> getStoichiometricUnit() {
 		// TODO: return lowest common denominator stoichiometric unit ??
 		
@@ -92,7 +98,7 @@ public class Composition implements Serializable {
 		for (Element e : components.keySet())
 			result.put(e, components.get(e));
 		return result;
-	}
+	} */
 	
 	public Map<Element,Double> getFractionalComposition() {
 		Map<Element,Double> result = new HashMap<Element,Double>();
@@ -106,8 +112,10 @@ public class Composition implements Serializable {
     }    
     
     public boolean equals (Composition o, double tol) {
-        Composition me = scrubSmallAmounts(this, tol, false);
-        Composition so = scrubSmallAmounts(o, tol, false); 
+    //    Composition me = scrubSmallAmounts(this, tol, false);
+     //   Composition so = scrubSmallAmounts(o, tol, false); 
+    	Composition me =  this;
+    	Composition so = o;
         
         // make sure they have the same elements
     	for (Element e : me.getElements())

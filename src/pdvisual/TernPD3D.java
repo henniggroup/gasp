@@ -9,20 +9,17 @@ import jv.viewer.PvViewer;
 import chemistry.*;
 import crystallography.*;
 import javax.swing.*;
+import ga.StructureOrg;
 
+import java.util.List;
+
+import utility.Constants;
 import utility.Utility;
+import vasp.VaspIn;
 
 import java.awt.event.*;
 import java.io.File;
 
-/**
- * Applet shows simple interactive linear algebra.
- * 
- * @see			jv.viewer.PvViewer
- * @author		Konrad Polthier
- * @version		04.03.01, 1.10 revised (kp) Package moved to vgp.tutor.linear from dev.app.linear.<br>
- *					26.05.00, 1.00 created (kp) 
- */
 public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, ItemListener {
 	/** 3D-viewer window for graphics output and which is embedded into the applet */
 	protected	PvViewer			m_viewer;
@@ -61,6 +58,9 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 	MenuItem miGetStructureInfo;
 	
 	MenuItem miExportCHPDB;
+	MenuItem miExportData;
+	MenuItem miExportStructs;
+	MenuItem miExportVoltageCurve;
 	
 	SelectPtsForPDD_IP selectPtsInfoPanel;
 
@@ -269,11 +269,20 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 		menuBar.remove(windowMenu);
 		menuBar.remove(helpMenu);
 		
-		// add export option to file menu
+		// add export options to file menu
 		fileMenu.addSeparator();
+		miExportData = new MenuItem("Export Data", null);
+		miExportData.addActionListener(this);
+		fileMenu.add(miExportData);
 		miExportCHPDB = new MenuItem("Export Convex Hull", null);
 		miExportCHPDB.addActionListener(this);
 		fileMenu.add(miExportCHPDB);
+		miExportStructs = new MenuItem("Export Structures", null);
+		miExportStructs.addActionListener(this);
+		fileMenu.add(miExportStructs);
+		miExportVoltageCurve = new MenuItem("Export V Curve", null);
+		miExportVoltageCurve.addActionListener(this);
+		fileMenu.add(miExportVoltageCurve);
 		
 		menuBar.add(fileMenu);
 		menuBar.add(optionsMenu);
@@ -325,7 +334,7 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_SCALE_RECT);
 		} else if (source == miGetStructureInfo) {
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_PICK);
-		}  else if (source == miExportCHPDB) {
+		} else if (source == miExportCHPDB) {
 			//Create a file chooser
 			final JFileChooser fc = new JFileChooser();
 	        int returnVal = fc.showOpenDialog(this);
@@ -335,6 +344,159 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 	            PDData p = (PDData)pdd;
 	            Utility.writeSerializable((new PDBuilder(p.getStableEntries(), p.getElements(), p.getChemPots())).getPDData(), fileName);
 	        }
+		} else if (source == miExportData) {
+			//Create a file chooser
+			final JFileChooser fc = new JFileChooser();
+	        int returnVal = fc.showOpenDialog(this);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            String fileName = fc.getSelectedFile().getAbsolutePath();
+	            //This is where a real application would open the file.
+	            StringBuilder result = new StringBuilder();
+	            for (int i = 0; i < m_project.m_vectors.getNumVertices(); i++) {
+	            	result.append(m_project.m_vectors.getVertex(i).getName() + " ");
+	            	for (int j = 0; j < Constants.numDimensions; j++)
+	            		result.append(m_project.m_vectors.getVertex(i).getEntries()[j] + " ");
+	            	result.append("\n");
+	            }
+	            Utility.writeStringToFile(result.toString(), fileName);
+	       }
+		} else if (source == miExportStructs) {
+			final JFileChooser fc = new JFileChooser();
+			fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	        int returnVal = fc.showOpenDialog(this);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            String dirname = fc.getSelectedFile().getAbsolutePath();
+	            //This is where a real application would open the file.
+	            for (IComputedEntry ent : ((PDData)pdd).getAllEntries()) {
+	            	int sid = ((StructureOrg)(ent)).getID();
+	            	(new VaspIn(ent.getCell(), null, null, null)).writePoscar(dirname+"/"+sid+".POSCAR", false);
+	            }
+	       }
+		} else if (source == miExportVoltageCurve) {
+			final JFileChooser fc = new JFileChooser();
+	        int returnVal = fc.showOpenDialog(this);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	        	Element anode = (Element)JOptionPane.showInputDialog(null, "Choose intercalation element:", "Anode", JOptionPane.PLAIN_MESSAGE, null, pdd.getElements().toArray(), pdd.getElements().get(0));
+	        	java.util.LinkedList<Composition> cathodeCompChoices = new java.util.LinkedList<Composition>();
+	        	for (IComputedEntry i : ((PDData)pdd).getStableEntries()) {
+	        		cathodeCompChoices.add(i.getComposition());
+	        	}
+	        	Composition cathode = (Composition)JOptionPane.showInputDialog(null, "Choose other endpoint:", "Cathode", JOptionPane.PLAIN_MESSAGE, null, cathodeCompChoices.toArray(), cathodeCompChoices.get(0));
+	        	
+	        	// get anode energy
+	        	double anodeEnergy = Double.NaN;
+	        	Composition anodeComp = new Composition(anode);
+	        	for (int basisIndx : ((PDData)pdd).getIndxStableEntries())
+	        		if (((PDData)pdd).getAllEntries().get(basisIndx).getComposition().equals(anodeComp))
+	        			anodeEnergy = ((PDData)pdd).getAllEntries().get(basisIndx).getEnergyPerAtom();
+	        	if (Double.isNaN(anodeEnergy)) {
+	        		System.out.println("ERROR: no anode comp found in pseudo pdd?");
+	        		(new Exception()).printStackTrace();
+	        	}
+	        	
+	        	StringBuilder result = new StringBuilder();
+	        	for (List<Integer> facet : ((PDData)pdd).getIndxFacets()) {
+	        		// we should always have a binary pseudo pdd here
+	        		if (facet.size() != 2) {
+	        			System.out.println("ERROR: facet.size() != 2 in TernPD3D.");
+	        			(new Exception()).printStackTrace();
+	        		}
+	        		IComputedEntry endpoint0 = ((PDData)pdd).getAllEntries().get(facet.get(0));
+	        		IComputedEntry endpoint1 = ((PDData)pdd).getAllEntries().get(facet.get(1));
+	        		
+	        		// if this facet has too much anode, continue
+	        		if (endpoint0.getComposition().getFractionalCompo(anode) > cathode.getFractionalCompo(anode)
+	        				|| endpoint1.getComposition().getFractionalCompo(anode) > cathode.getFractionalCompo(anode))
+	        			continue;
+	        		
+	        		// make sure endpoint 1 has more anode (lithium)
+	        		if (endpoint0.getComposition().getFractionalCompo(anode) > endpoint1.getComposition().getFractionalCompo(anode)) {
+	        			IComputedEntry temp = endpoint0;
+	        			endpoint0 = endpoint1;
+	        			endpoint1 = temp;
+	        		}
+	        		
+	        		// e.g. compound is Li_a Si_b  ==  Li_(a/b) Si_1
+	        		double endpoint0_a = endpoint0.getComposition().getFractionalCompo(anode);
+	        		double endpoint0_b = 1-endpoint0_a;
+	        		double endpoint1_a = endpoint1.getComposition().getFractionalCompo(anode);
+	        		double endpoint1_b = 1-endpoint1_a;
+	        		double x0 = endpoint0_a / endpoint0_b;
+	        		double x1 = endpoint1_a / endpoint1_b;
+	        		double energy0 = endpoint0.getEnergyPerAtom() * (1 + x0); // total energy of Li_(x0)Si_1
+	        		double energy1 = endpoint1.getEnergyPerAtom() * (1 + x1); // total energy of Li_(x1)Si_1
+
+	        		double voltage = - (energy1 - energy0 - (x1-x0) * anodeEnergy) / (x1 - x0);
+	        		
+	        		result.append(x0 + " " + x1 + " " + voltage + "\n");
+	        	}
+	        	
+	            String fileName = fc.getSelectedFile().getAbsolutePath();
+	            Utility.writeStringToFile(result.toString(), fileName);
+
+	       } /* else if (source == miExportVoltageCurve) {
+				final JFileChooser fc = new JFileChooser();
+		        int returnVal = fc.showOpenDialog(this);
+		        if (returnVal == JFileChooser.APPROVE_OPTION) {
+		        	Element anode = (Element)JOptionPane.showInputDialog(null, "Choose intercalation element:", "Anode", JOptionPane.PLAIN_MESSAGE, null, pdd.getElements().toArray(), pdd.getElements().get(0));
+		        	java.util.LinkedList<Composition> cathodeCompChoices = new java.util.LinkedList<Composition>();
+		        	for (IComputedEntry i : ((PDData)pdd).getStableEntries()) {
+		        		cathodeCompChoices.add(i.getComposition());
+		        	}
+		        	Composition cathode = (Composition)JOptionPane.showInputDialog(null, "Choose other endpoint:", "Cathode", JOptionPane.PLAIN_MESSAGE, null, cathodeCompChoices.toArray(), cathodeCompChoices.get(0));
+		        	
+		        	java.util.ArrayList<Composition> ppdbComps = new java.util.ArrayList<Composition>();
+		        	Composition anodeComp = new Composition(anode);
+		        	ppdbComps.add(anodeComp);
+		        	ppdbComps.add(cathode);
+		        	PseudoPDData ppdb = (new PseudoPDBuilder((PDData)pdd)).getPseudoPDData(ppdbComps);
+		        	
+		        	// get anode energy
+		        	double anodeEnergy = Double.NaN;
+		        	for (int basisIndx : ppdb.getBasisEntryIndxs())
+		        		if (ppdb.getAllPhases().get(basisIndx).getComposition().equals(anodeComp))
+		        			anodeEnergy = ppdb.getAllPhases().get(basisIndx).getEnergy();
+		        	if (Double.isNaN(anodeEnergy)) {
+		        		System.out.println("ERROR: no anode comp found in pseudo pdd?");
+		        		(new Exception()).printStackTrace();
+		        	}
+		        	
+		        	StringBuilder result = new StringBuilder();
+		        	for (List<Integer> facet : ppdb.getIndxFacets()) {
+		        		// we should always have a binary pseudo pdd here
+		        		if (facet.size() != 2) {
+		        			System.out.println("ERROR: facet.size() != 2 in TernPD3D.");
+		        			(new Exception()).printStackTrace();
+		        		}
+		        		MixedPhase endpoint0 = ppdb.getAllPhases().get(facet.get(0));
+		        		MixedPhase endpoint1 = ppdb.getAllPhases().get(facet.get(1));
+		        		
+		        		// make sure endpoint 1 has more anode (lithium)
+		        		if (endpoint0.getComposition().getFractionalCompo(anode) > endpoint1.getComposition().getFractionalCompo(anode)) {
+		        			MixedPhase temp = endpoint0;
+		        			endpoint0 = endpoint1;
+		        			endpoint1 = temp;
+		        		}
+		        		
+		        		// e.g. compound is Li_a Si_b  ==  Li_(a/b) Si_1
+		        		double endpoint0_a = endpoint0.getComposition().getFractionalCompo(anode);
+		        		double endpoint0_b = 1-endpoint0_a;
+		        		double endpoint1_a = endpoint1.getComposition().getFractionalCompo(anode);
+		        		double endpoint1_b = 1-endpoint1_a;
+		        		double x0 = endpoint0_a / endpoint0_b;
+		        		double x1 = endpoint1_a / endpoint1_b;
+		        		double energy0 = endpoint0.getEnergy();
+		        		double energy1 = endpoint1.getEnergy();
+
+		        		double voltage = (energy1 - energy0 - (x1-x0) * anodeEnergy) / (x1 - x0);
+		        		
+		        		result.append(x0 + " " + x1 + " " + voltage + "\n");
+		        	}
+		        	
+		            String fileName = fc.getSelectedFile().getAbsolutePath();
+		            Utility.writeStringToFile(result.toString(), fileName);
+
+		       } */
 		}
 	}
         

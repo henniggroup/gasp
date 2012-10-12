@@ -402,6 +402,11 @@ public class DLPolyEnergy implements Energy {
 		
 		return finalEnergy;
 	}
+	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
 
 
 	//testing

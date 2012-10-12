@@ -162,7 +162,7 @@ public class PDBuilder implements Serializable {
                 int numVerticesInCommon = 0;
                 for (int m = 0; m < fi.size(); m++) {
                     for (int n = 0; n < fj.size(); n++) {
-                        if (fi.get(m) == fj.get(n)) {
+                        if (fi.get(m).equals(fj.get(n))) {
                             numVerticesInCommon++;
                         }
                     }

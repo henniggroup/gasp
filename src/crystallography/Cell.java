@@ -493,7 +493,16 @@ public class Cell implements Serializable {
         double[][] P = Matrix.identity(3,3).getArrayCopy();
 
         // start loop
+        int maxNumIters = 100000; // just some big number
+        int numIters = 0;
         while (true) {
+        	// break if we're in an infinite loop which can happen apparently.
+        	// but rlyrly shouldnt happen much.
+        	if (numIters > maxNumIters) {
+        		GAOut.out().stdout("WARNING: breaking out of infinite loop in Cell.getNigliReducedCell", GAOut.WARNING);
+        		break;
+        	}
+        	numIters++;
             // Step 1
             if (((a - b) > TOL)
                     || ((Math.abs(a - b) < TOL) && (Math.abs(ksi) > Math
@@ -844,7 +853,14 @@ public class Cell implements Serializable {
 		Vect c2 = other.getCentroid();
 		
 		Site p11 = this.getSite(0);
-		Site p12 = this.getSite(1);
+		Site p12;
+		// try to find a p12 such that p12, p11, and c1 are not collinear
+		int p12indx = 1;
+		do {
+			p12 = this.getSite(p12indx);
+			p12indx++;
+		} while (p12indx < this.getNumSites() && Vect.pointsAreCollinear(c1,p12.getCoords(),p11.getCoords(),atomicMisfit));
+		
 		
 		Cell thisStd = this.getCellRotatedWithSitesInPrincDirections(p11.getCoords(), p12.getCoords());
 		
@@ -1062,6 +1078,11 @@ public class Cell implements Serializable {
 
 	// return nearest neighborslist sorted by distance from center
 	public List<Site> getAtomsInSphereSorted(final Vect center, double dist) {
+		return getAtomsInSphereSorted(center, dist, false);
+	}
+
+		
+	public List<Site> getAtomsInSphereSorted(final Vect center, double dist, boolean newSites) {
 		//Map<Site, Double> resultsMap = new HashMap<Site,Double>();
 		List<Site> result = new ArrayList<Site>();
 		
@@ -1089,7 +1110,10 @@ public class Cell implements Serializable {
 										    .plus(latticeVectors.get(1).scalarMult((double)j))
 										    .plus(latticeVectors.get(2).scalarMult((double)k));
 						if (center.getCartDistanceTo(trialCoords) <= dist) {
-							result.add(s);
+							if (newSites)
+								result.add(new Site(s.getElement(), trialCoords));
+							else
+								result.add(s);
 							continue;
 						}
 						//	result.add(new Site(s.getElement(), trialCoords));

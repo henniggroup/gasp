@@ -44,10 +44,24 @@ public class PDViewer {
 			elements.addAll(pd.getElements());
 			chempots.putAll(pd.getChemPots());
 		}
+		
+		if (aparser.hasOption("r")) {
+			List<IComputedEntry> newEnts = new ArrayList<IComputedEntry>(entries);
+
+			for (String s : aparser.getArguments("r")) {
+				int sid = Integer.parseInt(s);
+				for (IComputedEntry ent : entries)
+					if (((StructureOrg)ent).getID() == sid)
+						newEnts.remove(ent);
+			}
+			
+			entries = newEnts;
+		}
 
 		if (aparser.hasArguments("m")) {
 			List<String> mArgs = aparser.getArguments("m");
 			if (mArgs.size() % 2 != 0) {
+				System.out.println(mArgs.size() +" args given to --m");
 				usage();
 				return;
 			}
@@ -68,22 +82,7 @@ public class PDViewer {
 		PDData pdd = pdb.getPDData();
 				
 		if (aparser.hasOption("v")) {
-			// remove entries with energy > 0 and add dummy entries w/ energy = 0 at each vertex
-			
-			java.util.List<IComputedEntry> newEntries = new ArrayList<IComputedEntry>();
-			for (IComputedEntry e : entries)
-				if (e.getEnergyPerAtom() <= 0)
-					newEntries.add(e);
-			
-			for (Element e : elements) {
-				List<Site> els = new ArrayList<Site>();
-				els.add(new Site(e, new Vect(0.0,0.0,0.0)));
-				StructureOrg dummy = new StructureOrg(new Cell(1.,1.,1.,90.,90.,90.,els,""));
-				dummy.setTotalEnergy(0);
-				newEntries.add(dummy);
-			}
-			
-			System.out.println((new PDBuilder(newEntries, elements, chempots)).getPDData().getCHullVolume());
+			PDHartkeMaker.getHartkeVolume(pdd);
 			System.exit(0);
 		}
 		

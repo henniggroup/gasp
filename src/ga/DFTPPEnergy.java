@@ -301,6 +301,11 @@ public class DFTPPEnergy implements Energy {
 		return finalEnergy;
 	}
 	
+	
+	public boolean cannotCompute(StructureOrg o) {
+		return false;
+	}
+	
 	// just for testing
 	public static void main(String args[]) {
 		String output = Utility.readStringFromFile("/home/wtipton/out");
