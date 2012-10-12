@@ -254,6 +254,106 @@ public class MopacEnergy implements Energy {
 		return p;
 	}
 	
+//	public static Cell parseOut(String output) {
+//		GAParameters params = GAParameters.getParams();
+//
+//		List<Vect> newVects = new LinkedList<Vect>();
+//		List<Site> newSites = new LinkedList<Site>();
+//		
+//		// check for case where structure is already optimized
+//		String line = null;
+//		Pattern goodPattern = Pattern.compile("     GRADIENTS WERE INITIALLY ACCEPTABLY SMALL");
+//		Matcher goodMatcher = goodPattern.matcher(output);
+//		try {
+//			BufferedReader t = new BufferedReader(new FileReader(output));
+//			try {
+//				while ((line = t.readLine()) != null) {
+//					goodMatcher.reset(line);
+//					if (goodMatcher.find()) {
+//						System.out.println("Structure already optimized, returning original");
+//						return null;
+//					}
+//				}
+//			} catch (IOException x) {
+//				GAOut.out().stdout("MopacEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL, 1);
+//			}
+//		} catch (FileNotFoundException e) {
+//			System.out.println("MopacEnergy.parseStructure: .out not found");
+//			return null;
+//		}
+//		
+//		// parse the output to return a structure
+//		line = null;
+//		Pattern coordsPattern = Pattern.compile("       FINAL  POINT  AND  DERIVATIVES");
+//		Matcher coordsMatcher = coordsPattern.matcher(output);
+//		try {
+//			BufferedReader r = new BufferedReader(new FileReader(output));			
+//			try {
+//				while ((line = r.readLine()) != null) {
+//					coordsMatcher.reset(line);
+////					System.out.print("line: " + line + "\n");
+//
+//					if (coordsMatcher.find()) {
+////						System.out.println("here's the line: " + line);
+//						r.readLine(); r.readLine();
+//						//TODO: is this worth improving (i.e. not random-looking numbers)?
+//						for (int e=0; e<(3*sites.size()+16); e++) {
+//							r.readLine();
+//						}
+//						line = r.readLine();
+//						coordsMatcher.reset(line);
+//						try {
+//							// read in atomic locations
+//							for (Site s: sites) {
+//								StringTokenizer t = new StringTokenizer(line);
+////								System.out.println("this is the token zone: " + line);
+//								t.nextToken(); t.nextToken();
+//								Double x = Double.parseDouble(t.nextToken()); t.nextToken();
+//								Double y = Double.parseDouble(t.nextToken()); t.nextToken();
+//								Double z = Double.parseDouble(t.nextToken());
+//								Vect v = new Vect(x,y,z);
+//								newSites.add(new Site(s.getElement(),v));
+//								line = r.readLine();
+//							}
+//							
+//							// read in lattice vectors
+//							for (int k=0; k<Constants.numDimensions; k++) {
+//								StringTokenizer m = new StringTokenizer(line);
+////								System.out.println("this is the lattice token zone: " + line);
+//								m.nextToken(); m.nextToken();
+//								Double x = Double.parseDouble(m.nextToken()); m.nextToken();
+//								Double y = Double.parseDouble(m.nextToken()); m.nextToken();
+//								Double z = Double.parseDouble(m.nextToken());
+//								Vect v = new Vect(x,y,z);
+//								newVects.add(v);
+//								line = r.readLine();
+//							}
+//							
+//						} catch (NumberFormatException x) {
+//							GAOut.out().stdout("MopacEnergy.parseStructure: " + x.getMessage(), GAOut.NOTICE, 1);
+//							GAOut.out().stdout("MOPAC output follows: ", GAOut.DEBUG, 1);
+//							GAOut.out().stdout(output, GAOut.DEBUG, 1);
+//						}
+//						break;
+//					}
+//				}
+//			} catch (IOException x) {
+//				GAOut.out().stdout("MopacEnergy: IOException: " + x.getLocalizedMessage(), GAOut.CRITICAL, 1);
+//			}
+//		} catch (FileNotFoundException e) {
+//			System.out.println("MopacEnergy.parseStructure: .out not found");
+//			return null;
+//		}
+//
+//		
+//		Cell p = new Cell(newVects, newSites);
+//		
+//		//TODO: remove this line, is just for testing
+////		p.writeCIF(params.getTempDirName() + "/" + c.getID() + "/parsed" + c.getID() + ".cif");
+//				
+//		return p;
+//	}
+	
 	//TODO: parsing from the .arc file rather than .out might be cleaner, though not necessary
 	public static Double parseFinalEnergy(String output) {
 		GAParameters params = GAParameters.getParams();
