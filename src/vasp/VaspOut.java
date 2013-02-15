@@ -47,7 +47,7 @@ public class VaspOut {
 		try {
 			poscarReader = new BufferedReader(new FileReader(poscarInFile));
 			/* Read the comment line */
-			description = poscarReader.readLine(); 
+			description = poscarReader.readLine() + "; Read from " + poscarInFile; 
 			/* Get the scaling factor */
 			double scalingFactor = Double.parseDouble(poscarReader.readLine()); 
 			/* Get lattice vectors */
@@ -106,7 +106,7 @@ public class VaspOut {
 		}
 		
 		/* Make the VaspData object which for now just has a Cell */
-		return new Cell(latticeVectors, basis, null);
+		return new Cell(latticeVectors, basis, description);
 
 	}
 	

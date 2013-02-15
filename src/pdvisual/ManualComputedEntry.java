@@ -1,5 +1,7 @@
 package pdvisual;
 
+import ga.GAUtils;
+
 import java.io.Serializable;
 
 import chemistry.Composition;
@@ -34,6 +36,17 @@ public class ManualComputedEntry implements IComputedEntry,Serializable {
 	
 	public String getLabel() {
 		return cell.getLabel();
+	}
+	
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		String newline = GAUtils.newline();
+		
+		result.append("ManualComputedEntry: " + getLabel() + ":" + newline);
+		result.append("Total Energy: " + totalEnergy +  newline);
+		result.append(cell.toString());
+		
+		return result.toString();
 	}
 	
 }

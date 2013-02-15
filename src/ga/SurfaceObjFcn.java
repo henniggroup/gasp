@@ -107,9 +107,10 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	}
 	
 	// for testing
+	/*
 	public static void main(String args[]) {
 		
-		/*
+		
 		String arg[] = {"20", "hi"};
 		
 		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/POSCAR"));
@@ -123,6 +124,6 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		cof.unpadOrg();
 		
 		c.getCell().writeCIF("/home/wtipton/POSCAR.unpadded.cif");
-*/
-	}
+
+	}*/
 }
