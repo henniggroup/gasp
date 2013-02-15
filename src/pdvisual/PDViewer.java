@@ -80,6 +80,16 @@ public class PDViewer {
 		
 		PDBuilder pdb = new PDBuilder(entries, elements, chempots);
 		PDData pdd = pdb.getPDData();
+		
+		if (aparser.hasOption("c")) {
+			PDData pd_to_compare = (PDData)(Utility.readSerializable(aparser.getArgument("c")));
+			PDAnalyzer pda = new PDAnalyzer(pdd);
+			for (IComputedEntry e : pd_to_compare.getAllEntries()) {
+				System.out.println(e.toString());
+				System.out.println("Energy above chull: " + pda.getEnergyPerAtomAboveHull(e));
+			}
+			System.exit(0);
+		}
 				
 		if (aparser.hasOption("v")) {
 			PDHartkeMaker.getHartkeVolume(pdd);
