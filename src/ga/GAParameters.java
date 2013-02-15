@@ -224,7 +224,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
 		System.out.println("   --objectiveFunction <epa/pd> ohmms <header> <footer> <cautious?>");
-		System.out.println("   --objectiveFunction <epa/pd> lammps <potlFile>");
+		System.out.println("   --objectiveFunction <epa/pd> lammps <potlFile> <relax box?>");
 		System.out.println("   --objectiveFunction <epa/pd> castep <cautious?> <kpointSpacing> <pressure> <paramFile> <element potcar>+ ");
 		System.out.println("   --objectiveFunction <epa/pd> avogadro <avog header file>");
 		System.out.println("   --objectiveFunction <epa/pd> dlpoly <loc> <potl>");
