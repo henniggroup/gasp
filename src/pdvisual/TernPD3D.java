@@ -57,6 +57,7 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 	CheckboxMenuItem cbmiMakePDD;
 	MenuItem miGetStructureInfo;
 	
+	MenuItem miExportPDD;
 	MenuItem miExportCHPDB;
 	MenuItem miExportData;
 	MenuItem miExportStructs;
@@ -271,6 +272,9 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 		
 		// add export options to file menu
 		fileMenu.addSeparator();
+		miExportPDD = new MenuItem("Export PDD", null);
+		miExportPDD.addActionListener(this);
+		fileMenu.add(miExportPDD);
 		miExportData = new MenuItem("Export Data", null);
 		miExportData.addActionListener(this);
 		fileMenu.add(miExportData);
@@ -334,6 +338,14 @@ public class TernPD3D extends jv.object.PsMainFrame implements ActionListener, I
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_SCALE_RECT);
 		} else if (source == miGetStructureInfo) {
 			m_project.getDisplay().setMajorMode(PvDisplayIf.MODE_PICK);
+		} else if (source == miExportPDD) {
+			//Create a file chooser
+			final JFileChooser fc = new JFileChooser();
+	        int returnVal = fc.showOpenDialog(this);
+	        if (returnVal == JFileChooser.APPROVE_OPTION) {
+	            String fileName = fc.getSelectedFile().getAbsolutePath();
+	            Utility.writeSerializable((PDData)pdd, fileName);
+	        }
 		} else if (source == miExportCHPDB) {
 			//Create a file chooser
 			final JFileChooser fc = new JFileChooser();
