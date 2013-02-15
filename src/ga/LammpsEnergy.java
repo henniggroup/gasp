@@ -21,6 +21,7 @@ import crystallography.Site;
 public class LammpsEnergy implements Energy {
 	
 	private String potlStr;
+	private boolean relax_box;
 	
 	private static final String dataFileName = "data.in";
 	private static final String dumpFileName = "dump.atom";
@@ -34,6 +35,11 @@ public class LammpsEnergy implements Energy {
 		// read in the LAMMPS potential to use
 		File potlFile = new File(args.get(0));
 		potlStr = GAUtils.readStringFromFile(potlFile);
+		
+		if (args.size() > 1)
+			relax_box = Boolean.parseBoolean(args.get(1));
+		else
+			relax_box = true;
 
 	}
 
@@ -131,7 +137,7 @@ Atoms
 		return result.toString();
 	}
 
-	private static String getLammpsInputFile(StructureOrg c, String potlStr) {
+	private static String getLammpsInputFile(StructureOrg c, String potlStr, boolean relax) {
 		StringBuilder ans = new StringBuilder();
 		String newline = GAUtils.newline();
 
@@ -152,11 +158,13 @@ Atoms
 		ans.append(newline + potlStr + newline);
 
 		ans.append("minimize 0.0 1.0e-8 1 1" + newline);
-		ans.append("fix 1 all box/relax tri 1e4 vmax 0.001" + newline);
+		if (relax)
+			ans.append("fix 1 all box/relax tri 1e4 vmax 0.001" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		ans.append("dump myDump all atom 100000000000000 " + dumpFileName + newline);
 		ans.append("dump_modify myDump sort 1 scale no" + newline);
-		ans.append("fix 1 all box/relax tri 0 vmax 0.001" + newline);
+		if (relax)
+			ans.append("fix 1 all box/relax tri 0 vmax 0.001" + newline);
 		ans.append("min_modify line quadratic" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		
@@ -221,7 +229,7 @@ Atoms
 		// write unrelaxed cell to disk
 		VaspIn.writePoscar(c.getCell(), outDirPath + "/" + c.getID() + ".unrelaxed.POSCAR", false);
 		
-		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr), outDirPath + "/" + inFileName);
+		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr, relax_box), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(getLammpsDataFile(c), outDirPath + "/" + dataFileName);
 		GAOut.out().stdout("Starting Lammps computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
 		
@@ -332,7 +340,7 @@ Atoms
 			}
 		} */
 		for (i = 0; i < lines.length; i++) {
-			if (lines[i].matches(".*Step *Temp *E_pair *E_mol *TotEng *Press *Volume.*")) {
+			if (lines[i].matches(".*Step *Temp *E_pair *E_mol *TotEng *Press.*")) {
 				String energies[] = lines[i+2].trim().split("  *");
 				try {
 					finalEnergy = Double.parseDouble(energies[4]);
