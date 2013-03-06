@@ -55,13 +55,10 @@ public class RandomSOCreator implements StructureOrgCreator {
 		double maxll = params.getMaxLatticeLength();
 		double minll = params.getMinLatticeLength();
 		double maxla = params.getMaxLatticeAngleDegrees();
-		double minla = params.getMinLatticeAngleDegrees();
+		double minla = params.getMinLatticeAngleDegrees();		
+		double maxch = params.getMaxCellHeight();
 		
 		Random rand = params.getRandom();
-		
-		double la = rand.nextDouble()*(maxll-minll)+minll;
-		double lb = rand.nextDouble()*(maxll-minll)+minll;
-		double lc = rand.nextDouble()*(maxll-minll)+minll;
 		
 		// sum of the angles needs to be < 360 degrees
 		double adeg, bdeg, gdeg;
@@ -70,7 +67,16 @@ public class RandomSOCreator implements StructureOrgCreator {
 			bdeg = (rand.nextDouble()*(maxla-minla)+minla);
 			gdeg = (rand.nextDouble()*(maxla-minla)+minla);
 		} while (!GAUtils.satisfiesTriangleInequality(adeg, bdeg, gdeg) || adeg + bdeg + gdeg >= 360);
-			
+		
+		double la = rand.nextDouble()*(maxll-minll)+minll;
+		double lb = rand.nextDouble()*(maxll-minll)+minll;
+		
+		//TODO: FIXME: maximum z lattice length
+		// should be correctly constrained by maxCellHeight
+		double maxZll = Math.min(maxll,2*maxch);
+		
+		double lc = rand.nextDouble()*(maxZll-minll)+minll;
+		
 		return (new Cell(la,lb,lc,adeg,bdeg,gdeg,null,null)).getLatticeVectors();
 	}
 	

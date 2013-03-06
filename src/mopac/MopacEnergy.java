@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import utility.Constants;
 import utility.Utility;
 import utility.Vect;
+import vasp.VaspOut;
 import crystallography.Cell;
 import crystallography.Site;
 
@@ -144,12 +145,12 @@ public class MopacEnergy implements Energy {
 		}
 			
 		// Parse final structure, set as return structure
-		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out") == null) {
-			GAOut.out().stdout("Warning: bad MOPAC CIF.  Not updating structure.", GAOut.WARNING, c.getID());
-		} else {
+	//	if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out") == null) {
+	//		GAOut.out().stdout("Warning: bad MOPAC CIF.  Not updating structure.", GAOut.WARNING, c.getID());
+	//	} else {
 			Cell p = parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out");
 			c.setCell(p);
-		}
+	//	}
 		
 	}
 	
@@ -245,8 +246,15 @@ public class MopacEnergy implements Energy {
 			return c.getCell();
 		}
 
-		
-		Cell p = new Cell(newVects, newSites);
+		Cell p;
+		try {
+			p = new Cell(newVects, newSites);
+		} catch (Exception x) {
+			GAOut.out().stdout("ERROR: Cell constructor threw in MopacEnergy.parseStructure",GAOut.WARNING,0);
+			GAOut.out().stdout("   while trying to parse "+ output,GAOut.WARNING,0);
+			x.printStackTrace();
+			p = null;
+		}
 		
 		//TODO: remove this line, is just for testing
 //		p.writeCIF(params.getTempDirName() + "/" + c.getID() + "/parsed" + c.getID() + ".cif");
@@ -400,19 +408,24 @@ public class MopacEnergy implements Energy {
 		return false;
 	}
 	//testing
-/*	public static void main(String[] args) {
+	public static void main(String[] args) {
+		StructureOrg s = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/test_run/garun_mopac_c/temp/738.POSCAR"));
+		String filename = "/Users/benjaminrevard/GA/test_run/garun_mopac_c/temp/738.out";
+		System.out.println(parseStructure(s,filename));
+		
+		/*
 		String[] argsIn = {"/home/skw57/Downloads/dl_poly_4.02/execute/"};
 		DLPolyEnergy bob = new DLPolyEnergy(argsIn);
 		Cell c = Cell.parseCif(new File("/home/skw57/2.cif"));
 		
 		bob.getEnergy(new StructureOrg(c));
-		
+		*/
 	//	String output = GulpEnergy.runGULP("mno2_poly.gin");
 	//	System.out.println(output);
 	//	System.out.println(GulpEnergy.parseFinalEnergy(output, bob.cautious));
 	//	System.out.println(output.contains("failed"));
 	}
-*/
+
 	
 	
 }

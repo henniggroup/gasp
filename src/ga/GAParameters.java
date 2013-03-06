@@ -93,6 +93,7 @@ public class GAParameters implements Serializable {
 	private double minLatticeLength = -1;
 	private double maxLatticeAngle = -1;
 	private double minLatticeAngle = -1;
+	private double maxCellHeight = Double.POSITIVE_INFINITY;
 	private int maxNumAtoms = 1;
 	private int minNumAtoms = 1;
 	private int minNumSpecies = 1;
@@ -252,6 +253,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --minLatticeLength d : minimum lattice vector length (Angstroms)");
 		System.out.println("   --maxLatticeAngle d : maximum lattice angle (Degrees)");
 		System.out.println("   --minLatticeAngle d : minimum lattice angle (Degrees)");
+		System.out.println("   --maxCellHeight d : maximum height of cell in z-direction");
 		System.out.println("   --maxNumAtoms n");
 		System.out.println("   --minNumAtoms n");
 		System.out.println("   --minNumSpecies n");
@@ -309,6 +311,8 @@ public class GAParameters implements Serializable {
 				maxLatticeAngle = Double.parseDouble(arguments.get(0));
 			else if (flag.equalsIgnoreCase("minLatticeAngle"))
 				minLatticeAngle = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxCellHeight"))
+				maxCellHeight = Double.parseDouble(arguments.get(0));
 			else if (flag.equalsIgnoreCase("maxNumAtoms"))
 				maxNumAtoms = Integer.parseInt(arguments.get(0));
 			else if (flag.equalsIgnoreCase("minNumAtoms"))
@@ -617,6 +621,10 @@ public class GAParameters implements Serializable {
 
 	public double getMaxLatticeLength() {
 		return maxLatticeLength;
+	}
+	
+	public double getMaxCellHeight() {
+		return maxCellHeight;
 	}
 
 	public double getMinInteratomicDistance() {

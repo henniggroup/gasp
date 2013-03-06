@@ -126,7 +126,7 @@ public class Isotropy {
 			}
 		}
 		
-		System.out.println("ERROR: couldn't gind spacegroup in findsym output: " + output);
+		System.out.println("ERROR: couldn't find spacegroup in findsym output: " + output);
 		return -1;
 	}
 	

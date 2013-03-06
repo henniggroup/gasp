@@ -40,6 +40,9 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	
 	private void unpadOrg() {
 		Cell oldCell = org.getCell();
+		if (oldCell == null)
+			return;
+		
 		double mid = GAParameters.getParams().getMinInteratomicDistance();
 
 		// get a bounding box for the atoms

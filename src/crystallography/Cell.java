@@ -1432,6 +1432,16 @@ public class Cell implements Serializable {
 		
 	} 
 	
+
+	public double getHeight() {
+		List<Vect>lVects = getLatticeVectors();
+		Vect a = lVects.get(0);
+		Vect b = lVects.get(1);
+		Vect c = lVects.get(2);
+		Vect normalToXandY = a.cross(b);
+		return normalToXandY.scalarMult(c.dot(normalToXandY)/normalToXandY.dot(normalToXandY)).length();
+	}
+	
 /*
 	// Convert from one type of file to another
 	// Can be used to standardize CIF files (i.e. CIF to CIF conversion)
@@ -1480,10 +1490,11 @@ public class Cell implements Serializable {
 		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
 		
 		
-		Cell a = Cell.parseCif(new File("/home/wtipton/lisi_pd/cifs/90.cif"));
+		Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
 		System.out.println(a.toString());
+		System.out.println(a.getHeight());
 	//	a.getNigliReducedCell();
-		
+	/*	
 		for (int i = 0; i < a.getNumSites(); i++) {
 			// it's no good if there are any other atoms in the minimum radius sphere
 			System.out.println(a.getSite(i).toString());
@@ -1491,7 +1502,7 @@ public class Cell implements Serializable {
 			if (sitesList.size() > 1) {
 				System.out.println("Organism failed minimum interatomic distance constraint: " + sitesList.size());
 			}
-		} 
+		} */
 
 		
 //		a.writeCIF("test");
@@ -1564,5 +1575,6 @@ public class Cell implements Serializable {
 		*/
 		
 	}
+
 	
 }

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.*;
 
 import utility.Utility;
+import utility.Vect;
 
 import crystallography.Cell;
 import crystallography.Site;
@@ -187,7 +188,14 @@ public final class StructureDev implements Development, Serializable {
 						+ i + "] == " + lAngles[i] + ").", GAOut.NOTICE, s.getID());
 				return false;
 			}
-		}	
+		}
+		
+		// Check cell height - in the z direction
+		if (structure.getHeight() > GAParameters.getParams().getMaxCellHeight()) {
+			GAOut.out().stdout("Organism " + s.getID() + " failed max cell height constraint"
+					, GAOut.NOTICE, s.getID());
+			return false;
+		}
 		
 		// check the stoichiometry
 		/*
