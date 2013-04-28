@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import org.openbabel.OBAtom;
+/*import org.openbabel.OBAtom;
 import org.openbabel.OBBase;
 import org.openbabel.OBConversion;
 import org.openbabel.OBMol;
@@ -26,7 +26,7 @@ import org.openbabel.OBUnitCell;
 import org.openbabel.openbabel_java;
 import org.openbabel.openbabel_javaConstants;
 import org.openbabel.vector3;
-import org.openbabel.vectorVector3;
+import org.openbabel.vectorVector3;*/
 
 import Jama.Matrix;
 
@@ -34,7 +34,7 @@ import utility.*;
 import vasp.VaspOut;
 import chemistry.*;
 
-import org.openbabel.*;
+//import org.openbabel.*;
 /* Represents a crystallographic cell: lattice parameters and a basis.
  * IS IMMUTABLE!
  * 
