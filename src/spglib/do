@@ -1,3 +1,0 @@
-swig -java -package spglib spglib.i
-gcc -c spglib_wrap.c -I/opt/java/include/ -I/opt/java/include/linux -fPIC
-gcc -shared spglib_wrap.o -lsymspg -o libspglib.so
