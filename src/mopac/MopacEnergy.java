@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import utility.Constants;
 import utility.Utility;
 import utility.Vect;
+import vasp.VaspOut;
 import crystallography.Cell;
 import crystallography.Site;
 
@@ -69,7 +70,7 @@ public class MopacEnergy implements Energy {
 			List<Double> coords = s.getCoords().getCartesianComponents();
 			atoms = atoms + s.getElement().getSymbol() + "  ";
 			for (int k=0; k<Constants.numDimensions; k++) {
-				atoms = atoms + coords.get(k) + "   0   ";
+				atoms = atoms + coords.get(k) + "   1   "; // 0 means dont optimize coordinate; 1 means do opt
 			}
 			atoms = atoms + "\n";
 		}
@@ -170,7 +171,7 @@ public class MopacEnergy implements Energy {
 
 		// parse the output to return a structure
 		line = null;
-		Pattern coordsPattern = Pattern.compile("   ATOM   CHEMICAL          X               Y               Z");
+		Pattern coordsPattern = Pattern.compile(" *ATOM *CHEMICAL *X *Y *Z *");
 		Matcher coordsMatcher = coordsPattern.matcher(output);
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(output));			
@@ -189,7 +190,8 @@ public class MopacEnergy implements Energy {
 								//						for (int e=0; e<16; e++) {
 								//							r.readLine();
 								//						}
-								line = r.readLine();
+								line = r.readLine().replace("*", ""); // sometimes the asterisks are included in the output, sometimes not
+
 								//System.out.println(line);
 								coordsMatcher.reset(line);
 								try {
@@ -203,7 +205,7 @@ public class MopacEnergy implements Energy {
 										Double z = Double.parseDouble(t.nextToken());
 										Vect v = new Vect(x,y,z);
 										newSites.add(new Site(s.getElement(),v));
-										line = r.readLine();
+										line = r.readLine().replace("*", "");
 										//System.out.println(line);
 									}
 
@@ -212,17 +214,17 @@ public class MopacEnergy implements Energy {
 										StringTokenizer m = new StringTokenizer(line);
 										//								System.out.println("this is the lattice token zone: " + line);
 										m.nextToken(); m.nextToken();
-										Double x = Double.parseDouble(m.nextToken()); m.nextToken();
-										Double y = Double.parseDouble(m.nextToken()); m.nextToken();
+										Double x = Double.parseDouble(m.nextToken()); 
+										Double y = Double.parseDouble(m.nextToken()); 
 										Double z = Double.parseDouble(m.nextToken());
 										Vect v = new Vect(x,y,z);
 										newVects.add(v);
-										line = r.readLine();
+										line = r.readLine().replace("*", "");
 										//System.out.println(line);
 									}
 
 								} catch (NumberFormatException x) {
-									GAOut.out().stdout("MopacEnergy.parseStructure: " + x.getMessage(), GAOut.NOTICE, c.getID());
+									GAOut.out().stdout("NumberFormatException in MopacEnergy.parseStructure: " + x.getMessage(), GAOut.NOTICE, c.getID());
 									GAOut.out().stdout("MOPAC output follows: ", GAOut.DEBUG, c.getID());
 									GAOut.out().stdout(output, GAOut.DEBUG, c.getID());
 								}
@@ -238,6 +240,7 @@ public class MopacEnergy implements Energy {
 			System.out.println("MopacEnergy.parseStructure: .out not found");
 			return c.getCell();
 		}
+
 
 
 		Cell p = new Cell(newVects, newSites);
@@ -290,6 +293,13 @@ public class MopacEnergy implements Energy {
 	public boolean cannotCompute(StructureOrg o) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	// just for testing
+	public static void main(String args[]) {
+			String output = "/home/wtipton/59.out";
+			StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
+			System.out.println(parseStructure(c,output));
 	}
 
 }
