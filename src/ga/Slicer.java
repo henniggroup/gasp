@@ -118,7 +118,12 @@ public final class Slicer implements Variation {
 		for (Site s : c.getSites())
 			newSites.add(new Site(s.getElement(), s.getCoords().plus(c.getLatticeVectors().get(doubleDim))));
 		
-		return new Cell(newVects, newSites, c.getLabel());
+		Cell result = new Cell(newVects, newSites, c.getLabel());
+		
+		if (GAParameters.getParams().getUseNiggliReducedCell())
+			return result.getNigliReducedCell();
+		else
+			return result;
 	}
 
 	public Organism doVariation(Generation parents, Generation offspring, Selection sel) {

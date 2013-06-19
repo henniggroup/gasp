@@ -135,7 +135,8 @@ public final class StructureDev implements Development, Serializable {
 		
 		// dont want to do this the first generation
 		if (structure.getComposition().getNumElements() < params.getMinNumSpecies() && GAParameters.getParams().getRecord().getGenNum() != 0) {
-			GAOut.out().stdout("Organism " + s.getID() + " failed max number of species constraint: (composition = "
+			GAOut.out().stdout("Organism " + s.getID() + " failed minimum (" + params.getMinNumSpecies() 
+					+ ") number of species constraint: (composition = "
 					+ structure.getComposition().toString() + ").", GAOut.NOTICE, s.getID());
 			return false;
 		}

@@ -535,11 +535,11 @@ public class TernPD3DProj extends PjProject implements ActionListener, MouseMoti
         return abc2xy;
     } */
     
-    public double[] getTernaryXYCoord(double[] rectangularCoords){
+    public static double[] getTernaryXYCoord(double[] rectangularCoords){
         if(rectangularCoords.length != 3) 
         	System.out.println("Error: in Composition.getTernaryXYCoord basis.length != 3");
         
-        double sqrt3o2 = 0.5 * Math.sqrt(2);
+        double sqrt3o2 = 0.5 * Math.sqrt(3);
         
         double[][] F = {{ 1.0, 0.5,     0.0}
         				,{0.0, sqrt3o2, 0.0}

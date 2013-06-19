@@ -165,7 +165,7 @@ Atoms
 		ans.append("dump_modify myDump sort 1 scale no" + newline);
 		if (relax)
 			ans.append("fix 1 all box/relax tri 0 vmax 0.001" + newline);
-		ans.append("min_modify line quadratic" + newline);
+		ans.append("#min_modify line quadratic" + newline);
 		ans.append("minimize 0.0 1.0e-8 10000 100000 " + newline);
 		
 		return ans.toString();

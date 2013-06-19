@@ -185,10 +185,11 @@ public class GAParameters implements Serializable {
 	
 	// print out a usage statement
 	public static void usage(String errorStr, Boolean die) {
-		System.out.println("GASP: built " + utility.BuildDate.buildDate);
+		System.out.println();
+		GAOut.out().stdout("GASP: built " + utility.BuildDate.buildDate, GAOut.INFO);
 		if (!errorStr.equals("")) {
-			System.out.println(errorStr);
-			System.out.println("");
+			GAOut.out().stdout(errorStr, GAOut.CRITICAL);
+			GAOut.out().stdout("", GAOut.CRITICAL);
 		}
 		System.out.println("Usage: ga <options> (--f <input-file> OR --r <resume-file>)");
 		System.out.println("Arguments are case-insensitive.  All arguments can be passed in the input-file.");
@@ -856,7 +857,7 @@ public class GAParameters implements Serializable {
 			// make the output directory
 			outDir = new File(outDirName);
 			if (!params.getDryRun() && !outDir.mkdir()) 
-				GAParameters.usage("Can't create directory " + outDirName, true);
+				GAParameters.usage("ERROR: Can't create directory " + outDirName, true);
 			
 			// make the output files
 			outFile = new File(outDir, outFileName);

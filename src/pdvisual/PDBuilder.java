@@ -121,12 +121,25 @@ public class PDBuilder implements Serializable {
             }
         }
         /**
-         * one last check -- remove facets where the formation energy of
+         * remove facets where the formation energy of
          * one of the points on the facet is positive (i.e., it is part of the
          * convex hull, but in the Eform > 0 space)
+         * 
+         * and lastly, in the case where points with negative formation energy exist,
+         * and no points with positive formation energy exist, we have the "flat"
+         * facet whose endpoints are the elemental phases, and we want to remove this
          */
         iFacet = facets.iterator();
         List<Double> eforms = newPDData.getFormEnergiesPerAtom();
+        
+        boolean haveNegEformEntries = false;
+        for (Double e : eforms) {
+        	if (e < 0) {
+        		haveNegEformEntries = true;
+        		break;
+        	}
+        }
+        
         while (iFacet.hasNext()) {
             List<Integer> facet = iFacet.next();
             boolean removeFacet = false;
@@ -136,11 +149,14 @@ public class PDBuilder implements Serializable {
                     break;
                 }
             }
+            if (!removeFacet && haveNegEformEntries) {
+            	removeFacet = true;
+                for (Integer ivert : facet) {
+                	// remove facet if eforms of all endpoints are essentially 0
+                	removeFacet &= Math.abs(eforms.get(ivert)) < EFORM_TOL;
+                }
+            }
             if (removeFacet) {
-            //    System.out.println("removing facet (vertex has positive eform):");
-            //    for (int i = 0; i < facet.size(); i++) {
-            //        System.out.println(newPDData.getEntry(facet.get(i)));
-            //    }
                 iFacet.remove();
             }
         }

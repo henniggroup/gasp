@@ -136,6 +136,10 @@ public class Element implements Comparable, Serializable {
 		Z = _Z;
 	}
 	
+	private Element() {
+		// no public constructors
+	}
+	
 	private String[] getEntryFromZ(int _Z) {
 		for (String[] entry : elementData) {
 			if (Integer.parseInt(entry[ZEntryLoc]) == _Z)

@@ -90,7 +90,7 @@ public class VaspIn {
 			List<Site> basis = cell.getSites();	
 			for (Element e : elements)
 				for (Site s : basis) {
-					if (s.getElement() == e) {
+					if (s.getElement().equals(e)) {
 						List<Double> coords = null;
 						if (useCartesianCoords)
 							coords = s.getCoords().getCartesianComponents();

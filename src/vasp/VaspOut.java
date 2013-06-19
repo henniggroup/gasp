@@ -110,6 +110,105 @@ public class VaspOut {
 
 	}
 	
+	public static List<VaspConfig> getConfigs(String outcarFileName, Cell origCell) {
+		List<VaspConfig> result = new ArrayList<VaspConfig>();
+		
+		BufferedReader outcarReader = null;
+		try {
+			outcarReader = new BufferedReader(new FileReader(outcarFileName));
+			String line;
+			
+			int currentConfigNum = 0;
+			
+			Pattern newConfigPattern = Pattern.compile("--* *Iteration *"+(currentConfigNum+1));
+			Pattern stressPattern = Pattern.compile("in kB");
+			Pattern energyPattern = Pattern.compile(" energy  without entropy"); // two spaces between energy and without :p
+			Pattern atomsPattern = Pattern.compile("POSITION *TOTAL-FORCE");
+			Pattern lvectsPattern = Pattern.compile("direct lattice vectors");
+			
+			VaspConfig currentConf = null;
+			List<Vect> lVects = new ArrayList<Vect>();
+			List<Site> sites = new ArrayList<Site>();
+			while ((line = outcarReader.readLine()) != null) {
+				if (newConfigPattern.matcher(line).find()) {
+					if (currentConfigNum > 0) {
+						Cell newCell = new Cell(lVects, sites, "Configuration " + currentConfigNum + " from " + outcarFileName);
+						currentConf.setCell(newCell);
+						result.add(currentConf);
+					}
+					currentConf = new VaspConfig();
+					lVects = new ArrayList<Vect>();
+					sites = new ArrayList<Site>();
+					currentConfigNum++;
+					newConfigPattern = Pattern.compile("--* *Iteration *"+(currentConfigNum+1));
+				} else
+				
+				if (atomsPattern.matcher(line).find()) {
+					outcarReader.readLine(); // skip a line of hyphens
+					List<Vect> forces = new ArrayList<Vect>();
+					for (int i = 0; i < origCell.getNumSites(); i++) {	
+						StringTokenizer atomLineTok = new StringTokenizer(outcarReader.readLine());
+						double x = Double.parseDouble(atomLineTok.nextToken());
+						double y = Double.parseDouble(atomLineTok.nextToken());
+						double z = Double.parseDouble(atomLineTok.nextToken());
+						double fx = Double.parseDouble(atomLineTok.nextToken());
+						double fy = Double.parseDouble(atomLineTok.nextToken());
+						double fz = Double.parseDouble(atomLineTok.nextToken());
+						sites.add(new Site(origCell.getSite(i).getElement(),new Vect(x,y,z)));
+						forces.add(new Vect(fx,fy,fz));
+					}
+					currentConf.setForces(forces);
+				} else
+				
+				if (lvectsPattern.matcher(line).find()) {
+					for (int i = 0; i < 3; i++) {
+						StringTokenizer vectLineTok = new StringTokenizer(outcarReader.readLine());
+						double x = Double.parseDouble(vectLineTok.nextToken());
+						double y = Double.parseDouble(vectLineTok.nextToken());
+						double z = Double.parseDouble(vectLineTok.nextToken());
+						lVects.add(new Vect(x,y,z));
+					}
+				} else
+				
+				if (stressPattern.matcher(line).find()) {
+					StringTokenizer energyLineTok = new StringTokenizer(line);
+					energyLineTok.nextToken();energyLineTok.nextToken(); // want 6 tokens starting with the 3rd
+					double stress[] = new double[VaspConfig.STRESS_LEN];
+					for (int i = 0; i < VaspConfig.STRESS_LEN; i++)
+						stress[i] = Double.parseDouble(energyLineTok.nextToken()) / 1602.0;
+					// TODO: the 1602 is copied from the potfit parser. no idea where it came from.
+					currentConf.setStress(stress);
+				} else
+				
+				if (energyPattern.matcher(line).find()) {
+					StringTokenizer energyLineTok = new StringTokenizer(line);
+					energyLineTok.nextToken();energyLineTok.nextToken(); // we want the 7th token
+					energyLineTok.nextToken();energyLineTok.nextToken();
+					energyLineTok.nextToken();energyLineTok.nextToken();
+					currentConf.setTotalEnergy(Double.parseDouble(energyLineTok.nextToken()));
+				}	
+			}
+			if (currentConf != null && currentConf.energyHasBeenSet()) {
+				Cell newCell = new Cell(lVects, sites, "Configuration " + currentConfigNum + " from " + outcarFileName);
+				currentConf.setCell(newCell);
+				result.add(currentConf);
+			}
+			
+		} catch (Exception x) {
+			GAOut.out().stdout("Warning: VaspOut.getConfigs() failed: " + x.getMessage(), GAOut.NOTICE);
+		} finally {
+			if (outcarReader != null)
+				try {
+					outcarReader.close();
+				} catch (IOException x) {
+					GAOut.out().stdout("Warning: VaspOut.getConfigs() failed to close outcarReader: " + x.getMessage(), GAOut.NOTICE);
+				}
+		}
+		
+		return result;
+	}
+
+	
 	public static double getFinalEnergy(String outcarFileName, boolean cautious) {
 		
 		double energy = Double.POSITIVE_INFINITY;
@@ -179,6 +278,13 @@ public class VaspOut {
 	} */
 
 	public static void main(String args[]) {
-		System.out.println(getFinalEnergy("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/OUTCAR", false));
+		for (VaspConfig i : getConfigs("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/OUTCAR", 
+				getPOSCAR("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/POSCAR"))) {
+			System.out.println(i.getTotalEnergy());
+			for (double d : i.getStress())
+				System.out.print(d + " ");
+			System.out.println("");
+			System.out.println(i.getCell());
+		}
 	}
 }
