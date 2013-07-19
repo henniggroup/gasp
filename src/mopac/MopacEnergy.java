@@ -171,6 +171,7 @@ public class MopacEnergy implements Energy {
 
 		// parse the output to return a structure
 		line = null;
+		boolean finalGeometryFound = false;
 		Pattern coordsPattern = Pattern.compile(" *ATOM *CHEMICAL *X *Y *Z *");
 		Matcher coordsMatcher = coordsPattern.matcher(output);
 		try {
@@ -184,6 +185,7 @@ public class MopacEnergy implements Energy {
 						while ((line = r.readLine()) != null) {
 							coordsMatcher.reset(line);
 							if (coordsMatcher.find()) {
+								finalGeometryFound = true;
 								//						System.out.println("here's the line: " + line);
 								r.readLine(); r.readLine();
 								//TODO: is this worth improving (i.e. not random-looking numbers)?
@@ -241,11 +243,10 @@ public class MopacEnergy implements Energy {
 			return c.getCell();
 		}
 
-
-
-		Cell p = new Cell(newVects, newSites);
-
-		return p;
+		if (finalGeometryFound)
+			return new Cell(newVects, newSites);
+		else
+			return null;
 	}
 
 	//TODO: parsing from the .arc file rather than .out might be cleaner, though not necessary
@@ -297,8 +298,11 @@ public class MopacEnergy implements Energy {
 	
 	// just for testing
 	public static void main(String args[]) {
-			String output = "/home/wtipton/59.out";
-			StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
+			//String output = "/home/wtipton/59.out";
+			//StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
+			//System.out.println(parseStructure(c,output));
+			String output = "/Users/benjaminrevard/GA/B_N_mopac/Si/temp/1193.out";
+			StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/B_N_mopac/Si/1193.POSCAR"));
 			System.out.println(parseStructure(c,output));
 	}
 
