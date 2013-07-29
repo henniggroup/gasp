@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -289,17 +290,38 @@ public class MopacEnergy implements Energy {
 		return finalEnergy;
 	}
 
-	@Override
 	public boolean cannotCompute(StructureOrg o) {
-		// TODO Auto-generated method stub
-		return false;
+		
+		double minSphereRadius = 4.5; // necessary to get accurate results, according to jimmy stewart
+		
+		List<Vect> vects = o.getCell().getLatticeVectors();
+		Vect a = vects.get(0);
+		Vect b = vects.get(1);
+		Vect c = vects.get(2);
+
+		Vect n1 = a.cross(b);
+		Vect n2 = c.cross(b);
+		Vect n3 = a.cross(c);
+		
+		Vect center = (a.plus(b).plus(c)).scalarMult(0.5);
+		
+		double d1 = Math.abs(n1.dot(center)) / n1.length();
+		double d2 = Math.abs(n1.dot(center)) / n2.length();
+		double d3 = Math.abs(n1.dot(center)) / n3.length();
+	
+		if (d1 < minSphereRadius || d2 < minSphereRadius ||d3 < minSphereRadius)
+			return true;
+		else		
+			return false;
 	}
 	
 	// just for testing
 	public static void main(String args[]) {
-			String output = "/home/wtipton/59.out";
-			StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
-			System.out.println(parseStructure(c,output));
+		//	String output = "/home/wtipton/59.out";
+		List<String> as = new ArrayList<String>();
+		as.add("");
+		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
+		System.out.println((new MopacEnergy(as)).cannotCompute(c));
 	}
 
 }
