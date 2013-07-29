@@ -178,6 +178,7 @@ public class GeneticAlgorithm {
 			// make new organisms with this soc until it returns null or until one develops correctly
 			do { 
 				newOrg = soc.makeOrganism(offspring);
+				System.out.println(newOrg);
 			} while (newOrg != null && dev != null && !dev.doDevelop(offspring, newOrg));
 			
 			// save the organisms creator

@@ -96,19 +96,12 @@ public final class StructureDev implements Development, Serializable {
 		// Interatomic Distances
 		// - important to do this before some stuff that breaks if, e.g., we have two sites w/
 		//   exactly the same position (e.g. niggli cell reduction losing those atoms b/c of supercell method)
-		if (minid != -1)
-			for (int i = 0; i < s.getCell().getNumSites(); i++) {
-				// it's no good if there are any other atoms in the minimum radius sphere
-				List<Site> sitesInSphere = s.getCell().getAtomsInSphereSorted(s.getCell().getSite(i).getCoords(), minid);
-				if (sitesInSphere.size() > 1) {
-					GAOut.out().stdout("Organism " + s.getID() + " failed minimum interatomic distance constraint." , GAOut.NOTICE, s.getID());
-					// if we've added structure to wholepop rGuard before doing relaxation and now it fails, remove it
-					//  - this was fixed by making rguard save cells instead of structureorgs
-			//		if (rGuard != null)
-			//			rGuard.removeStructureOrg(s);
-					return false;
-				}
+		if (minid != -1) {
+			if (! s.getCell().satisfiesMinInteratomicDistance(minid)) {
+				GAOut.out().stdout("Organism " + s.getID() + " failed minimum interatomic distance constraint." , GAOut.NOTICE, s.getID());
+				return false;
 			}
+		}
 		
 		// use the Niggli reduced cell 
 		if (useNiggliReducedCell ) {

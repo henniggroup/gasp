@@ -1366,6 +1366,17 @@ public class Cell implements Serializable {
 		return answer;
 	} 
 	
+	public boolean satisfiesMinInteratomicDistance(double minid) {
+		for (int i = 0; i < getNumSites(); i++) {
+			// it's no good if there are any other atoms in the minimum radius sphere
+			List<Site> sitesInSphere = getAtomsInSphereSorted(getSite(i).getCoords(), minid);
+			if (sitesInSphere.size() > 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	// parses a CIF file (of the format written by openbabel)
 	// and returns a structure
 	public static Cell parseAvogCif(File cifFile) {

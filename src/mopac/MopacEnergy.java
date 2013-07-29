@@ -172,6 +172,7 @@ public class MopacEnergy implements Energy {
 
 		// parse the output to return a structure
 		line = null;
+		boolean finalGeometryFound = false;
 		Pattern coordsPattern = Pattern.compile(" *ATOM *CHEMICAL *X *Y *Z *");
 		Matcher coordsMatcher = coordsPattern.matcher(output);
 		try {
@@ -185,6 +186,7 @@ public class MopacEnergy implements Energy {
 						while ((line = r.readLine()) != null) {
 							coordsMatcher.reset(line);
 							if (coordsMatcher.find()) {
+								finalGeometryFound = true;
 								//						System.out.println("here's the line: " + line);
 								r.readLine(); r.readLine();
 								//TODO: is this worth improving (i.e. not random-looking numbers)?
@@ -242,11 +244,10 @@ public class MopacEnergy implements Energy {
 			return c.getCell();
 		}
 
-
-
-		Cell p = new Cell(newVects, newSites);
-
-		return p;
+		if (finalGeometryFound)
+			return new Cell(newVects, newSites);
+		else
+			return null;
 	}
 
 	//TODO: parsing from the .arc file rather than .out might be cleaner, though not necessary
