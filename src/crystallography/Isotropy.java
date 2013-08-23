@@ -16,7 +16,7 @@ import vasp.VaspOut;
 public class Isotropy {
 	
 	//  in case program bombs, try again w/ different accuracy
-	public static double accuracies[] = {.1,0.04,0.01,0.005,0.001,0.0005};
+	public static double accuracies[] = {.1,0.04,0.01,0.005,0.001,0.0005}; 
 	
 	private static String getFindsymInput(Cell c, double accuracy) {
 		StringBuilder result = new StringBuilder();
@@ -240,18 +240,31 @@ public class Isotropy {
 	}
 	
 	public static void main(String args[]) {
-		Cell c = VaspOut.getPOSCAR(args[0]);
+		//Cell c = VaspOut.getPOSCAR(args[0]);
+		Cell c = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1394776.POSCAR");
+		Cell d = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1229918.POSCAR");
+		Cell e = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1222022.POSCAR");
+		Cell f = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1571078.POSCAR");
+		
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 	//	Cell a = Cell.parseCif(new File("/home/wtipton/10631.cif"));
 	//	Cell b = Cell.parseCif(new File("/home/wtipton/11929.cif"));
 		
-	//	System.out.println(a.matchesCell(b, 0.1, 0.1, 0.1));
+		System.out.println(c.matchesCell(d, 0.1, 0.5, 0.3));
+		System.out.println(c.matchesCell(e, 0.1, 0.5, 0.3));
+		System.out.println(c.matchesCell(f, 0.1, 0.5, 0.3));
+		System.out.println(d.matchesCell(e, 0.1, 0.5, 0.3));
+		System.out.println(d.matchesCell(f, 0.1, 0.5, 0.3));
+		System.out.println(e.matchesCell(f, 0.1, 0.5, 0.3));
 
 		//String fsInput = utility.Utility.readStringFromFile("/home/wtipton/fstest");
 		
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
-		System.out.println(c.getFSOOutput());		
+	//	System.out.println(c.getFSOOutput());	
+	//	System.out.println(d.getFSOOutput());
+	//	System.out.println(e.getFSOOutput()); 
+	//	System.out.println(f.getFSOOutput());
 //		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
 	//	b.getNigliReducedCell().writeCIF("/home/wtipton/11134.nig.cif");
 	//	System.out.println(getWyckoffCell(c));

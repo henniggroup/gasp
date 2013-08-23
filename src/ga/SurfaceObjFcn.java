@@ -43,6 +43,8 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		if (oldCell == null)
 			return;
 		
+		oldCell = oldCell.getCellRotatedIntoPrincDirs();
+		
 		double mid = GAParameters.getParams().getMinInteratomicDistance();
 
 		// get a bounding box for the atoms
@@ -55,7 +57,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		}
 		double zlen = maxz - minz;
 		
-		// make new list of sites where we subtract (minx,miny,minz) off all the old ones
+		// make new list of sites where we subtract (minz) off all the old ones
 		List<Site> newSites = new ArrayList<Site>();
 		Vect minv = new Vect(0.0, 0.0, minz - mid/2);
 		for (Site s : oldCell.getSites())
