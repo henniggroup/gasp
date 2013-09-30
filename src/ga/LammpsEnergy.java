@@ -57,9 +57,9 @@ public class LammpsEnergy implements Energy {
 	}
 
 	// returns a structure representation in format parse-able by Lammps
-	private static String getLammpsDataFile(StructureOrg c) {
+	public static String getLammpsDataFile(Cell c) {
 		
-		Cell cell = c.getCell().getCellRotatedIntoPrincDirs();
+		Cell cell = c.getCellRotatedIntoPrincDirs();
 		CompositionSpace compSpace = GAParameters.getParams().getCompSpace();
 		//example:
 		/* 
@@ -230,7 +230,7 @@ Atoms
 		VaspIn.writePoscar(c.getCell(), outDirPath + "/" + c.getID() + ".unrelaxed.POSCAR", false);
 		
 		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr, relax_box), outDirPath + "/" + inFileName);
-		utility.Utility.writeStringToFile(getLammpsDataFile(c), outDirPath + "/" + dataFileName);
+		utility.Utility.writeStringToFile(getLammpsDataFile(c.getCell()), outDirPath + "/" + dataFileName);
 		GAOut.out().stdout("Starting Lammps computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
 		
 		String lammpsOutput = runLAMMPS(outDir.getAbsolutePath());
