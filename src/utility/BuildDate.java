@@ -6,6 +6,6 @@ package utility;
 
 public class BuildDate {
 
-	public static final String buildDate = "Mon Jul 29 11:20:02 EDT 2013";
+	public static final String buildDate = "Fri Aug 16 21:20:02 EDT 2013";
 
 }

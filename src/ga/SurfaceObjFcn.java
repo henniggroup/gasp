@@ -57,7 +57,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		}
 		double zlen = maxz - minz;
 		
-		// make new list of sites where we subtract (minz) off all the old ones
+		// make new list of sites where we subtract (0,0,minz-mid/2) off all the old ones
 		List<Site> newSites = new ArrayList<Site>();
 		Vect minv = new Vect(0.0, 0.0, minz - mid/2);
 		for (Site s : oldCell.getSites())
