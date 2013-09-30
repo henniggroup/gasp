@@ -21,22 +21,24 @@ import crystallography.Site;
 public class LammpsEnergy implements Energy {
 	
 	private String potlStr;
+	private String unitsStr;
 	private boolean relax_box;
 	
 	private static final String dataFileName = "data.in";
 	private static final String dumpFileName = "dump.atom";
-	private static final String inFileName = "in.min";
+	private static final String inFileName = "in.min"; 
 
 	public LammpsEnergy(List<String> args)
 	{
-		if (args == null || args.size() < 1)
+		if (args == null || args.size() < 2)
 			GAParameters.usage("Not enough parameters given to LammpsEnergy", true);
 
 		// read in the LAMMPS potential to use
 		File potlFile = new File(args.get(0));
 		potlStr = GAUtils.readStringFromFile(potlFile);
+		unitsStr = args.get(1);
 		
-		if (args.size() > 1)
+		if (args.size() > 2)
 			relax_box = Boolean.parseBoolean(args.get(1));
 		else
 			relax_box = true;
@@ -137,12 +139,12 @@ Atoms
 		return result.toString();
 	}
 
-	private static String getLammpsInputFile(StructureOrg c, String potlStr, boolean relax) {
+	private static String getLammpsInputFile(StructureOrg c, String potlStr, String units, boolean relax) {
 		StringBuilder ans = new StringBuilder();
 		String newline = GAUtils.newline();
 
 		//ans.append("units		metal" + newline);
-		ans.append("units		real" + newline);
+		ans.append("units		" + units + newline);
 		ans.append("dimension	3" + newline);
 		//ans.append("atom_style	atomic" + newline);
 		ans.append("atom_style	charge" + newline);
@@ -229,7 +231,7 @@ Atoms
 		// write unrelaxed cell to disk
 		VaspIn.writePoscar(c.getCell(), outDirPath + "/" + c.getID() + ".unrelaxed.POSCAR", false);
 		
-		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr, relax_box), outDirPath + "/" + inFileName);
+		utility.Utility.writeStringToFile(getLammpsInputFile(c, potlStr, unitsStr, relax_box), outDirPath + "/" + inFileName);
 		utility.Utility.writeStringToFile(getLammpsDataFile(c.getCell()), outDirPath + "/" + dataFileName);
 		GAOut.out().stdout("Starting Lammps computation on organism " + c.getID(), GAOut.NOTICE, c.getID());
 		
