@@ -43,6 +43,8 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		if (oldCell == null)
 			return;
 		
+		oldCell = oldCell.getCellRotatedIntoPrincDirs();
+		
 		double mid = GAParameters.getParams().getMinInteratomicDistance();
 
 		// get a bounding box for the atoms
