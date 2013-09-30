@@ -90,6 +90,7 @@ public class ClusterObjFcn extends ObjectiveFunction {
 		// relax the cell - have to wait for it to finish before using results
 		Thread t = energyFcn.evaluate();
 		try {
+			if (t != null)
 				t.join();
 		} catch (InterruptedException x) {
 			GAOut.out().stdout("InterruptedException in energy calc thread in ClusterObjFcn: " + x.getMessage(), GAOut.NOTICE, org.getID());

@@ -87,7 +87,7 @@ public class GeneticAlgorithm {
 					// write Hartke output if required
 					if (GAParameters.getParams().getWriteHartkeFile()) {
 						String hLine = s.getID() + " " + o.getSecond() + " " 
-									   + s.getTotalEnergy() + " " + s.getValue() 
+									   + s.getTotalEnergy() + " " + (s.knowsValue()?s.getValue():"infinity") 
 									   + " " + offspring.contains(s) + "\n";
 						Utility.writeStringToFile(hLine, GAParameters.getParams().getHartkeOutFile(), true);
 					}

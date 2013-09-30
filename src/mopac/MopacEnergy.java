@@ -59,7 +59,7 @@ public class MopacEnergy implements Energy {
 
 		String outdir = params.getTempDirName() + "/" + c.getID() + ".mop";
 		// uses PM7, overrides interatomic distance check, uses all cartesian coordinates
-		String keywds = "PM7 GEO-OK XYZ T=60.00M\n";
+		String keywds = "PM7 GEO-OK XYZ T=60.00M\n"; 
 		String title = "Structure " + c.getID() + "\n\n";
 
 		List<Vect> latVects = c.getCell().getLatticeVectors();
@@ -103,8 +103,9 @@ public class MopacEnergy implements Energy {
 		String s = null;
 		BufferedReader stdInput = null;
 		BufferedReader stdError = null;
+		Process p = null;
 		try {
-			Process p = Runtime.getRuntime().exec(execpath + " " + input);
+			p = Runtime.getRuntime().exec(execpath + " " + input);
 
 			stdInput = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));
@@ -129,14 +130,29 @@ public class MopacEnergy implements Energy {
 				try{ stdInput.close(); } catch (Exception x) { } //ignore
 			if (stdError != null) 
 				try{ stdError.close(); } catch (Exception x) { } //ignore
+			try {
+				p.getErrorStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				p.getOutputStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				p.getInputStream().close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		// Parse final structure, set as return structure
 		if (parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out") == null) {
 			GAOut.out().stdout("Warning: bad MOPAC CIF.  Not updating structure.", GAOut.WARNING, c.getID());
 		} else {
-			Cell p = parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out");
-			c.setCell(p);
+			Cell finalStructure = parseStructure(c, params.getTempDirName() + "/" + c.getID() + ".out");
+			c.setCell(finalStructure);
 		}
 
 	}
@@ -318,11 +334,17 @@ public class MopacEnergy implements Energy {
 	
 	// just for testing
 	public static void main(String args[]) {
+	//	StructureOrg a = new StructureOrg(VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si7/926059.POSCAR"));
+	//	StructureOrg b = new StructureOrg(VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si7/1678920.POSCAR"));
+	//	runMopac(a);
+	//	runMopac(b);
+	//	System.out.println(a);
+	//	System.out.println(b);
 		//	String output = "/home/wtipton/59.out";
-		List<String> as = new ArrayList<String>();
-		as.add("");
-		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
-		System.out.println((new MopacEnergy(as)).cannotCompute(c));
+	//	List<String> as = new ArrayList<String>();
+	//	as.add("");
+	//	StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/1.POSCAR"));
+	//	System.out.println((new MopacEnergy(as)).cannotCompute(c));
 	}
 
 }

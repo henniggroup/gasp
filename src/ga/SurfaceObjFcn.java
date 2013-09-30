@@ -83,9 +83,13 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		// relax the cell - have to wait for it to finish before using results
 		Thread t = energyFcn.evaluate();
 		try {
+			if (t != null)
 				t.join();
 		} catch (InterruptedException x) {
 			GAOut.out().stdout("InterruptedException in energy calc thread in SurfaceObjFcn: " + x.getMessage(), GAOut.WARNING, org.getID());
+		} catch (Exception x) {
+			GAOut.out().stdout("ERROR: exception in SurfaceObjFcn:run", GAOut.CRITICAL);
+			x.printStackTrace();
 		}
 		
 		// updating structure w/ relaxed version is this done in EPA already

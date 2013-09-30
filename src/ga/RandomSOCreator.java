@@ -21,9 +21,30 @@ public class RandomSOCreator implements StructureOrgCreator {
 	private String newGenType;
 	private double givenVolPerAtom;
 	
+	private boolean storedConstraints = false; // true if we're storing constraints, false if getting them from GAParameters
+	private double maxll, minll, maxla, minla, maxh;
+	private int maxna, minna;
+	
+	public RandomSOCreator(List<String> args, double maxll, double minll, double maxla, double minla, double maxh, int maxna, int minna) {
+		init(args);
+		storedConstraints = true;
+		this.maxll = maxll;
+		this.minll = minll;
+		this.maxla = maxla;
+		this.minla = minla;
+		this.maxh = maxh;
+		this.maxna = maxna;
+		this.minna = minna;
+		
+	}
+	
 	public RandomSOCreator(List<String> args) {
 		GAParameters params = GAParameters.getParams();
 		
+		init(args);
+	}
+	
+	private void init(List<String> args) {
 		// parse the options passed in
 		if (args == null || args.size() < 1)
 			GAParameters.usage("Not enough parameters given to RandomSOCreator", true);
@@ -43,22 +64,27 @@ public class RandomSOCreator implements StructureOrgCreator {
 	public String toString() {
 		return "RandomSOCreator: " + newGenType + " with volume, " + givenVolPerAtom;
 	}
-
-	// makes a basis which is random except that it satisfies the hard constraints
-	public static List<Vect> makeRandomLattice() {
+	
+	private void initCellConstraints() {
 		GAParameters params = GAParameters.getParams();
-		
+
 		if (params.getMaxLatticeAngleDegrees() == -1 || params.getMinLatticeAngleDegrees() == -1
 				|| params.getMaxLatticeLength() == -1 || params.getMinLatticeLength() == -1)
 			GAParameters.usage("Error: Must set lattice parameter constraints to use makeRandomLattice().", true);
 		
-		double maxll = params.getMaxLatticeLength();
-		double minll = params.getMinLatticeLength();
-		double maxla = params.getMaxLatticeAngleDegrees();
-		double minla = params.getMinLatticeAngleDegrees();		
-		double maxch = params.getMaxCellHeight();
+		maxll = params.getMaxLatticeLength();
+		minll = params.getMinLatticeLength();
+		maxla = params.getMaxLatticeAngleDegrees();
+		minla = params.getMinLatticeAngleDegrees();		
+		maxh = params.getMaxCellHeight();
+		maxna = params.getMaxNumAtoms();
+		minna = params.getMinNumAtoms();
+	}
+
+	// makes a basis which is random except that it satisfies the hard constraints
+	public List<Vect> makeRandomLattice() {
 		
-		Random rand = params.getRandom();
+		Random rand = GAParameters.getParams().getRandom();
 		
 		// sum of the angles needs to be < 360 degrees
 		double adeg, bdeg, gdeg;
@@ -73,7 +99,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 		
 		//TODO: FIXME: maximum z lattice length
 		// should be correctly constrained by maxCellHeight
-		double maxZll = Math.min(maxll,2*maxch);
+		double maxZll = Math.min(maxll,2*maxh);
 		
 		double lc = rand.nextDouble()*(maxZll-minll)+minll;
 		
@@ -85,8 +111,12 @@ public class RandomSOCreator implements StructureOrgCreator {
 	protected StructureOrg makeRandomOrg() {
 		GAParameters params = GAParameters.getParams();
 		Random rand = params.getRandom();
+		
+		if (!storedConstraints)
+			initCellConstraints();
+		
 		//HashMap<String,Integer> constituents = params.getConstituents();
-		Composition comp = params.getCompSpace().getRandomIntegerCompInSpace(params.getMinNumAtoms(), params.getMaxNumAtoms());
+		Composition comp = params.getCompSpace().getRandomIntegerCompInSpace(minna, maxna);
 
 		// make random lattice parameters satisfying hard constraints
 		// the Basis for our new organism

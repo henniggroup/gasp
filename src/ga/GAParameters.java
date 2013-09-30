@@ -221,6 +221,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --initialPopulation <num> poscars <directory>");
 		System.out.println("   --initialPopulation <num> manual");
 		System.out.println("   --initialPopulation <num> units <numMols> <numAtoms_1>...<numAtoms_n> (<symbol_i> <x_i> <y_i> <z_i>)+ <numUnits_1>...<numUnits_n> <targetDensity> <densityTol> <unitsOnly?>");
+		System.out.println("   --initialPopulation <num> supercell a b c maxll minll maxla minla maxh maxna minna <randomsocreator args>");
 		System.out.println("Objective Functions");
 		System.out.println("   --objectiveFunction cluster <padding length> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
@@ -412,7 +413,7 @@ public class GAParameters implements Serializable {
 			}
 			else if (flag.toLowerCase().startsWith("initialpopulation")) {
 				if (arguments.size() < 2)
-					this.usage("Malformed input in initialpopulation", true);
+					usage("Malformed input in initialpopulation", true);
 				Integer numOrgs = new Integer(Integer.parseInt(arguments.get(0)));
 				String creatorType = arguments.get(1);
 
@@ -426,6 +427,8 @@ public class GAParameters implements Serializable {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new GivenSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else if (creatorType.equalsIgnoreCase("units")) {
 					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new UnitsSOCreator( Utility.subList(arguments, 2)), numOrgs));
+				} else if (creatorType.equalsIgnoreCase("supercell")) {
+					initialOrgCreators.add(new Pair<StructureOrgCreator,Integer>(new SupercellSOCreator( Utility.subList(arguments, 2)), numOrgs));
 				} else {
 					usage("Unrecognized population type " + creatorType, true);
 				}					

@@ -241,21 +241,22 @@ public class Isotropy {
 	
 	public static void main(String args[]) {
 		//Cell c = VaspOut.getPOSCAR(args[0]);
-		Cell c = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1394776.POSCAR");
-		Cell d = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1229918.POSCAR");
-		Cell e = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1222022.POSCAR");
-		Cell f = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_Si6/1571078.POSCAR");
+	//	Cell c = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/33836.POSCAR");
+	//	Cell d = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/34257.POSCAR");
+	//	Cell e = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/35690.POSCAR");
+	//	Cell f = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/40495.POSCAR");
+	//	Cell g = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/40914.POSCAR");
 		
 		//Cell c = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 	//	Cell a = Cell.parseCif(new File("/home/wtipton/10631.cif"));
 	//	Cell b = Cell.parseCif(new File("/home/wtipton/11929.cif"));
 		
-		System.out.println(c.matchesCell(d, 0.1, 0.5, 0.3));
-		System.out.println(c.matchesCell(e, 0.1, 0.5, 0.3));
-		System.out.println(c.matchesCell(f, 0.1, 0.5, 0.3));
-		System.out.println(d.matchesCell(e, 0.1, 0.5, 0.3));
-		System.out.println(d.matchesCell(f, 0.1, 0.5, 0.3));
-		System.out.println(e.matchesCell(f, 0.1, 0.5, 0.3));
+	//	System.out.println(c.matchesCell(d, 0.1, 0.5, 0.3));
+	//	System.out.println(c.matchesCell(e, 0.1, 0.5, 0.3));
+	//	System.out.println(c.matchesCell(f, 0.1, 0.5, 0.3));
+	//	System.out.println(d.matchesCell(e, 0.1, 0.5, 0.3));
+	//	System.out.println(d.matchesCell(f, 0.1, 0.5, 0.3));
+	//	System.out.println(e.matchesCell(f, 0.1, 0.5, 0.3));
 
 		//String fsInput = utility.Utility.readStringFromFile("/home/wtipton/fstest");
 		
@@ -265,6 +266,7 @@ public class Isotropy {
 	//	System.out.println(d.getFSOOutput());
 	//	System.out.println(e.getFSOOutput()); 
 	//	System.out.println(f.getFSOOutput());
+	//	System.out.println(g.getFSOOutput());
 //		System.out.println(getFindsymOutput(b.getNigliReducedCell()));	
 	//	b.getNigliReducedCell().writeCIF("/home/wtipton/11134.nig.cif");
 	//	System.out.println(getWyckoffCell(c));
