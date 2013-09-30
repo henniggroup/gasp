@@ -82,7 +82,19 @@ public class RandomSOCreator implements StructureOrgCreator {
 	}
 
 	// makes a basis which is random except that it satisfies the hard constraints
-	public List<Vect> makeRandomLattice() {
+	public static List<Vect> makeRandomLattice() {
+		GAParameters params = GAParameters.getParams();
+		double maxll = params.getMaxLatticeLength();
+		double minll = params.getMinLatticeLength();
+		double maxla = params.getMaxLatticeAngleDegrees();
+		double minla = params.getMinLatticeAngleDegrees();		
+		double maxh = params.getMaxCellHeight();
+		int maxna = params.getMaxNumAtoms();
+		int minna = params.getMinNumAtoms();
+		return makeRandomLattice(maxll, minll, maxla, minla, maxh, maxna, minna);
+	}
+	
+	public static List<Vect> makeRandomLattice(double maxll, double minll, double maxla, double minla, double maxh, int maxna, int minna) {
 		
 		Random rand = GAParameters.getParams().getRandom();
 		
@@ -120,7 +132,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 
 		// make random lattice parameters satisfying hard constraints
 		// the Basis for our new organism
-		List<Vect> latVects = makeRandomLattice();
+		List<Vect> latVects = makeRandomLattice(maxll, minll, maxla, minla, maxh, maxna, minna);
 
 		// make lists to hold the points and species which will make our new Structure
 		ArrayList<Site> sitesList = new ArrayList<Site>();
