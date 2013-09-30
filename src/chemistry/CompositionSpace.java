@@ -69,6 +69,15 @@ public class CompositionSpace implements Serializable {
 				if (!elements.contains(e))
 					elements.add(e);
 		
+		// sort by elemental weight for good measure/consistency
+		Collections.sort(elements, new Comparator<Element>() 
+									{
+									    public int compare(Element e1, Element e2) 
+									    {
+									    	return e1.getZ() - e2.getZ();
+									    }
+									});
+		
 		// make the basis
 		basis = new LinkedList<Vect>();
 		for (Composition c : _endpoints) {
