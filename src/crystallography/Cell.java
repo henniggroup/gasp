@@ -1501,9 +1501,9 @@ public class Cell implements Serializable {
 		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
 		
 		
-		Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
-		System.out.println(a.toString());
-		System.out.println(a.getHeight());
+	//	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/1075.unrelaxed.POSCAR");
+	//	System.out.println(a.satisfiesMinInteratomicDistance(1.075));
+	//	System.out.println(a.getHeight());
 	//	a.getNigliReducedCell();
 	/*	
 		for (int i = 0; i < a.getNumSites(); i++) {

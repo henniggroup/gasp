@@ -1,7 +1,10 @@
 package ga;
 
 import java.util.ArrayList;
+
 import java.util.List;
+
+import java.util.Arrays;   // Ben added this
 
 import crystallography.Cell;
 import crystallography.Site;
@@ -22,22 +25,38 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		org = (StructureOrg)o;
 	}
 	
+	/**
+	 * Rotates the cell into the principle directions and then adds padding to the magnitude 
+	 * of the c lattice vector (which is now aligned vertically). Takes care of atomic sites 
+	 * so that the relative positions of the atoms are the same in the padded cell as the original.
+	 */
 	private void padOrg() {
 		Cell oldCell = org.getCell();
+		
+		oldCell = oldCell.getCellRotatedIntoPrincDirs(); 
 		
 		List<Vect> basis = new ArrayList<Vect>();
 		basis.add(oldCell.getLatticeVectors().get(0));
 		basis.add(oldCell.getLatticeVectors().get(1));
-		basis.add(new Vect(0.0, 0.0, padding));
+		double c = oldCell.getCellLengths()[2];   
+		basis.add(new Vect(0.0, 0.0, padding + c));
 		
 		List<Site> newSites = new ArrayList<Site>();
 		for (Site s : oldCell.getSites())
-			newSites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, padding/2))));	
+			newSites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, (padding + c)/2))));	
 		
 		Cell newCell = new Cell(basis, newSites, oldCell.getLabel());
 		org.setCell(newCell, false);
 	}
 	
+	/**
+	 * Rotates the cell into the principle directions and then removes vertical padding 
+	 * from the cell without changing the relative positions of the atoms. The magnitude 
+	 * of the vertical cell vector of the unpadded cell is equal to the vertical distance 
+	 * between highest and lowest atoms in the cell plus the minimum interatomic distance 
+	 * (mid). The atoms are arranged in the unpadded cell such that highest atom is mid/2 
+	 * from the top of cell, and the lowest atom is mid/2 from the bottom of the cell.   
+	 */
 	private void unpadOrg() {
 		Cell oldCell = org.getCell();
 		if (oldCell == null)
@@ -116,23 +135,28 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	}
 	
 	// for testing
-	/*
-	public static void main(String args[]) {
+	
+/*	public static void main(String args[]) {
 		
 		
 		String arg[] = {"20", "hi"};
 		
-		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/home/wtipton/POSCAR"));
+		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/padding_testing/POSCAR"));
 		
-		SurfaceObjFcn cof = new SurfaceObjFcn(arg, c);
+		// Convert array of strings to list of strings for the constructor
+		List<String> larg = Arrays.asList(arg);
+		
+		SurfaceObjFcn cof = new SurfaceObjFcn(larg, c);
 		
 		cof.padOrg();
 		
-		c.getCell().writeCIF("/home/wtipton/POSCAR.padded.cif");
+		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.padded.cif");
 		
 		cof.unpadOrg();
 		
-		c.getCell().writeCIF("/home/wtipton/POSCAR.unpadded.cif");
+		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.unpadded.cif");
+		
+		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
 
 	}*/
 }

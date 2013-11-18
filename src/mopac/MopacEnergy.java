@@ -59,7 +59,7 @@ public class MopacEnergy implements Energy {
 
 		String outdir = params.getTempDirName() + "/" + c.getID() + ".mop";
 		// uses PM7, overrides interatomic distance check, uses all cartesian coordinates
-		String keywds = "PM7 GEO-OK XYZ T=60.00M\n"; 
+		String keywds = "PM7 GEO-OK XYZ T=500.00M RELSCF=0.01 RMIN=-10\n"; 
 		String title = "Structure " + c.getID() + "\n\n";
 
 		List<Vect> latVects = c.getCell().getLatticeVectors();
