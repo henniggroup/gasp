@@ -21,6 +21,7 @@ public class PDViewer {
 		System.out.println("       --m POSCAR1 ENERGY1 POSCAR2 ENERGY2...");
 		System.out.println("       --v    - just print volume and exit");
 		System.out.println("       --c <file.pdb.tgz>	- compare other structures to input");
+		System.out.println("       --minEn <num>  - minimum total energy");
 	}
 	
 	public static void main(String[] args) {
@@ -84,6 +85,16 @@ public class PDViewer {
 						chempots.put(e, 0.0);
 					}
 				System.out.println("Using ManualComputedEntry with composition " + cell.getComposition() + " and total energy " + energy);
+			}
+		}
+		
+		if (aparser.hasArguments("minEn")) {
+			double minEn = Double.parseDouble(aparser.getArgument("minEn"));
+			Iterator<IComputedEntry> it = entries.iterator();
+			while (it.hasNext()) {
+				IComputedEntry e = it.next();
+				if (e.getTotalEnergy() < minEn)
+					it.remove();
 			}
 		}
 		

@@ -103,6 +103,11 @@ public final class StructureDev implements Development, Serializable {
 			}
 		}
 		
+		if (!s.getCell().satisfiesPerSpeciesMIDs(params.getPerSpeciesMIDs())) {
+			GAOut.out().stdout("Organism " + s.getID() + " failed per-species minimum interatomic distance constraint." , GAOut.NOTICE, s.getID());
+			return false;
+		}
+		
 		// use the Niggli reduced cell 
 		if (useNiggliReducedCell ) {
 			s.standardize();
