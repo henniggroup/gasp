@@ -6,9 +6,11 @@ import java.util.List;
 
 import java.util.Arrays;   // Ben added this
 
+import chemistry.Element;
 import crystallography.Cell;
 import crystallography.Site;
 import pdvisual.PDAnalyzer;
+import utility.Triplet;
 import utility.Utility;
 import utility.Vect;
 import vasp.VaspOut;
@@ -63,8 +65,14 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 			return;
 		
 		oldCell = oldCell.getCellRotatedIntoPrincDirs();
+		double mid; // minimum interatomic distance
 		
-		double mid = GAParameters.getParams().getMinInteratomicDistance();
+		// get the largest minimum interatomic distance
+		if (GAParameters.getParams().getMinInteratomicDistance() == -1) {
+			mid =  maxMID();	
+		} else {
+			mid = GAParameters.getParams().getMinInteratomicDistance();
+		}
 
 		// get a bounding box for the atoms
 		double minz = Double.MAX_VALUE;
@@ -92,6 +100,30 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		org.setCell(newCell, false);
 		
 	}
+	
+	
+	/**
+	 * Returns the largest per species minimum interatomic distance
+	 * Precondition: the perSpeciesMID option has been used
+	 */
+	public double maxMID() {
+		// Get an array of all the minimum interatomic distances
+		List<Triplet<Element, Element, Double>> tripletList = GAParameters.getParams().getPerSpeciesMIDs();
+		double[] MIDs = new double[tripletList.size()];
+		for (int i = 0; i < tripletList.size(); i++) {
+			MIDs[i] = tripletList.get(i).getThird();
+		}
+		
+		// Sort through the array and find the max value
+		double mid = 0;
+		for (int j = 0; j < MIDs.length; j++) {
+			if (MIDs[j] > mid) {
+				mid = MIDs[j];
+			}
+		}
+		return mid;
+	}
+	
 	
 	public void run() {
 		
@@ -133,6 +165,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	public String toString() {
 		return "SurfaceObjFcn"; // TODO: more? 
 	}
+	
 	
 	// for testing
 	
