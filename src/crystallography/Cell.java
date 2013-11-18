@@ -1366,6 +1366,31 @@ public class Cell implements Serializable {
 		return answer;
 	} 
 	
+	public boolean satisfiesPerSpeciesMIDs(List<Triplet<Element,Element,Double>> mids) {
+		for (Triplet<Element,Element,Double> mid : mids) {
+			Element a = mid.getFirst();
+			Element b = mid.getSecond();
+			Double minid = mid.getThird();
+			
+			for (int i = 0; i < getNumSites(); i++) {
+				List<Site> sitesInSphere = getAtomsInSphereSorted(getSite(i).getCoords(), minid);
+				boolean sphereHasA = false;
+				boolean sphereHasB = false;
+				for (Site s : sitesInSphere) {
+					if (!sphereHasA && s.getElement().equals(a)) {
+						sphereHasA = true;
+						continue;
+					}
+					if (s.getElement().equals(b))
+						sphereHasB = true;
+				}
+				if (sphereHasA && sphereHasB)
+					return false;
+			}
+		}
+		return true;
+	}
+
 	public boolean satisfiesMinInteratomicDistance(double minid) {
 		for (int i = 0; i < getNumSites(); i++) {
 			// it's no good if there are any other atoms in the minimum radius sphere
@@ -1501,9 +1526,20 @@ public class Cell implements Serializable {
 		System.out.println(c.matchesCell(c, 0.1, 0.05, 0.05)); */
 		
 		
+<<<<<<< HEAD
 	//	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/1075.unrelaxed.POSCAR");
 	//	System.out.println(a.satisfiesMinInteratomicDistance(1.075));
 	//	System.out.println(a.getHeight());
+=======
+	/*	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
+		System.out.println(a.toString());
+		System.out.println(a.getHeight()); */
+		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
+				Element.getElemFromSymbol("Al"),0.02));
+		Cell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
+		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+>>>>>>> 3ce10d895f350ca3b11f4ff12906a107d36bf59e
 	//	a.getNigliReducedCell();
 	/*	
 		for (int i = 0; i < a.getNumSites(); i++) {

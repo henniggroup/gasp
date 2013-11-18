@@ -14,6 +14,7 @@ import chemistry.Element;
 import utility.ArgumentParser;
 import utility.Pair;
 import utility.Utility;
+import utility.Triplet;
 import vasp.VaspIn;
 
 import crystallography.Cell;
@@ -89,6 +90,7 @@ public class GAParameters implements Serializable {
 	private String runTitle = "default";
 	// - hard constraints (in Angstroms and degrees):
 	private double minInteratomicDistance = -1;
+	private List<Triplet<Element,Element,Double>> perSpeciesMIDs;
 	private double maxLatticeLength = -1;
 	private double minLatticeLength = -1;
 	private double maxLatticeAngle = -1;
@@ -170,6 +172,8 @@ public class GAParameters implements Serializable {
 		//constituents = new HashMap<String, Integer>();
 		// initialize initialOrgCreators map
 		initialOrgCreators = new ArrayList<Pair<StructureOrgCreator,Integer>>();
+		
+		perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
 	}
 	
 	// singleton
@@ -251,6 +255,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --convergenceCriterion foundStructure <CIF filename> <rGuard misfits>");
 		System.out.println("Hard Constraints");
 		System.out.println("   --minInteratomicDistance d : minimum interatomic distance (Angstroms)");
+		System.out.println("   --perSpeciesMID <symbol1> <symbol2> <distance>");
 		System.out.println("   --maxLatticeLength d : maximum lattice vector length (Angstroms)");
 		System.out.println("   --minLatticeLength d : minimum lattice vector length (Angstroms)");
 		System.out.println("   --maxLatticeAngle d : maximum lattice angle (Degrees)");
@@ -305,7 +310,14 @@ public class GAParameters implements Serializable {
 					outDirName += s;
 			} else if (flag.equalsIgnoreCase("minInteratomicDistance"))
 				minInteratomicDistance = Double.parseDouble(arguments.get(0));
-			else if (flag.equalsIgnoreCase("maxLatticeLength"))
+			else if (flag.equalsIgnoreCase("perSpeciesMID")) {
+				if (arguments.size() < 3)
+					usage("Error: not enough arguments to perSpeciesMID", true);
+				Element a = Element.getElemFromSymbol(arguments.get(0));
+				Element b = Element.getElemFromSymbol(arguments.get(1));
+				Double dist = Double.parseDouble(arguments.get(2));
+				perSpeciesMIDs.add(new Triplet<Element,Element,Double>(a,b,dist));
+			} else if (flag.equalsIgnoreCase("maxLatticeLength"))
 				maxLatticeLength = Double.parseDouble(arguments.get(0));
 			else if (flag.equalsIgnoreCase("minLatticeLength"))
 				minLatticeLength = Double.parseDouble(arguments.get(0));
@@ -633,6 +645,10 @@ public class GAParameters implements Serializable {
 
 	public double getMinInteratomicDistance() {
 		return minInteratomicDistance;
+	}
+	
+	public List<Triplet<Element,Element,Double>> getPerSpeciesMIDs() {
+		return perSpeciesMIDs;
 	}
 
 	public double getMinLatticeAngleDegrees() {
