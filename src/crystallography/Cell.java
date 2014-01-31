@@ -1366,6 +1366,10 @@ public class Cell implements Serializable {
 		return answer;
 	} 
 	
+	/**
+	 * Determines if the cell satisfies the per species minimum interatomic distance constraints.
+	 * Precondition: the perSpeciedMID option has been used
+	 */
 	public boolean satisfiesPerSpeciesMIDs(List<Triplet<Element,Element,Double>> mids) {
 		for (Triplet<Element,Element,Double> mid : mids) {
 			Element a = mid.getFirst();
@@ -1374,22 +1378,25 @@ public class Cell implements Serializable {
 			
 			for (int i = 0; i < getNumSites(); i++) {
 				List<Site> sitesInSphere = getAtomsInSphereSorted(getSite(i).getCoords(), minid);
-				boolean sphereHasA = false;
-				boolean sphereHasB = false;
-				for (Site s : sitesInSphere) {
-					if (!sphereHasA && s.getElement().equals(a)) {
-						sphereHasA = true;
-						continue;
+				
+				if (sitesInSphere.size() == 1) { // If only one site in sphere, there's no problem
+					continue;  
+				} else { // Otherwise, need to check if atoms match those in the triplet. If so, it fails
+					sitesInSphere.remove(0); // Have to remove the atom at the center of the sphere first
+					
+					for (Site s : sitesInSphere) {  
+						Boolean passed = !( ((getSite(i).getElement() == a) && (s.getElement() == b)) ||
+								((getSite(i).getElement() == b) && (s.getElement() == a)) ); 
+						if (passed == false) { 
+							return false; 
+						}
 					}
-					if (s.getElement().equals(b))
-						sphereHasB = true;
 				}
-				if (sphereHasA && sphereHasB)
-					return false;
-			}
-		}
+			} 
+		} 
 		return true;
 	}
+	
 
 	public boolean satisfiesMinInteratomicDistance(double minid) {
 		for (int i = 0; i < getNumSites(); i++) {
@@ -1532,11 +1539,20 @@ public class Cell implements Serializable {
 	/*	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
 		System.out.println(a.toString());
 		System.out.println(a.getHeight()); */
+//		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+//		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
+//				Element.getElemFromSymbol("Al"),0.02));
+//		Cell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
+//		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+		
 		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
-		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
-				Element.getElemFromSymbol("Al"),0.02));
-		Cell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("C"), 1.13));
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("Si"), 1.51));
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Si"), Element.getElemFromSymbol("Si"), 1.84));
+		
+		Cell c = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
 		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+
 
 	//	a.getNigliReducedCell();
 	/*	
