@@ -174,9 +174,9 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	public static void main(String args[]) {
 		
 		
-		String arg[] = {"6", "hi"};
+		String arg[] = {"7", "hi"};
 		
-		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/SiC_initial_structures/996unpadded.POSCAR"));
+		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.POSCAR"));
 		
 		// Convert array of strings to list of strings for the constructor
 		List<String> larg = Arrays.asList(arg);
@@ -191,9 +191,9 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		
 //		cof.padOrg();
 		
-		c.getCell().writeCIF("/Users/benjaminrevard/GA/SiC_initial_structures/996unpadded.cif");
+		c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif");
 				
-		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/SiC_initial_structures/996unpadded.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/SiC_initial_structures/996.POSCAR", false);
+		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733unpadded.POSCAR", false);
 		
 //		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
 

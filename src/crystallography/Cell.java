@@ -1379,7 +1379,7 @@ public class Cell implements Serializable {
 			for (int i = 0; i < getNumSites(); i++) {
 				List<Site> sitesInSphere = getAtomsInSphereSorted(getSite(i).getCoords(), minid);
 				
-				if (sitesInSphere.size() == 1) { // If only one site in sphere, there's no problem
+				if (sitesInSphere.size() <= 1) { // If only one site in sphere, there's no problem
 					continue;  
 				} else { // Otherwise, need to check if atoms match those in the triplet. If so, it fails
 					sitesInSphere.remove(0); // Have to remove the atom at the center of the sphere first
