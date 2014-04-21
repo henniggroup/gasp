@@ -1,5 +1,31 @@
+<<<<<<< HEAD
 package crystallography;
 
+=======
+/*
+ * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
+
+This file is part of the Genetic Algorithm for Structure and Phase Prediction (GASP).
+
+    GASP is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    GASP is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with GASP.  If not, see <http://www.gnu.org/licenses/>.
+    
+    
+    */
+
+package crystallography;
+   
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 import ga.GAOut;
 import ga.GAParameters;
 import ga.GAUtils;
@@ -32,7 +58,10 @@ import Jama.Matrix;
 
 import utility.*;
 import vasp.VaspOut;
+<<<<<<< HEAD
 import vasp.VaspIn;
+=======
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 import chemistry.*;
 
 //import org.openbabel.*;
@@ -193,7 +222,10 @@ public class Cell implements Serializable {
 							newBasisCandidates.add((new Site(s.getElement(),candidateSiteLoc.getVectShiftedIntoBasis(newVectors))));
 					}
 				}
+<<<<<<< HEAD
 				
+=======
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 			}
 		}
 		
@@ -280,7 +312,11 @@ public class Cell implements Serializable {
 		return false;
 	}
 	
+<<<<<<< HEAD
 	public void rotatedIntoPrincDirs() {
+=======
+	public Cell getCellRotatedIntoPrincDirs() {
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		// so we keep all the sites with the same fractional coordinates
 		// and just make new axes with the same lengths/angles but in
 		// better directions
@@ -301,8 +337,12 @@ public class Cell implements Serializable {
 			newBasis.add(new Site(s.getElement(), new Vect(fracCoords.get(0), fracCoords.get(1), fracCoords.get(2), newCellVectors)));
 		}
 		
+<<<<<<< HEAD
 		this.latticeVectors = newCellVectors;
 		this.basis = newBasis;
+=======
+		return new Cell (newCellVectors, newBasis, getLabel());
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	}
 	
 	public double getVolume() {
@@ -457,6 +497,7 @@ public class Cell implements Serializable {
     	if (niggliReducedCell != null)
     		return niggliReducedCell;
     
+<<<<<<< HEAD
     	Cell result = getNiggliCell();    
         niggliReducedCell = result;
         return niggliReducedCell; 
@@ -495,6 +536,12 @@ public class Cell implements Serializable {
     
     private Cell getNiggliCell() {
     	double TOL = 1e-8;
+=======
+//    	if (true)
+//throw new RuntimeException("nrc");
+    	    	
+        double TOL = 1e-8;
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
         // Initialize matrices for tranformations (3x3).
         double[][] m1 = new double[3][3];
@@ -655,7 +702,11 @@ public class Cell implements Serializable {
 
             // Step 8
             if ((ksi + eta + zeta + a + b < 0)
+<<<<<<< HEAD
                     || ((ksi + eta + zeta + a + b== 0) && (2.0 * (a + eta)
+=======
+                    || ((ksi + eta + zeta + a + b < 0) && (2.0 * (a + eta)
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
                             + zeta > 0))) {
             	P = (new Matrix(P)).times(new Matrix(m8)).getArray();
     //            P = MatrixMath.SquareMatrixMult(P, m8);
@@ -722,6 +773,18 @@ public class Cell implements Serializable {
                       for (int j = 0; j < 6; j++)
                           System.out.println(poutdat[j]);
         }
+<<<<<<< HEAD
+=======
+
+  //      result.setDescription(this.getDescription());
+  /*      for (int i = 0; i < this.m_sites.length; i++) {
+            Vect p = this.m_sites[i].m_loc;
+            Vect scaledPoint = p.inBasis(nigglibasis);
+            scaledPoint = result.translateIntoCell(scaledPoint);
+            result.addSiteChecked(new Site(scaledPoint, this.m_sites[i].m_sp,
+                    this.m_sites[i].m_occ));
+        } */
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
         
         if (this.getBasisSize() != result.getBasisSize()) {
         	GAOut.out().stdout("ERROR: Niggli cell reduction gained or lost atoms", GAOut.CRITICAL);
@@ -729,9 +792,18 @@ public class Cell implements Serializable {
         	GAOut.out().stdout(result.toString(), GAOut.CRITICAL);
         	(new Exception()).printStackTrace();
         }
+<<<<<<< HEAD
         return result; 
 	}
         
+=======
+        
+        niggliReducedCell = result;
+        return result; 
+    }
+
+
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	public Site getSite(int i) {
 		return basis.get(i);
 	}
@@ -1391,6 +1463,13 @@ public class Cell implements Serializable {
 		return answer;
 	} 
 	
+<<<<<<< HEAD
+=======
+	/**
+	 * Determines if the cell satisfies the per species minimum interatomic distance constraints.
+	 * Precondition: the perSpeciedMID option has been used
+	 */
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	public boolean satisfiesPerSpeciesMIDs(List<Triplet<Element,Element,Double>> mids) {
 		for (Triplet<Element,Element,Double> mid : mids) {
 			Element a = mid.getFirst();
@@ -1399,6 +1478,7 @@ public class Cell implements Serializable {
 			
 			for (int i = 0; i < getNumSites(); i++) {
 				List<Site> sitesInSphere = getAtomsInSphereSorted(getSite(i).getCoords(), minid);
+<<<<<<< HEAD
 				boolean sphereHasA = false;
 				boolean sphereHasB = false;
 				for (Site s : sitesInSphere) {
@@ -1415,6 +1495,27 @@ public class Cell implements Serializable {
 		}
 		return true;
 	}
+=======
+				
+				if (sitesInSphere.size() <= 1) { // If only one site in sphere, there's no problem
+					continue;  
+				} else { // Otherwise, need to check if atoms match those in the triplet. If so, it fails
+					sitesInSphere.remove(0); // Have to remove the atom at the center of the sphere first
+					
+					for (Site s : sitesInSphere) {  
+						Boolean passed = !( ((getSite(i).getElement() == a) && (s.getElement() == b)) ||
+								((getSite(i).getElement() == b) && (s.getElement() == a)) ); 
+						if (passed == false) { 
+							return false; 
+						}
+					}
+				}
+			} 
+		} 
+		return true;
+	}
+	
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
 	public boolean satisfiesMinInteratomicDistance(double minid) {
 		for (int i = 0; i < getNumSites(); i++) {
@@ -1557,6 +1658,7 @@ public class Cell implements Serializable {
 	/*	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
 		System.out.println(a.toString());
 		System.out.println(a.getHeight()); */
+<<<<<<< HEAD
 	//ist<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
 	//erSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
 	//	Element.getElemFromSymbol("Al"),0.02));
@@ -1579,6 +1681,22 @@ public class Cell implements Serializable {
 			VaspIn.writePoscar(d, "/Users/AnnaYesypenko/Desktop/POSCARS/result2.POSCAR", true);
 		
 		//}
+=======
+//		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+//		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
+//				Element.getElemFromSymbol("Al"),0.02));
+//		Cell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
+//		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+		
+		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("C"), 1.13));
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("Si"), 1.51));
+		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Si"), Element.getElemFromSymbol("Si"), 1.84));
+		
+		Cell c = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
+		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
 	//	a.getNigliReducedCell();
 	/*	
@@ -1664,4 +1782,8 @@ public class Cell implements Serializable {
 	}
 
 	
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
