@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -20,8 +18,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
-
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 package utility;
 
 // this is updated automatically by a cron job on wills machine.
@@ -29,11 +25,5 @@ package utility;
 // helpful to set auto-refresh in workspace prefs in eclipse.
 
 public class BuildDate {
-
-<<<<<<< HEAD
 	public static final String buildDate = "Fri Aug 16 21:20:02 EDT 2013";
-=======
-	public static final String buildDate = "Tues Mar 11 21:20:02 EDT 2014";
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
-
 }

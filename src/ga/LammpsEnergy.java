@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 /* Genetic algorithm for crystal structure prediction.  Will Tipton.  2010. */
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -21,7 +19,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
 package ga;
 
@@ -82,15 +79,9 @@ public class LammpsEnergy implements Energy {
 	}
 
 	// returns a structure representation in format parse-able by Lammps
-<<<<<<< HEAD
 	public static String getLammpsDataFile(Cell cell) {
 		
 		cell.rotatedIntoPrincDirs();
-=======
-	public static String getLammpsDataFile(Cell c) {
-		
-		Cell cell = c.getCellRotatedIntoPrincDirs();
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		CompositionSpace compSpace = GAParameters.getParams().getCompSpace();
 		//example:
 		/* 
@@ -401,12 +392,8 @@ Atoms
 	    //     The displacement in a skewed direction must be less than half the box length in that dimension. 
 		//     E.g. the xy tilt must be between -half and +half of the x box length. 
 		
-<<<<<<< HEAD
 		Cell cell = o.getCell();
 		cell.rotatedIntoPrincDirs();
-=======
-		Cell cell = o.getCell().getCellRotatedIntoPrincDirs();
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		
 		double xlo = 0, xhi = cell.getLatticeVectors().get(0).getCartesianComponents().get(0);
 		double ylo = 0, yhi = cell.getLatticeVectors().get(1).getCartesianComponents().get(1);

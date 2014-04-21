@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 /* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -21,7 +19,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
+
 
 package ga;
 
@@ -114,11 +112,7 @@ public class GAParameters implements Serializable {
 	// - hard constraints (in Angstroms and degrees):
 	private double minInteratomicDistance = -1;
 	private List<Triplet<Element,Element,Double>> perSpeciesMIDs;
-<<<<<<< HEAD
 	private double maxLatticeLength = -1;
-=======
-	private double maxLatticeLength = -1; 
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	private double minLatticeLength = -1;
 	private double maxLatticeAngle = -1;
 	private double minLatticeAngle = -1;
@@ -131,10 +125,7 @@ public class GAParameters implements Serializable {
 	private List<Set<String>> notNearestNeighbors = null;
 	private double maxNearestNeighborLength = 0;
 	private boolean useNiggliReducedCell = false;
-<<<<<<< HEAD
 	private boolean use2DNiggliReducedCell = false;
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	private boolean writeHartkeFile = false;
 	
 	private boolean colorOutput = true;
@@ -247,10 +238,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --useSurrogateModel <gulp header file> <potentials_specification file> <refit frequency>");
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
-<<<<<<< HEAD
 		System.out.println("   --use2DNiggliReducedCell <true|false>");
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		System.out.println("   --writeHartkeFile <boolean>");
 		System.out.println("   --colorOutput <boolean>");
 		System.out.println("Initial Population");
@@ -376,11 +364,8 @@ public class GAParameters implements Serializable {
 				endGameNumGens = Integer.parseInt(arguments.get(0));
 			else if (flag.equalsIgnoreCase("useNiggliReducedCell"))
 				useNiggliReducedCell = Boolean.parseBoolean(arguments.get(0));
-<<<<<<< HEAD
 			else if (flag.equalsIgnoreCase("use2DNiggliReducedCell"))
 				use2DNiggliReducedCell = Boolean.parseBoolean(arguments.get(0));
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 			else if (flag.equalsIgnoreCase("popSize"))
 				popSize = Integer.parseInt(arguments.get(0));
 			else if (flag.equalsIgnoreCase("keepTempFiles"))
@@ -815,13 +800,10 @@ public class GAParameters implements Serializable {
 		return useNiggliReducedCell;
 	}
 	
-<<<<<<< HEAD
 	public boolean getUse2DNiggliReducedCell() {
 		return use2DNiggliReducedCell;
 	}
 	
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	public Boolean getKeepTempFiles() {
 		return keepTempFiles;
 	}

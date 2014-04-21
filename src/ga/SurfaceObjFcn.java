@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 package ga;
 
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -23,10 +21,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     */
 
-package ga;
-
 import java.io.File;
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 import java.util.ArrayList;
 
 import java.util.List;
@@ -40,10 +35,7 @@ import pdvisual.PDAnalyzer;
 import utility.Triplet;
 import utility.Utility;
 import utility.Vect;
-<<<<<<< HEAD
-=======
 import vasp.VaspIn;
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 import vasp.VaspOut;
 
 public class SurfaceObjFcn extends ObjectiveFunction {
@@ -66,11 +58,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	private void padOrg() {
 		Cell oldCell = org.getCell();
 		
-<<<<<<< HEAD
 		oldCell.rotatedIntoPrincDirs(); 
-=======
-		oldCell = oldCell.getCellRotatedIntoPrincDirs(); 
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		
 		List<Vect> basis = new ArrayList<Vect>();
 		basis.add(oldCell.getLatticeVectors().get(0));
@@ -104,20 +92,12 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		if (oldCell == null)
 			return;
 		
-<<<<<<< HEAD
 		oldCell.rotatedIntoPrincDirs();
-=======
-		oldCell = oldCell.getCellRotatedIntoPrincDirs();
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		double mid; // minimum interatomic distance
 		
 		// get the largest minimum interatomic distance
 		if (GAParameters.getParams().getMinInteratomicDistance() == -1) {
-<<<<<<< HEAD
 			mid =  maxMID();	
-=======
-			mid = maxMID();	
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		} else {
 			mid = GAParameters.getParams().getMinInteratomicDistance();
 		}
@@ -161,23 +141,13 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		for (int i = 0; i < tripletList.size(); i++) {
 			MIDs[i] = tripletList.get(i).getThird();
 		}
-		
-<<<<<<< HEAD
-		// Sort through the array and find the max value
-=======
 		// Searches through the array and returns the max value
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		double mid = 0;
 		for (int j = 0; j < MIDs.length; j++) {
 			if (MIDs[j] > mid) {
 				mid = MIDs[j];
-<<<<<<< HEAD
 			}
 		}
-=======
-			} 
-		} 
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		return mid;
 	}
 	
@@ -226,7 +196,6 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	
 	// for testing
 	
-<<<<<<< HEAD
 /*	public static void main(String args[]) {
 		
 		
@@ -259,21 +228,18 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
 
 	}*/
-=======
 	//	cof.unpadOrg();
 		
 //		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.padded.cif");
 		
-		cof.unpadOrg();
+		//cof.unpadOrg();
 		
 //		cof.padOrg();
 		
-		c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif");
+		//c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif");
 				
-		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733unpadded.POSCAR", false);
+		//(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733unpadded.POSCAR", false);
 		
 //		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
 
 	} 
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
-}

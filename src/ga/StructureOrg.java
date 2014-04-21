@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 /* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -21,7 +19,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
 package ga;
 
@@ -79,14 +76,11 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 		reduced = true;
 	}
 	
-<<<<<<< HEAD
 	public void standardize2D() {
 		structure = structure.getCellWithAllAtomsInCell().getNigliReduced2DCell();
 		reduced = true;
 	}
 	
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	public double getTotalEnergy() {
 		return totalEnergy;
 	}

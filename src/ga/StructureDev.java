@@ -1,6 +1,4 @@
-<<<<<<< HEAD
 /* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
-=======
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -21,7 +19,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 
 package ga;
 
@@ -46,10 +43,7 @@ public final class StructureDev implements Development, Serializable {
 	static final long serialVersionUID = 1;
 	
 	private Boolean useNiggliReducedCell;
-<<<<<<< HEAD
 	private Boolean use2DNiggliReducedCell;
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	
 	private RedundancyGuard rGuard;
 	private Boolean useWholePopRG;
@@ -61,10 +55,7 @@ public final class StructureDev implements Development, Serializable {
 		GAParameters params = GAParameters.getParams();
 		
 		useNiggliReducedCell = params.getUseNiggliReducedCell();
-<<<<<<< HEAD
 		use2DNiggliReducedCell = params.getUse2DNiggliReducedCell();
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		
 		String rgType = params.getRedundancyGuardType();
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
@@ -84,12 +75,8 @@ public final class StructureDev implements Development, Serializable {
 		StringBuilder result = new StringBuilder();
 		
 		result.append("StructureDev development. useNiggliReducedCell: "
-<<<<<<< HEAD
 				+ useNiggliReducedCell + ", use2DNiggliReducedCell: " + 
 				use2DNiggliReducedCell + ", rGuard: " + rGuard);
-=======
-				+ useNiggliReducedCell + ", rGuard:" + rGuard);
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		
 		return result.toString();
 	}
@@ -153,7 +140,6 @@ public final class StructureDev implements Development, Serializable {
 			}
 		}
 		
-<<<<<<< HEAD
 		
 		// use the 2D Niggli reduced cell 
 		if (use2DNiggliReducedCell ) {
@@ -164,8 +150,6 @@ public final class StructureDev implements Development, Serializable {
 			}
 		}
 		
-=======
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 		Cell structure = s.getCell();
 		
 		// check the number of atoms

@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
-/*
- * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
+/* Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
 This file is part of the Genetic Algorithm for Structure and Phase Prediction (GASP).
 
@@ -21,7 +18,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     */
 
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 package pdvisual;
 
 import chemistry.*;
