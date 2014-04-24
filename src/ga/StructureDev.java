@@ -1,3 +1,4 @@
+/* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -42,6 +43,7 @@ public final class StructureDev implements Development, Serializable {
 	static final long serialVersionUID = 1;
 	
 	private Boolean useNiggliReducedCell;
+	private Boolean use2DNiggliReducedCell;
 	
 	private RedundancyGuard rGuard;
 	private Boolean useWholePopRG;
@@ -53,6 +55,7 @@ public final class StructureDev implements Development, Serializable {
 		GAParameters params = GAParameters.getParams();
 		
 		useNiggliReducedCell = params.getUseNiggliReducedCell();
+		use2DNiggliReducedCell = params.getUse2DNiggliReducedCell();
 		
 		String rgType = params.getRedundancyGuardType();
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
@@ -72,7 +75,8 @@ public final class StructureDev implements Development, Serializable {
 		StringBuilder result = new StringBuilder();
 		
 		result.append("StructureDev development. useNiggliReducedCell: "
-				+ useNiggliReducedCell + ", rGuard:" + rGuard);
+				+ useNiggliReducedCell + ", use2DNiggliReducedCell: " + 
+				use2DNiggliReducedCell + ", rGuard: " + rGuard);
 		
 		return result.toString();
 	}
@@ -132,6 +136,16 @@ public final class StructureDev implements Development, Serializable {
 			s.standardize();
 			if (!s.isReduced()) {
 				GAOut.out().stdout("Organism " + s.getID() + " failed Niggli reduction.", GAOut.NOTICE, s.getID());
+				return false;
+			}
+		}
+		
+		
+		// use the 2D Niggli reduced cell 
+		if (use2DNiggliReducedCell ) {
+			s.standardize2D();
+			if (!s.isReduced()) {
+				GAOut.out().stdout("Organism " + s.getID() + " failed 2D Niggli reduction.", GAOut.NOTICE, s.getID());
 				return false;
 			}
 		}

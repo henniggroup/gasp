@@ -18,7 +18,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
-
 package utility;
 
 // from http://www.devx.com/tips/Tip/13004

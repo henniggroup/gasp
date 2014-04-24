@@ -1,3 +1,4 @@
+/* Genetic algorithm for crystal structure prediction.  Will Tipton.  2010. */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -78,9 +79,9 @@ public class LammpsEnergy implements Energy {
 	}
 
 	// returns a structure representation in format parse-able by Lammps
-	public static String getLammpsDataFile(Cell c) {
+	public static String getLammpsDataFile(Cell cell) {
 		
-		Cell cell = c.getCellRotatedIntoPrincDirs();
+		cell.rotatedIntoPrincDirs();
 		CompositionSpace compSpace = GAParameters.getParams().getCompSpace();
 		//example:
 		/* 
@@ -391,7 +392,8 @@ Atoms
 	    //     The displacement in a skewed direction must be less than half the box length in that dimension. 
 		//     E.g. the xy tilt must be between -half and +half of the x box length. 
 		
-		Cell cell = o.getCell().getCellRotatedIntoPrincDirs();
+		Cell cell = o.getCell();
+		cell.rotatedIntoPrincDirs();
 		
 		double xlo = 0, xhi = cell.getLatticeVectors().get(0).getCartesianComponents().get(0);
 		double ylo = 0, yhi = cell.getLatticeVectors().get(1).getCartesianComponents().get(1);

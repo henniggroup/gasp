@@ -18,7 +18,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
-
 package utility;
 
 // this is updated automatically by a cron job on wills machine.
@@ -26,7 +25,5 @@ package utility;
 // helpful to set auto-refresh in workspace prefs in eclipse.
 
 public class BuildDate {
-
-	public static final String buildDate = "Tues Mar 11 21:20:02 EDT 2014";
-
+	public static final String buildDate = "Fri Aug 16 21:20:02 EDT 2013";
 }

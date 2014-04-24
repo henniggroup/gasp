@@ -1,3 +1,4 @@
+/* Genetic algorithm for crystal structure prediction.  */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -18,6 +19,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
+
 
 package ga;
 

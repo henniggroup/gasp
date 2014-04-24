@@ -266,7 +266,8 @@ public class SupercellOptimizer {
 		
 		// maybe rotate the cell into principle directions
 		if (rotate)
-			outputCell = outputCell.getCellRotatedIntoPrincDirs();
+			outputCell.rotatedIntoPrincDirs();
+
 		
 		// maybe 
 		if (niggliReduce)

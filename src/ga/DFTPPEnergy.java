@@ -19,6 +19,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     */
 
+
 package ga;
 
 import java.io.BufferedReader;

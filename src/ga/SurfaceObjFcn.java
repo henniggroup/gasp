@@ -1,3 +1,5 @@
+package ga;
+
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -18,8 +20,6 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
-
-package ga;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -58,7 +58,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	private void padOrg() {
 		Cell oldCell = org.getCell();
 		
-		oldCell = oldCell.getCellRotatedIntoPrincDirs(); 
+		oldCell.rotatedIntoPrincDirs(); 
 		
 		List<Vect> basis = new ArrayList<Vect>();
 		basis.add(oldCell.getLatticeVectors().get(0));
@@ -79,20 +79,20 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	 * from the cell without changing the relative positions of the atoms. The magnitude 
 	 * of the vertical cell vector of the unpadded cell is equal to the vertical distance 
 	 * between highest and lowest atoms in the cell plus the minimum interatomic distance 
-	 * (mid). The atoms are arranged in the unpadded cell such that the highest atom is 
-	 * mid/2 from the top of cell, and the lowest atom is mid/2 from the bottom of the cell.   
+	 * (mid). The atoms are arranged in the unpadded cell such that highest atom is mid/2 
+	 * from the top of cell, and the lowest atom is mid/2 from the bottom of the cell.   
 	 */
 	private void unpadOrg() {
 		Cell oldCell = org.getCell();
 		if (oldCell == null)
 			return;
 		
-		oldCell = oldCell.getCellRotatedIntoPrincDirs();
+		oldCell.rotatedIntoPrincDirs();
 		double mid; // minimum interatomic distance
 		
 		// get the largest minimum interatomic distance
 		if (GAParameters.getParams().getMinInteratomicDistance() == -1) {
-			mid = maxMID();	
+			mid =  maxMID();	
 		} else {
 			mid = GAParameters.getParams().getMinInteratomicDistance();
 		}
@@ -136,14 +136,13 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		for (int i = 0; i < tripletList.size(); i++) {
 			MIDs[i] = tripletList.get(i).getThird();
 		}
-		
 		// Searches through the array and returns the max value
 		double mid = 0;
 		for (int j = 0; j < MIDs.length; j++) {
 			if (MIDs[j] > mid) {
 				mid = MIDs[j];
-			} 
-		} 
+			}
+		}
 		return mid;
 	}
 	
@@ -192,31 +191,59 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	
 	// for testing
 	
+/*	public static void main(String args[]) {
+		
+		
+		String arg[] = {"20", "hi"};
+		
+		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/padding_testing/POSCAR"));
+=======
 	public static void main(String args[]) {
 		
 		
 		String arg[] = {"7", "hi"};
 		
+<<<<<<< HEAD
 		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111.POSCAR"));
+=======
+		StructureOrg c = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.POSCAR"));
+>>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
+>>>>>>> 2206bced5b8c9b683a86f59b8b41bbf3d04eeb75
 		
 		// Convert array of strings to list of strings for the constructor
 		List<String> larg = Arrays.asList(arg);
 		
 		SurfaceObjFcn cof = new SurfaceObjFcn(larg, c);
 		
+<<<<<<< HEAD
+		cof.padOrg();
+		
+		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.padded.cif");
+		
+		cof.unpadOrg();
+		
+		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.unpadded.cif");
+		
+		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
+
+	}*/
 	//	cof.unpadOrg();
 		
 //		c.getCell().writeCIF("/Users/benjaminrevard/GA/padding_testing/POSCAR.padded.cif");
 		
-		cof.unpadOrg();
+		//cof.unpadOrg();
 		
-		cof.padOrg();
+//		cof.padOrg();
 		
-		c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111.cif");
+
+//		c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111.cif");
 				
-		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111padded.POSCAR", false);
+//		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/some_structures/tri_111padded.POSCAR", false);
+
+		//c.getCell().writeCIF("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif");
+				
+		//(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/GA/vasp/InP/ch5_initial_structs/8733unpadded.POSCAR", false);
 		
 //		System.out.println(GAParameters.getParams().getMinInteratomicDistance());
 
 	} 
-}

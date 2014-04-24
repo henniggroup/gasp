@@ -1,3 +1,4 @@
+/* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
@@ -72,6 +73,11 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	
 	public void standardize() {
 		structure = structure.getCellWithAllAtomsInCell().getNigliReducedCell();
+		reduced = true;
+	}
+	
+	public void standardize2D() {
+		structure = structure.getCellWithAllAtomsInCell().getNigliReduced2DCell();
 		reduced = true;
 	}
 	

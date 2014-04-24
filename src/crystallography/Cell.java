@@ -53,6 +53,7 @@ import Jama.Matrix;
 
 import utility.*;
 import vasp.VaspOut;
+import vasp.VaspIn;
 import chemistry.*;
 
 //import org.openbabel.*;
@@ -299,7 +300,7 @@ public class Cell implements Serializable {
 		return false;
 	}
 	
-	public Cell getCellRotatedIntoPrincDirs() {
+	public void rotatedIntoPrincDirs() {
 		// so we keep all the sites with the same fractional coordinates
 		// and just make new axes with the same lengths/angles but in
 		// better directions
@@ -320,7 +321,8 @@ public class Cell implements Serializable {
 			newBasis.add(new Site(s.getElement(), new Vect(fracCoords.get(0), fracCoords.get(1), fracCoords.get(2), newCellVectors)));
 		}
 		
-		return new Cell (newCellVectors, newBasis, getLabel());
+		this.latticeVectors = newCellVectors;
+		this.basis = newBasis;
 	}
 	
 	public double getVolume() {
@@ -474,11 +476,45 @@ public class Cell implements Serializable {
     public Cell getNigliReducedCell() {
     	if (niggliReducedCell != null)
     		return niggliReducedCell;
+
+    	Cell result = getNiggliCell();    
+        niggliReducedCell = result;
+        return niggliReducedCell; 
+    }
+
     
-//    	if (true)
-//throw new RuntimeException("nrc");
-    	    	
-        double TOL = 1e-8;
+	/**
+     * Method returning the reduced version of a 2D Niggli cell
+     * with c lattice parameter perpendicular to ab plane
+     */
+    private Cell niggliReduced2DCell;
+    public Cell getNigliReduced2DCell() {
+    	if (niggliReduced2DCell != null)
+    		return niggliReduced2DCell;
+    
+    	rotatedIntoPrincDirs();
+		
+		List<Vect> vectors = new ArrayList<Vect>();
+		vectors.add(this.getLatticeVectors().get(0));
+		vectors.add(this.getLatticeVectors().get(1));  
+		double k = this.getCellLengths()[2];   
+		vectors.add(new Vect(0.0, 0.0, k));
+		
+		List<Site> newSites = new ArrayList<Site>();
+		for (Site s : this.getSites())
+			newSites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, k/2.0))));	
+		
+		latticeVectors = vectors;
+		basis = newSites;
+		
+        Cell result = getNiggliCell();
+        niggliReduced2DCell = result; 
+        return niggliReduced2DCell; 
+    }
+    
+    
+    private Cell getNiggliCell() {
+    	double TOL = 1e-8;
 
         // Initialize matrices for tranformations (3x3).
         double[][] m1 = new double[3][3];
@@ -639,7 +675,7 @@ public class Cell implements Serializable {
 
             // Step 8
             if ((ksi + eta + zeta + a + b < 0)
-                    || ((ksi + eta + zeta + a + b < 0) && (2.0 * (a + eta)
+                    || ((ksi + eta + zeta + a + b== 0) && (2.0 * (a + eta)
                             + zeta > 0))) {
             	P = (new Matrix(P)).times(new Matrix(m8)).getArray();
     //            P = MatrixMath.SquareMatrixMult(P, m8);
@@ -707,25 +743,16 @@ public class Cell implements Serializable {
                           System.out.println(poutdat[j]);
         }
 
-  //      result.setDescription(this.getDescription());
-  /*      for (int i = 0; i < this.m_sites.length; i++) {
-            Vect p = this.m_sites[i].m_loc;
-            Vect scaledPoint = p.inBasis(nigglibasis);
-            scaledPoint = result.translateIntoCell(scaledPoint);
-            result.addSiteChecked(new Site(scaledPoint, this.m_sites[i].m_sp,
-                    this.m_sites[i].m_occ));
-        } */
-        
         if (this.getBasisSize() != result.getBasisSize()) {
         	GAOut.out().stdout("ERROR: Niggli cell reduction gained or lost atoms", GAOut.CRITICAL);
         	GAOut.out().stdout(this.toString(), GAOut.CRITICAL);
         	GAOut.out().stdout(result.toString(), GAOut.CRITICAL);
         	(new Exception()).printStackTrace();
         }
-        
-        niggliReducedCell = result;
-        return result; 
+
+        return result;
     }
+
 
 
 	public Site getSite(int i) {
@@ -1387,6 +1414,7 @@ public class Cell implements Serializable {
 		return answer;
 	} 
 	
+
 	/**
 	 * Determines if the cell satisfies the per species minimum interatomic distance constraints.
 	 * Precondition: the perSpeciedMID option has been used
@@ -1560,6 +1588,28 @@ public class Cell implements Serializable {
 	/*	Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/materials/POSCAR");
 		System.out.println(a.toString());
 		System.out.println(a.getHeight()); */
+	//ist<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+	//erSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
+	//	Element.getElemFromSymbol("Al"),0.02));
+	//ell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
+	//ystem.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+		
+		/*
+		String [] set = {"14430", "22924", "14495", 
+				"14438", "14440", "14455", "14461", "14465", "14475",
+				"14492", "14493"};
+		
+		for (int i = 0; i<set.length; i++) {
+		*/
+		//for (int i = 1; i<=5; i++) {
+			Cell c = VaspOut.getPOSCAR("/Users/AnnaYesypenko/Desktop/POSCARS/test2.POSCAR");
+			c.rotatedIntoPrincDirs();
+			Cell d = c.getNigliReduced2DCell();
+			System.out.println(c.toStringJustVectors());
+			System.out.println(d.toStringJustVectors());
+			VaspIn.writePoscar(d, "/Users/AnnaYesypenko/Desktop/POSCARS/result2.POSCAR", true);
+		
+		//}
 //		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
 //		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Al"),
 //				Element.getElemFromSymbol("Al"),0.02));
@@ -1571,8 +1621,8 @@ public class Cell implements Serializable {
 		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("Si"), 1.51));
 		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Si"), Element.getElemFromSymbol("Si"), 1.84));
 		
-		Cell c = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
-		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
+		System.out.println(f.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
 
 
 	//	a.getNigliReducedCell();
@@ -1659,4 +1709,4 @@ public class Cell implements Serializable {
 	}
 
 	
-}
+	}
