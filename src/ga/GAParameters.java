@@ -126,6 +126,8 @@ public class GAParameters implements Serializable {
 	private double maxNearestNeighborLength = 0;
 	private boolean useNiggliReducedCell = false;
 	private boolean use2DNiggliReducedCell = false;
+	private boolean useSubstrate = false;
+	private Cell substrate = null;
 	private boolean writeHartkeFile = false;
 	
 	private boolean colorOutput = true;
