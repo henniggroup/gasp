@@ -28,16 +28,14 @@ import java.io.*;
 
 import optimization.PDObjFcn;
 import pdvisual.*;
-
 import chemistry.CompositionSpace;
 import chemistry.Element;
-
 import utility.ArgumentParser;
 import utility.Pair;
 import utility.Utility;
 import utility.Triplet;
 import vasp.VaspIn;
-
+import vasp.VaspOut;
 import crystallography.Cell;
 import crystallography.Isotropy;
 
@@ -241,6 +239,7 @@ public class GAParameters implements Serializable {
 		System.out.println("   --endgameNumGens <n>");
 		System.out.println("   --useNiggliReducedCell <true|false>");
 		System.out.println("   --use2DNiggliReducedCell <true|false>");
+		System.out.println("   --useSubstrate <true|false> <path to substrate POSCAR file");
 		System.out.println("   --writeHartkeFile <boolean>");
 		System.out.println("   --colorOutput <boolean>");
 		System.out.println("Initial Population");
@@ -253,6 +252,8 @@ public class GAParameters implements Serializable {
 		System.out.println("   --initialPopulation <num> supercell a b c maxll minll maxla minla maxh maxna minna <randomsocreator args>");
 		System.out.println("Objective Functions");
 		System.out.println("   --objectiveFunction cluster <padding length> <other obj fcn args from below...>");
+		System.out.println("   --objectiveFunction surface <padding length> <other obj fcn args from below...>");
+		System.out.println("   --objectiveFunction substrate <padding length> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
 		System.out.println("   --objectiveFunction <epa/pd> ohmms <header> <footer> <cautious?>");
@@ -368,7 +369,11 @@ public class GAParameters implements Serializable {
 				useNiggliReducedCell = Boolean.parseBoolean(arguments.get(0));
 			else if (flag.equalsIgnoreCase("use2DNiggliReducedCell"))
 				use2DNiggliReducedCell = Boolean.parseBoolean(arguments.get(0));
-			else if (flag.equalsIgnoreCase("popSize"))
+			else if (flag.equalsIgnoreCase("use2DNiggliReducedCell")) {
+				useSubstrate = Boolean.parseBoolean(arguments.get(0));
+				if (useSubstrate)
+					substrate = VaspOut.getPOSCAR(arguments.get(1));
+			} else if (flag.equalsIgnoreCase("popSize"))
 				popSize = Integer.parseInt(arguments.get(0));
 			else if (flag.equalsIgnoreCase("keepTempFiles"))
 				keepTempFiles = Boolean.parseBoolean(arguments.get(0));
@@ -798,12 +803,20 @@ public class GAParameters implements Serializable {
 		return endGameNumGens;
 	}
 	
-	public boolean getUseNiggliReducedCell() {
+	public boolean usingNiggliReducedCell() {
 		return useNiggliReducedCell;
 	}
 	
-	public boolean getUse2DNiggliReducedCell() {
+	public boolean using2DNiggliReducedCell() {
 		return use2DNiggliReducedCell;
+	}
+	
+	public boolean usingSubstrate() {
+		return useSubstrate;
+	}
+	
+	public Cell getSubstrate() {
+		return substrate;
 	}
 	
 	public Boolean getKeepTempFiles() {

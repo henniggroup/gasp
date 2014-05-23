@@ -54,8 +54,8 @@ public final class StructureDev implements Development, Serializable {
 	public StructureDev() {
 		GAParameters params = GAParameters.getParams();
 		
-		useNiggliReducedCell = params.getUseNiggliReducedCell();
-		use2DNiggliReducedCell = params.getUse2DNiggliReducedCell();
+		useNiggliReducedCell = params.usingNiggliReducedCell();
+		use2DNiggliReducedCell = params.using2DNiggliReducedCell();
 		
 		String rgType = params.getRedundancyGuardType();
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
@@ -114,6 +114,17 @@ public final class StructureDev implements Development, Serializable {
 		if (s.getCell().isMalformed()) {
 			GAOut.out().stdout("Organism " + s.getID() + " failed: had malformed cell.", GAOut.NOTICE, s.getID());
 			return false;
+		}
+		
+		if(params.usingSubstrate()) {
+			Cell oldCell = s.getCell();
+			List<Vect> newBasis = params.getSubstrate().getLatticeVectors();
+			List<Site> newSites = new ArrayList<Site>();
+			for (Site site : oldCell.getSites()) {
+				site.getCoords().changeBasis(newBasis);
+				newSites.add(site);
+			}
+			s.setCell(new Cell (newBasis, newSites, oldCell.getLabel()));
 		}
 		
 		// Interatomic Distances

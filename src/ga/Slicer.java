@@ -140,7 +140,7 @@ public final class Slicer implements Variation {
 		
 		Cell result = new Cell(newVects, newSites, c.getLabel());
 		
-		if (GAParameters.getParams().getUseNiggliReducedCell())
+		if (GAParameters.getParams().usingNiggliReducedCell())
 			return result.getNigliReducedCell();
 		else
 			return result;

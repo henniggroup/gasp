@@ -55,7 +55,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	 * of the c lattice vector (which is now aligned vertically). Takes care of atomic sites 
 	 * so that the relative positions of the atoms are the same in the padded cell as the original.
 	 */
-	private void padOrg() {
+	void padOrg() {
 		Cell oldCell = org.getCell();
 		
 		oldCell.rotatedIntoPrincDirs(); 
@@ -79,15 +79,10 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 	 * from the cell without changing the relative positions of the atoms. The magnitude 
 	 * of the vertical cell vector of the unpadded cell is equal to the vertical distance 
 	 * between highest and lowest atoms in the cell plus the minimum interatomic distance 
-<<<<<<< HEAD
 	 * (mid). The atoms are arranged in the unpadded cell such that highest atom is mid/2 
 	 * from the top of cell, and the lowest atom is mid/2 from the bottom of the cell.   
-=======
-	 * (mid). The atoms are arranged in the unpadded cell such that the highest atom is 
-	 * mid/2 from the top of cell, and the lowest atom is mid/2 from the bottom of the cell.   
->>>>>>> 0e3189c40547bbd59ea42c4f91890d7511fb7797
 	 */
-	private void unpadOrg() {
+	void unpadOrg() {
 		Cell oldCell = org.getCell();
 		if (oldCell == null)
 			return;
@@ -102,19 +97,12 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 			mid = GAParameters.getParams().getMinInteratomicDistance();
 		}
 
-		// get a bounding box for the atoms
-		double minz = Double.MAX_VALUE;
-		double maxz = Double.MIN_VALUE;
-		for (Site s : oldCell.getSites()) {
-			List<Double> cartComps = s.getCoords().getCartesianComponents();
-			minz = Math.min(minz, cartComps.get(2));
-			maxz = Math.max(maxz, cartComps.get(2));
-		}
-		double zlen = maxz - minz;
+		double [] bounds = getAtomBox(oldCell);
+		double zlen = bounds[1] - bounds[0];
 		
 		// make new list of sites where we subtract (0,0,minz-mid/2) off all the old ones
 		List<Site> newSites = new ArrayList<Site>();
-		Vect minv = new Vect(0.0, 0.0, minz - mid/2);
+		Vect minv = new Vect(0.0, 0.0, bounds[0] - mid/2);
 		for (Site s : oldCell.getSites())
 			newSites.add(new Site(s.getElement(), s.getCoords().subtract(minv)));
 		
@@ -129,7 +117,18 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		
 	}
 	
-	
+	// returns a bounding box for the atoms (minz, maxz)
+	double[] getAtomBox(Cell cell) {
+		double minz = Double.MAX_VALUE;
+		double maxz = Double.MIN_VALUE;
+		for (Site s : cell.getSites()) {
+			List<Double> cartComps = s.getCoords().getCartesianComponents();
+			minz = Math.min(minz, cartComps.get(2));
+			maxz = Math.max(maxz, cartComps.get(2));
+		}
+		return new double [] {minz, maxz};
+	}
+
 	/**
 	 * Returns the largest per species minimum interatomic distance
 	 * Precondition: the perSpeciesMID option has been used

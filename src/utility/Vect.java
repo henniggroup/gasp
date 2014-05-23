@@ -38,10 +38,11 @@ public class Vect implements Serializable {
 	static final long serialVersionUID = 1l;
 	
 	/* fractional coordinates */
-	//private Double u,v,w;
-	List<Double> u ;
+	private List<Double> frac;
+	/* cartesian coordinates */
+	private List<Double> cart;
 	/* basis given in cartesian coordinates */
-	//private List<Vect> basis;
+	private List<Vect> basis;
 	
 	public Vect(List<Double> cartComps) {
 		this(cartComps, null);
@@ -49,26 +50,31 @@ public class Vect implements Serializable {
 	
 	public Vect (List<Double> cartComps, List<Vect> _basis) {
 		
-		if (_basis != null)
-			u = getCartCompsFromNoncartComps(cartComps,_basis);
-		else
-			u = new ArrayList<Double>(cartComps);
+		if (_basis != null) {
+			basis = _basis;
+			frac = cartComps;
+			setCartCoordToMatchFracCoord();
+		} else
+			cart = new ArrayList<Double>(cartComps);
 	}
 	public Vect(Double _u, Double _v, Double _w) {
 		this(_u,_v,_w,null);	
 	}
 	
 	public Vect(Double _u, Double _v, Double _w, List<Vect> _basis) {
-		u = new ArrayList<Double>();
-		u.add(_u); u.add(_v); u.add(_w);
-
 		if (_basis != null) {
+			basis = _basis;
+			frac = new ArrayList<Double>();
+			frac.add(_u); frac.add(_v); frac.add(_w);
 			// A null basis indicates that u,v,and w are cartesian coords,
 			// i.e. the basis is the standard unit vectors 
 			// Make sure our basis has three vectors 
 			if (_basis.size() != 3)
 				throw new IllegalArgumentException("ThreeVector given basis with other than 3 vectors.");
-			u = getCartCompsFromNoncartComps(u,_basis);
+			setCartCoordToMatchFracCoord();
+		} else {
+			cart = new ArrayList<Double>();
+			cart.add(_u); cart.add(_v); cart.add(_w);
 		}
 	}
 	
@@ -92,11 +98,11 @@ public class Vect implements Serializable {
 	}
 
 	public List<Double> getCartesianComponents() {
-		return new ArrayList<Double>(u);
+		return new ArrayList<Double>(cart);
 	}
 	
-	private static List<Double> getCartCompsFromNoncartComps(List<Double> coefs, List<Vect> basis) {
-		if (basis.isEmpty() || coefs.size() != basis.get(0).getDimension())
+	private void setCartCoordToMatchFracCoord() {
+		if (basis.isEmpty() || frac.size() != basis.get(0).getDimension())
 			throw new RuntimeException("Vect.getCartCompsFromNoncartComps");
 		
 		int dim = basis.get(0).getDimension();
@@ -104,10 +110,10 @@ public class Vect implements Serializable {
 		for (int i = 0; i < dim; i++){
 			double entry = 0;
 			for (int j = 0; j < dim; j++)
-				entry += coefs.get(j) * basis.get(j).getCartesianComponents().get(i);
+				entry += frac.get(j) * basis.get(j).getCartesianComponents().get(i);
 			result.add(entry);
 		}
-		return result;
+		cart = result;
 	
 	}
 	
@@ -169,7 +175,7 @@ public class Vect implements Serializable {
 	public Vect scalarMult(Double s) {
 		List<Double> newV = new ArrayList<Double>();
 		for (int i = 0; i < getDimension(); i++)
-			newV.add(s * u.get(i));
+			newV.add(s * cart.get(i));
 
 		return new Vect(newV);
 	}
@@ -194,6 +200,12 @@ public class Vect implements Serializable {
 			zhat = new Vect(0.0,0.0,1.0);
 		return zhat;
 	}
+	
+	public void changeBasis(List<Vect> basis) {
+		this.basis = basis;
+		frac = getComponentsWRTBasis(basis);
+		setCartCoordToMatchFracCoord();
+	}
 
 	/* Find the coordinates of our ThreeVector with respect to an alternate basis.
 	 * We have:
@@ -205,7 +217,7 @@ public class Vect implements Serializable {
 	 *  - see if running Jama's least-squares routine actually gives better results
 	 *    than solving the system "manually".
 	 */
-	public List<Double> getComponentsWRTBasis(List<Vect> basis) {
+	private List<Double> getComponentsWRTBasis(List<Vect> basis) {
 		int dim = getDimension();
 		
 		if (basis.size() != dim)
@@ -305,7 +317,7 @@ public class Vect implements Serializable {
 	}
 	
 	public int getDimension() {
-		return u.size();
+		return cart.size();
 	}
 	
 	public Double length() {
