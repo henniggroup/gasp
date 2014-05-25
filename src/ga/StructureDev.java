@@ -29,7 +29,7 @@ import java.util.*;
 
 import utility.Utility;
 import utility.Vect;
-
+import vasp.VaspOut;
 import crystallography.Cell;
 import crystallography.Site;
 
@@ -118,13 +118,18 @@ public final class StructureDev implements Development, Serializable {
 		
 		if(params.usingSubstrate()) {
 			Cell oldCell = s.getCell();
-			List<Vect> newBasis = params.getSubstrate().getLatticeVectors();
+			Cell substrate = params.getSubstrate();
+			List<Vect> newBasis = new ArrayList<Vect>();
+			newBasis.add(substrate.getLatticeVectors().get(0));
+			newBasis.add(substrate.getLatticeVectors().get(1));
+			newBasis.add(oldCell.getLatticeVectors().get(2));
 			List<Site> newSites = new ArrayList<Site>();
 			for (Site site : oldCell.getSites()) {
-				site.getCoords().changeBasis(newBasis);
-				newSites.add(site);
+				Vect v = site.getCoords().changeBasis(newBasis);
+				newSites.add(new Site(site.getElement(), v));
 			}
-			s.setCell(new Cell (newBasis, newSites, oldCell.getLabel()));
+			Cell newCell = new Cell(newBasis, newSites, oldCell.getLabel());
+			s.setCell(newCell);
 		}
 		
 		// Interatomic Distances

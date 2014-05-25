@@ -23,6 +23,10 @@ package utility;
 import java.io.Serializable;
 import java.util.*;
 
+import vasp.VaspIn;
+import vasp.VaspOut;
+import crystallography.Cell;
+import crystallography.Site;
 import Jama.*;
 /*  Represents a vector.
  *  Immutable!
@@ -114,7 +118,6 @@ public class Vect implements Serializable {
 			result.add(entry);
 		}
 		cart = result;
-	
 	}
 	
 	public Vect plusWRT(Vect shift, List<Vect> basis) {
@@ -201,10 +204,8 @@ public class Vect implements Serializable {
 		return zhat;
 	}
 	
-	public void changeBasis(List<Vect> basis) {
-		this.basis = basis;
-		frac = getComponentsWRTBasis(basis);
-		setCartCoordToMatchFracCoord();
+	public Vect changeBasis(List<Vect> basis) {
+		return new Vect(this.frac, basis);
 	}
 
 	/* Find the coordinates of our ThreeVector with respect to an alternate basis.
@@ -217,7 +218,7 @@ public class Vect implements Serializable {
 	 *  - see if running Jama's least-squares routine actually gives better results
 	 *    than solving the system "manually".
 	 */
-	private List<Double> getComponentsWRTBasis(List<Vect> basis) {
+	public List<Double> getComponentsWRTBasis(List<Vect> basis) {
 		int dim = getDimension();
 		
 		if (basis.size() != dim)
@@ -370,27 +371,62 @@ public class Vect implements Serializable {
 	 * For the sake of testing the ThreeVector class
 	 */
 	public static void main(String[] args) {
-		Vect bob = new Vect(1.0, 1.0, 1.0);
+//		Vect bob = new Vect(1.0, 1.0, 1.0);
+//		
+//		Vect e1 = new Vect(3.0, 0.0, 0.0);
+//		Vect e2 = new Vect(0.0, 3.0, 0.0);
+//		Vect e3 = new Vect(0.0, 0.0, 3.0);
+//		List<Vect> basis = new ArrayList<Vect>();
+//		basis.add(e1);
+//		basis.add(e2);
+//		basis.add(e3);
+//		
+//		Vect shift = new Vect(-2.0,-1.0,-2.0);
+//		
+//		bob = bob.plusWRT(shift, basis);
+//		
+//		System.out.println(bob);
+//		
+//		List<Double> components = bob.getComponentsWRTBasis(basis);
+//		System.out.println(components.get(0) + " " + components.get(1) + " " + components.get(2));
+//		
+//		System.out.println(e1.cross(e2));
+//		System.out.println(Vect.pointsAreCollinear(e1, e2, e3, 0.0001));
 		
-		Vect e1 = new Vect(3.0, 0.0, 0.0);
-		Vect e2 = new Vect(0.0, 3.0, 0.0);
-		Vect e3 = new Vect(0.0, 0.0, 3.0);
-		List<Vect> basis = new ArrayList<Vect>();
-		basis.add(e1);
-		basis.add(e2);
-		basis.add(e3);
 		
-		Vect shift = new Vect(-2.0,-1.0,-2.0);
+		//Cell substrate = VaspOut.getPOSCAR("/home/ay256/Desktop/23.POSCAR");
+//		List<Vect> basis = new ArrayList<Vect>();
+//		basis.add(new Vect (1.0, 0.0, 0.0));
+//		basis.add(new Vect (0.0, 1.0, 0.0));
+//		basis.add(new Vect (0.0, 0.0, 1.0));
+//		System.out.println("Making Vect v");
+//		Vect v = new Vect(0.5, 0.5, 0.5, basis);
+//		System.out.println(v.toString());
+//		List<Vect> newBasis = new ArrayList<Vect>();
+//		newBasis.add(new Vect (2.0, 0.0, 0.0));
+//		newBasis.add(new Vect (0.0, 2.0, 0.0));
+//		newBasis.add(new Vect (0.0, 0.0, 2.0));
+//		v.changeBasis(newBasis);
+//		assert v.basis == newBasis;
+//		for (Double d : v.frac)
+//			System.out.println("fractional coord" + d);
+//		System.out.println("After changing basis: " + v.toString());
 		
-		bob = bob.plusWRT(shift, basis);
+		Cell oldCell = VaspOut.getPOSCAR("/home/ay256/Desktop/2.vasp");
+		Cell substrate = VaspOut.getPOSCAR("/home/ay256/Desktop/23.POSCAR");
+		List<Vect> newBasis = new ArrayList<Vect>();
+		newBasis.add(substrate.getLatticeVectors().get(0));
+		newBasis.add(substrate.getLatticeVectors().get(1));
+		newBasis.add(oldCell.getLatticeVectors().get(2));
+		List<Site> newSites = new ArrayList<Site>();
+		for (Site site : oldCell.getSites()) {
+			Vect v = site.getCoords().changeBasis(newBasis);
+			newSites.add(new Site(site.getElement(), v));
+		}
+		Cell newCell = new Cell(newBasis, newSites, oldCell.getLabel());
+		VaspIn.writePoscar(newCell, "/home/ay256/Desktop/newCell.vasp", true);
+		VaspIn.writePoscar(oldCell, "/home/ay256/Desktop/oldCell.vasp", true);
 		
-		System.out.println(bob);
-		
-		List<Double> components = bob.getComponentsWRTBasis(basis);
-		System.out.println(components.get(0) + " " + components.get(1) + " " + components.get(2));
-		
-		System.out.println(e1.cross(e2));
-		System.out.println(Vect.pointsAreCollinear(e1, e2, e3, 0.0001));
 	}
 
 
