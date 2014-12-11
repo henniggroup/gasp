@@ -25,9 +25,7 @@ package ga;
 import java.util.*;
 
 import utility.Vect;
-
 import crystallography.*;
-
 import chemistry.*;
 
 
@@ -109,12 +107,10 @@ public class RandomSOCreator implements StructureOrgCreator {
 		double maxla = params.getMaxLatticeAngleDegrees();
 		double minla = params.getMinLatticeAngleDegrees();		
 		double maxh = params.getMaxCellHeight();
-		int maxna = params.getMaxNumAtoms();
-		int minna = params.getMinNumAtoms();
-		return makeRandomLattice(maxll, minll, maxla, minla, maxh, maxna, minna);
+		return makeRandomLattice(maxll, minll, maxla, minla, maxh);
 	}
 	
-	public static List<Vect> makeRandomLattice(double maxll, double minll, double maxla, double minla, double maxh, int maxna, int minna) {
+	public static List<Vect> makeRandomLattice(double maxll, double minll, double maxla, double minla, double maxh) {
 		
 		Random rand = GAParameters.getParams().getRandom();
 		
@@ -128,6 +124,29 @@ public class RandomSOCreator implements StructureOrgCreator {
 		
 		double la = rand.nextDouble()*(maxll-minll)+minll;
 		double lb = rand.nextDouble()*(maxll-minll)+minll;
+		
+		//TODO: FIXME: maximum z lattice length
+		// should be correctly constrained by maxCellHeight
+		double maxZll = Math.min(maxll,2*maxh);
+		
+		double lc = rand.nextDouble()*(maxZll-minll)+minll;
+		
+		return (new Cell(la,lb,lc,adeg,bdeg,gdeg,null,null)).getLatticeVectors();
+	}
+	
+	private List<Vect> makeSubstrateLattice(Cell substrate, double maxll, double minll, double maxla, double minla, double maxh) {
+		Random rand = GAParameters.getParams().getRandom();
+		
+		// sum of the angles needs to be < 360 degrees
+		double adeg, bdeg;
+		double gdeg = substrate.getCellAnglesDegrees()[2];
+		do {
+			adeg = (rand.nextDouble()*(maxla-minla)+minla);
+			bdeg = (rand.nextDouble()*(maxla-minla)+minla);
+		} while (!GAUtils.satisfiesTriangleInequality(adeg, bdeg, gdeg) || adeg + bdeg + gdeg >= 360);
+		
+		double la = substrate.getCellLengths()[0];
+		double lb = substrate.getCellLengths()[1];
 		
 		//TODO: FIXME: maximum z lattice length
 		// should be correctly constrained by maxCellHeight
@@ -152,7 +171,11 @@ public class RandomSOCreator implements StructureOrgCreator {
 
 		// make random lattice parameters satisfying hard constraints
 		// the Basis for our new organism
-		List<Vect> latVects = makeRandomLattice(maxll, minll, maxla, minla, maxh, maxna, minna);
+		List<Vect> latVects;
+		if (params.usingSubstrate())
+			latVects = makeSubstrateLattice(params.getSubstrate(), maxll, minll, maxla, minla, maxh);
+		else
+			latVects = makeRandomLattice(maxll, minll, maxla, minla, maxh);
 
 		// make lists to hold the points and species which will make our new Structure
 		ArrayList<Site> sitesList = new ArrayList<Site>();
@@ -180,7 +203,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 
 		return new StructureOrg(newStructure);
 	}
-	
+
 	public StructureOrg makeOrganism(Generation g) {
 
 		StructureOrg o = makeRandomOrg();

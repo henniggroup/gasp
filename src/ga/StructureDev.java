@@ -29,7 +29,7 @@ import java.util.*;
 
 import utility.Utility;
 import utility.Vect;
-
+import vasp.VaspOut;
 import crystallography.Cell;
 import crystallography.Site;
 
@@ -54,8 +54,8 @@ public final class StructureDev implements Development, Serializable {
 	public StructureDev() {
 		GAParameters params = GAParameters.getParams();
 		
-		useNiggliReducedCell = params.getUseNiggliReducedCell();
-		use2DNiggliReducedCell = params.getUse2DNiggliReducedCell();
+		useNiggliReducedCell = params.usingNiggliReducedCell();
+		use2DNiggliReducedCell = params.using2DNiggliReducedCell();
 		
 		String rgType = params.getRedundancyGuardType();
 		useWholePopRG = (rgType.equalsIgnoreCase("both")||rgType.equalsIgnoreCase("wholePopulation"));
@@ -114,6 +114,22 @@ public final class StructureDev implements Development, Serializable {
 		if (s.getCell().isMalformed()) {
 			GAOut.out().stdout("Organism " + s.getID() + " failed: had malformed cell.", GAOut.NOTICE, s.getID());
 			return false;
+		}
+		
+		if(params.usingSubstrate()) {
+			Cell oldCell = s.getCell();
+			Cell substrate = params.getSubstrate();
+			List<Vect> newBasis = new ArrayList<Vect>();
+			newBasis.add(substrate.getLatticeVectors().get(0));
+			newBasis.add(substrate.getLatticeVectors().get(1));
+			newBasis.add(oldCell.getLatticeVectors().get(2));
+			List<Site> newSites = new ArrayList<Site>();
+			for (Site site : oldCell.getSites()) {
+				Vect v = site.getCoords().changeBasis(newBasis);
+				newSites.add(new Site(site.getElement(), v));
+			}
+			Cell newCell = new Cell(newBasis, newSites, oldCell.getLabel());
+			s.setCell(newCell);
 		}
 		
 		// Interatomic Distances

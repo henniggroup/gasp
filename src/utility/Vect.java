@@ -23,6 +23,10 @@ package utility;
 import java.io.Serializable;
 import java.util.*;
 
+import vasp.VaspIn;
+import vasp.VaspOut;
+import crystallography.Cell;
+import crystallography.Site;
 import Jama.*;
 /*  Represents a vector.
  *  Immutable!
@@ -38,10 +42,11 @@ public class Vect implements Serializable {
 	static final long serialVersionUID = 1l;
 	
 	/* fractional coordinates */
-	//private Double u,v,w;
-	List<Double> u ;
+	private List<Double> frac;
+	/* cartesian coordinates */
+	private List<Double> cart;
 	/* basis given in cartesian coordinates */
-	//private List<Vect> basis;
+	private List<Vect> basis;
 	
 	public Vect(List<Double> cartComps) {
 		this(cartComps, null);
@@ -49,26 +54,31 @@ public class Vect implements Serializable {
 	
 	public Vect (List<Double> cartComps, List<Vect> _basis) {
 		
-		if (_basis != null)
-			u = getCartCompsFromNoncartComps(cartComps,_basis);
-		else
-			u = new ArrayList<Double>(cartComps);
+		if (_basis != null) {
+			basis = _basis;
+			frac = cartComps;
+			setCartCoordToMatchFracCoord();
+		} else
+			cart = new ArrayList<Double>(cartComps);
 	}
 	public Vect(Double _u, Double _v, Double _w) {
 		this(_u,_v,_w,null);	
 	}
 	
 	public Vect(Double _u, Double _v, Double _w, List<Vect> _basis) {
-		u = new ArrayList<Double>();
-		u.add(_u); u.add(_v); u.add(_w);
-
 		if (_basis != null) {
+			basis = _basis;
+			frac = new ArrayList<Double>();
+			frac.add(_u); frac.add(_v); frac.add(_w);
 			// A null basis indicates that u,v,and w are cartesian coords,
 			// i.e. the basis is the standard unit vectors 
 			// Make sure our basis has three vectors 
 			if (_basis.size() != 3)
 				throw new IllegalArgumentException("ThreeVector given basis with other than 3 vectors.");
-			u = getCartCompsFromNoncartComps(u,_basis);
+			setCartCoordToMatchFracCoord();
+		} else {
+			cart = new ArrayList<Double>();
+			cart.add(_u); cart.add(_v); cart.add(_w);
 		}
 	}
 	
@@ -92,11 +102,11 @@ public class Vect implements Serializable {
 	}
 
 	public List<Double> getCartesianComponents() {
-		return new ArrayList<Double>(u);
+		return new ArrayList<Double>(cart);
 	}
 	
-	private static List<Double> getCartCompsFromNoncartComps(List<Double> coefs, List<Vect> basis) {
-		if (basis.isEmpty() || coefs.size() != basis.get(0).getDimension())
+	private void setCartCoordToMatchFracCoord() {
+		if (basis.isEmpty() || frac.size() != basis.get(0).getDimension())
 			throw new RuntimeException("Vect.getCartCompsFromNoncartComps");
 		
 		int dim = basis.get(0).getDimension();
@@ -104,11 +114,10 @@ public class Vect implements Serializable {
 		for (int i = 0; i < dim; i++){
 			double entry = 0;
 			for (int j = 0; j < dim; j++)
-				entry += coefs.get(j) * basis.get(j).getCartesianComponents().get(i);
+				entry += frac.get(j) * basis.get(j).getCartesianComponents().get(i);
 			result.add(entry);
 		}
-		return result;
-	
+		cart = result;
 	}
 	
 	public Vect plusWRT(Vect shift, List<Vect> basis) {
@@ -169,7 +178,7 @@ public class Vect implements Serializable {
 	public Vect scalarMult(Double s) {
 		List<Double> newV = new ArrayList<Double>();
 		for (int i = 0; i < getDimension(); i++)
-			newV.add(s * u.get(i));
+			newV.add(s * cart.get(i));
 
 		return new Vect(newV);
 	}
@@ -193,6 +202,10 @@ public class Vect implements Serializable {
 		if (zhat == null)
 			zhat = new Vect(0.0,0.0,1.0);
 		return zhat;
+	}
+	
+	public Vect changeBasis(List<Vect> basis) {
+		return new Vect(this.frac, basis);
 	}
 
 	/* Find the coordinates of our ThreeVector with respect to an alternate basis.
@@ -305,7 +318,7 @@ public class Vect implements Serializable {
 	}
 	
 	public int getDimension() {
-		return u.size();
+		return cart.size();
 	}
 	
 	public Double length() {
@@ -358,27 +371,62 @@ public class Vect implements Serializable {
 	 * For the sake of testing the ThreeVector class
 	 */
 	public static void main(String[] args) {
-		Vect bob = new Vect(1.0, 1.0, 1.0);
+//		Vect bob = new Vect(1.0, 1.0, 1.0);
+//		
+//		Vect e1 = new Vect(3.0, 0.0, 0.0);
+//		Vect e2 = new Vect(0.0, 3.0, 0.0);
+//		Vect e3 = new Vect(0.0, 0.0, 3.0);
+//		List<Vect> basis = new ArrayList<Vect>();
+//		basis.add(e1);
+//		basis.add(e2);
+//		basis.add(e3);
+//		
+//		Vect shift = new Vect(-2.0,-1.0,-2.0);
+//		
+//		bob = bob.plusWRT(shift, basis);
+//		
+//		System.out.println(bob);
+//		
+//		List<Double> components = bob.getComponentsWRTBasis(basis);
+//		System.out.println(components.get(0) + " " + components.get(1) + " " + components.get(2));
+//		
+//		System.out.println(e1.cross(e2));
+//		System.out.println(Vect.pointsAreCollinear(e1, e2, e3, 0.0001));
 		
-		Vect e1 = new Vect(3.0, 0.0, 0.0);
-		Vect e2 = new Vect(0.0, 3.0, 0.0);
-		Vect e3 = new Vect(0.0, 0.0, 3.0);
-		List<Vect> basis = new ArrayList<Vect>();
-		basis.add(e1);
-		basis.add(e2);
-		basis.add(e3);
 		
-		Vect shift = new Vect(-2.0,-1.0,-2.0);
+		//Cell substrate = VaspOut.getPOSCAR("/home/ay256/Desktop/23.POSCAR");
+//		List<Vect> basis = new ArrayList<Vect>();
+//		basis.add(new Vect (1.0, 0.0, 0.0));
+//		basis.add(new Vect (0.0, 1.0, 0.0));
+//		basis.add(new Vect (0.0, 0.0, 1.0));
+//		System.out.println("Making Vect v");
+//		Vect v = new Vect(0.5, 0.5, 0.5, basis);
+//		System.out.println(v.toString());
+//		List<Vect> newBasis = new ArrayList<Vect>();
+//		newBasis.add(new Vect (2.0, 0.0, 0.0));
+//		newBasis.add(new Vect (0.0, 2.0, 0.0));
+//		newBasis.add(new Vect (0.0, 0.0, 2.0));
+//		v.changeBasis(newBasis);
+//		assert v.basis == newBasis;
+//		for (Double d : v.frac)
+//			System.out.println("fractional coord" + d);
+//		System.out.println("After changing basis: " + v.toString());
 		
-		bob = bob.plusWRT(shift, basis);
+		Cell oldCell = VaspOut.getPOSCAR("/home/ay256/Desktop/2.vasp");
+		Cell substrate = VaspOut.getPOSCAR("/home/ay256/Desktop/23.POSCAR");
+		List<Vect> newBasis = new ArrayList<Vect>();
+		newBasis.add(substrate.getLatticeVectors().get(0));
+		newBasis.add(substrate.getLatticeVectors().get(1));
+		newBasis.add(oldCell.getLatticeVectors().get(2));
+		List<Site> newSites = new ArrayList<Site>();
+		for (Site site : oldCell.getSites()) {
+			Vect v = site.getCoords().changeBasis(newBasis);
+			newSites.add(new Site(site.getElement(), v));
+		}
+		Cell newCell = new Cell(newBasis, newSites, oldCell.getLabel());
+		VaspIn.writePoscar(newCell, "/home/ay256/Desktop/newCell.vasp", true);
+		VaspIn.writePoscar(oldCell, "/home/ay256/Desktop/oldCell.vasp", true);
 		
-		System.out.println(bob);
-		
-		List<Double> components = bob.getComponentsWRTBasis(basis);
-		System.out.println(components.get(0) + " " + components.get(1) + " " + components.get(2));
-		
-		System.out.println(e1.cross(e2));
-		System.out.println(Vect.pointsAreCollinear(e1, e2, e3, 0.0001));
 	}
 
 
