@@ -34,6 +34,8 @@ import java.io.*;
 
 import utility.Constants;
 import utility.Vect;
+import vasp.VaspIn;
+import vasp.VaspOut;
 
 // Slicer is a Variation operation.  It selects two organisms
 // from the parent generation and creates an offspring organism.  The lattice
@@ -303,8 +305,11 @@ public final class Slicer implements Variation {
 	public static void main(String[] args) {
 		GAParameters params = GAParameters.getParams();
 		
-		StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
-		StructureOrg s2 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/44.cif")));
+	//	StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
+	//	StructureOrg s2 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/44.cif")));
+		
+		StructureOrg s1 = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/Mo.POSCAR"));
+		StructureOrg s2 = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/W.POSCAR"));
 		s1.setFitness(-1);
 		s2.setFitness(-1);
 		
@@ -312,18 +317,31 @@ public final class Slicer implements Variation {
 		parents.addOrganism(s1);
 		parents.addOrganism(s2);
 		
-		/*
-		String[] hsArgs = {"0.5", "0.0", "0", "0.00", "0", "0"};
+		
+		ArrayList<String> hsArgs = new ArrayList<String>(); 
+		hsArgs.add("0.5");
+		hsArgs.add("0.0");
+		hsArgs.add("0");
+		hsArgs.add("0.00");
+		hsArgs.add("0");
+		hsArgs.add("0");
+
 		Variation p = new Slicer(hsArgs);
-		String[] selArgs = {"2", "0"};
+		ArrayList<String> selArgs = new ArrayList<String>(); 
+		selArgs.add("2");
+		selArgs.add("0");
+
 		Selection sel = new ProbDistSelection(selArgs);
 		
 		StructureOrg o = (StructureOrg)p.doVariation(parents, null, sel);
-		System.out.println(o);
-		//GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false); 
-		o.standardize();
+		Cell child = o.getCell();
+		VaspIn.writePoscar(child, "/Users/benjaminrevard/Desktop/child.vasp", false);
+		
+	//	System.out.println(o);
+	//	GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false); 
+	//	o.standardize();
 		//GAUtils.writeStringToFile(o.getCIF(), new File("offspring_red.cif"), false); 
-		System.out.println(o); */
+	//	System.out.println(o); 
 
 	}
 }

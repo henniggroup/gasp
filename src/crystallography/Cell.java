@@ -1564,6 +1564,12 @@ public class Cell implements Serializable {
 
 		System.out.println(a.matchesCellNoPBCs(b, .1));
 */
+		
+//		Cell a = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/vasp/InP/111_slabs/1.POSCAR");
+//		a.rotatedIntoPrincDirs();
+		
+		
+//		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/Desktop/seven.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/Desktop/sevenpadded.POSCAR", false);
 		//Cell c2 = StructureOrg.parseCif(new File("/home/wtipton/cifs/2.cif"));
 		/*Cell a = Cell.parseCif(new File("/home/wtipton/andysexamples/205.cif"));
 		Cell b = Cell.parseCif(new File("/home/wtipton/andysexamples/29.cif"));
@@ -1602,12 +1608,12 @@ public class Cell implements Serializable {
 		for (int i = 0; i<set.length; i++) {
 		*/
 		//for (int i = 1; i<=5; i++) {
-			Cell c = VaspOut.getPOSCAR("/Users/AnnaYesypenko/Desktop/POSCARS/test2.POSCAR");
-			c.rotatedIntoPrincDirs();
-			Cell d = c.getNigliReduced2DCell();
-			System.out.println(c.toStringJustVectors());
-			System.out.println(d.toStringJustVectors());
-			VaspIn.writePoscar(d, "/Users/AnnaYesypenko/Desktop/POSCARS/result2.POSCAR", true);
+	//		Cell c = VaspOut.getPOSCAR("/Users/AnnaYesypenko/Desktop/POSCARS/test2.POSCAR");
+	//		c.rotatedIntoPrincDirs();
+	//		Cell d = c.getNigliReduced2DCell();
+	//		System.out.println(c.toStringJustVectors());
+	//		System.out.println(d.toStringJustVectors());
+	//		VaspIn.writePoscar(d, "/Users/AnnaYesypenko/Desktop/POSCARS/result2.POSCAR", true);
 		
 		//}
 //		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
@@ -1616,13 +1622,13 @@ public class Cell implements Serializable {
 //		Cell c = VaspOut.getPOSCAR("/home/wtipton/POSCAR");
 //		System.out.println(c.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
 		
-		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
-		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("C"), 1.13));
-		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("Si"), 1.51));
-		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Si"), Element.getElemFromSymbol("Si"), 1.84));
+//		List<Triplet<Element,Element,Double>> perSpeciesMIDs = new ArrayList<Triplet<Element,Element,Double>>();
+//		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("C"), 1.13));
+//		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("C"), Element.getElemFromSymbol("Si"), 1.51));
+//		perSpeciesMIDs.add(new Triplet<Element,Element,Double>(Element.getElemFromSymbol("Si"), Element.getElemFromSymbol("Si"), 1.84));
 		
-		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
-		System.out.println(f.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+//		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
+//		System.out.println(f.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
 
 
 	//	a.getNigliReducedCell();

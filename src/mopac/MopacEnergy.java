@@ -348,7 +348,7 @@ public class MopacEnergy implements Energy {
 		double d2 = Math.abs(n1.dot(center)) / n2.length();
 		double d3 = Math.abs(n1.dot(center)) / n3.length();
 	
-		if (d1 < minSphereRadius || d2 < minSphereRadius ||d3 < minSphereRadius)
+		if (d1 < minSphereRadius || d2 < minSphereRadius || d3 < minSphereRadius)
 			return true;
 		else		
 			return false;
