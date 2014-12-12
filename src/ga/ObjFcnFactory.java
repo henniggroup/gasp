@@ -50,8 +50,8 @@ public class ObjFcnFactory {
 			obj = new ClusterObjFcn(Utility.subList(objFcnArgs, 1), o);
 		} else if (objFcnType.equals("surface")) {
 			obj = new SurfaceObjFcn(Utility.subList(objFcnArgs, 1), o);
-		} else if (objFcnType.equals("substrate")) {
-			obj = new SubstrateObjFcn(Utility.subList(objFcnArgs, 1), o);
+//		} else if (objFcnType.equals("substrate")) {
+//			obj = new SubstrateObjFcn(Utility.subList(objFcnArgs, 1), o);
 		} else {
 			GAParameters.usage("Unknown objective function " + objFcnType, true);	
 		}

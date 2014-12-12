@@ -238,13 +238,13 @@ public class VaspOut {
 		try {
 			outcarReader = new BufferedReader(new FileReader(outcarFileName));
 			String line;
-			String energyRegexp = "TOTEN *= *[-\\.0-9]* eV";
+			String energyRegexp = "free *energy *TOTEN *= *[-\\.0-9]* eV"; // Added by Ben
 			Pattern energyPattern = Pattern.compile(energyRegexp);
 			while ((line = outcarReader.readLine()) != null) {
 				Matcher energyMatcher = energyPattern.matcher(line);
 				if (energyMatcher.find()) {
 					StringTokenizer energyLineTok = new StringTokenizer(energyMatcher.group(energyMatcher.groupCount()));
-					energyLineTok.nextToken();energyLineTok.nextToken();
+					energyLineTok.nextToken();energyLineTok.nextToken();energyLineTok.nextToken();energyLineTok.nextToken();
 					energy = Double.parseDouble(energyLineTok.nextToken());
 				}
 				if (line.contains(vaspSuccessString))
@@ -298,13 +298,15 @@ public class VaspOut {
 	} */
 
 	public static void main(String args[]) {
-		for (VaspConfig i : getConfigs("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/OUTCAR", 
-				getPOSCAR("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/POSCAR"))) {
-			System.out.println(i.getTotalEnergy());
-			for (double d : i.getStress())
-				System.out.print(d + " ");
-			System.out.println("");
-			System.out.println(i.getCell());
-		}
+//		for (VaspConfig i : getConfigs("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/OUTCAR", 
+//				getPOSCAR("/home/wtipton/projects/ga_for_crystals/oldruns/garun_vasp1/temp/testrun.17/POSCAR"))) {
+//			System.out.println(i.getTotalEnergy());
+//			for (double d : i.getStress())
+//				System.out.print(d + " ");
+//			System.out.println("");
+//			System.out.println(i.getCell());
+//		}
+		double energy = getFinalEnergy("/Users/benjaminrevard/Desktop/1002.OUTCAR", false);
+		System.out.println(energy);
 	}
 }
