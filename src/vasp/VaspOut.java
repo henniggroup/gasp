@@ -238,13 +238,13 @@ public class VaspOut {
 		try {
 			outcarReader = new BufferedReader(new FileReader(outcarFileName));
 			String line;
-			String energyRegexp = "free *energy *TOTEN *= *[-\\.0-9]* eV"; // Added by Ben
+			String energyRegexp = "TOTEN *= *[-\\.0-9]* eV";
 			Pattern energyPattern = Pattern.compile(energyRegexp);
 			while ((line = outcarReader.readLine()) != null) {
 				Matcher energyMatcher = energyPattern.matcher(line);
 				if (energyMatcher.find()) {
 					StringTokenizer energyLineTok = new StringTokenizer(energyMatcher.group(energyMatcher.groupCount()));
-					energyLineTok.nextToken();energyLineTok.nextToken();energyLineTok.nextToken();energyLineTok.nextToken();
+					energyLineTok.nextToken();energyLineTok.nextToken();
 					energy = Double.parseDouble(energyLineTok.nextToken());
 				}
 				if (line.contains(vaspSuccessString))
