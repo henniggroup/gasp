@@ -484,8 +484,8 @@ public class Cell implements Serializable {
 
     
 	/**
-     * Method returning the reduced version of a 2D Niggli cell
-     * with c lattice parameter perpendicular to ab plane
+     * method returning Niggli reduced cell representation for a 2D cell, with the c lattice vector 
+     * perpendicular to ab plane
      */
     private Cell niggliReduced2DCell;
     public Cell getNigliReduced2DCell() {
@@ -493,22 +493,44 @@ public class Cell implements Serializable {
     		return niggliReduced2DCell;
     
     	rotatedIntoPrincDirs();
-		
+    	
+		// pad the cell with 100 Angstroms of vacuum
 		List<Vect> vectors = new ArrayList<Vect>();
 		vectors.add(this.getLatticeVectors().get(0));
 		vectors.add(this.getLatticeVectors().get(1));  
 		double k = this.getCellLengths()[2];   
-		vectors.add(new Vect(0.0, 0.0, k));
+		vectors.add(new Vect(0.0, 0.0, 100.0 + k));
 		
-		List<Site> newSites = new ArrayList<Site>();
+		// move all the sites up to the vertical center of the cell
+		List<Site> sites = new ArrayList<Site>();
 		for (Site s : this.getSites())
-			newSites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, k/2.0))));	
-		
+			sites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, (100.0 + k)/2))));
+	
+		// set the lattice vectors and basis to the new values
 		latticeVectors = vectors;
-		basis = newSites;
-		
-        Cell result = getNiggliCell();
-        niggliReduced2DCell = result; 
+		basis = sites;
+
+		// do the Niggli cell reduction on the padded cell
+		Cell result = getNiggliCell();
+        
+        // unpad the reduced cell
+        result.rotatedIntoPrincDirs();
+        List<Vect> newVectors = result.getLatticeVectors();
+        newVectors.remove(2);
+        newVectors.add(new Vect(0.0, 0.0, k));
+        
+        // move all the sites back down
+        List<Site> newSites = new ArrayList<Site>();
+     	for (Site s : result.getSites())
+     		newSites.add(new Site(s.getElement(), s.getCoords().plus(new Vect(0.0, 0.0, -(100.0 + k)/2))));
+        
+     	// set the lattice vectors and basis to the new values
+        latticeVectors = newVectors;
+        basis = newSites;
+        
+        Cell finalResult = new Cell(latticeVectors, basis);
+        
+        niggliReduced2DCell = finalResult;
         return niggliReduced2DCell; 
     }
     
@@ -1629,6 +1651,13 @@ public class Cell implements Serializable {
 		
 //		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
 //		System.out.println(f.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
+		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/2D_Niggli.POSCAR");
+		Cell r = f.getNigliReduced2DCell();
+		
+		r.writeCIF("/Users/benjaminrevard/Desktop/new_reduced.cif");
+		
+		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/Desktop/new_reduced.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/Desktop/new_reduced.vasp", false);
+
 
 
 	//	a.getNigliReducedCell();
