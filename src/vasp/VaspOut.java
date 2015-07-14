@@ -18,6 +18,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
+
 package vasp;
 
 import crystallography.Cell;
@@ -52,7 +53,7 @@ import chemistry.Element;
 //NB: Convention: when runs fail, energy should evaluate to Double.POSITIVE_INFINITY
 
 public class VaspOut {
-	
+
 	static final String vaspSuccessString = "reached required accuracy";
 
 	public static Cell getPOSCAR(String poscarInFile) {

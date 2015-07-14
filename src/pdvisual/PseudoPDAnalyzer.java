@@ -1,4 +1,5 @@
-/* Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
+/*
+ * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 
 This file is part of the Genetic Algorithm for Structure and Phase Prediction (GASP).
 

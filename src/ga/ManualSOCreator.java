@@ -1,4 +1,3 @@
-/* Genetic algorithm for crystal structure prediction.  Will Tipton.  Ceder Lab at MIT. Summer 2007 */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 

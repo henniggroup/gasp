@@ -1,4 +1,3 @@
-/* Genetic algorithm for crystal structure prediction.  Will Tipton.  2010. */
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner
 

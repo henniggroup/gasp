@@ -18,6 +18,7 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
+
 package utility;
 
 // this is updated automatically by a cron job on wills machine.

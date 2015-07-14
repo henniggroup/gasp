@@ -1,5 +1,3 @@
-package ga;
-
 /*
  * Copyright 2011-2014 Will Tipton, Richard Hennig, Ben Revard, Stewart Wenner, Anna Yesypenko
 
@@ -20,6 +18,8 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
     
     
     */
+
+package ga;
 
 import java.io.File;
 import java.util.ArrayList;
