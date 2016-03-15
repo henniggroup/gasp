@@ -186,13 +186,21 @@ public class Isotropy {
 		//	System.out.print (line);
 			if (nextLineIsLatticeParams)
 				latticeParms = line;
-			nextLineIsLatticeParams = line.startsWith("Values of a,b,c,alpha,beta,gamma");	
+			nextLineIsLatticeParams = line.startsWith("Values of a,b,c,alpha,beta,gamma");
 			if (line.startsWith("Position of each atom"))
 				nextLineIsTypes = false;
 			if (nextLineIsTypes) {
 				String typeStrs[] = line.split("  *");
-				for (int i = 1; i < typeStrs.length; i++)
-					types.add(Integer.parseInt(typeStrs[i]));
+				for (int i = 0; i < typeStrs.length; i++) {								
+					String typeGroup[] = typeStrs[i].split("\\*"); 						
+					if (typeGroup.length == 2) {								
+						for (int j = 1; j <= Integer.parseInt(typeGroup[0]); j++) { 	
+							types.add(Integer.parseInt(typeGroup[1]));					
+						}																
+					} else {															
+						types.add(Integer.parseInt(typeGroup[0]));						
+					}																				
+				}
 			}
 			if (!nextLineIsTypes)
 				nextLineIsTypes = line.startsWith("Type of each atom");	
@@ -262,7 +270,7 @@ public class Isotropy {
 	
 	public static void main(String args[]) {
 		//Cell c = VaspOut.getPOSCAR(args[0]);
-	//	Cell c = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/33836.POSCAR");
+	//	Cell c = VaspOut.getPOSCAR("/home/brevard/testing/S2Mo.POSCAR");
 	//	Cell d = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/34257.POSCAR");
 	//	Cell e = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/35690.POSCAR");
 	//	Cell f = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/40495.POSCAR");
@@ -283,7 +291,13 @@ public class Isotropy {
 		
 	//	c = VaspOut.getPOSCAR("/home/wtipton/cifs/POSCAR");
 		
-	//	System.out.println(c.getFSOOutput());	
+	//	String fsoutput = getFindsymOut(c);
+	//	System.out.println(fsoutput);	
+	//	try {
+	//		System.out.println(parseWyckoffCell(fsoutput, c));
+	//	} catch (Exception x) {
+	//		System.out.println(x);
+	//	}
 	//	System.out.println(d.getFSOOutput());
 	//	System.out.println(e.getFSOOutput()); 
 	//	System.out.println(f.getFSOOutput());
