@@ -46,6 +46,9 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	private Boolean reduced = false;
 	private StructureOrgCreator SOCreator = null;
 	
+	private Vect location = null; // the location of the centroid of the cell in fractional coordinates of the sandwich lattice vectors. Used by IslandObjFcn
+	private double interlayerDist = 0; // the vertical distance between the atoms in the island and in the sandwiching layers. Used by IslandObjFcn 
+	
 	private double totalEnergy = Double.NaN;
 	
 	public StructureOrg(Cell s) {
@@ -71,12 +74,12 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	}
 	
 	public void standardize() {
-		structure = structure.getCellWithAllAtomsInCell().getNigliReducedCell();
+		structure = structure.getCellWithAllAtomsInCell().getNiggliReducedCell();
 		reduced = true;
 	}
 	
 	public void standardize2D() {
-		structure = structure.getCellWithAllAtomsInCell().getNigliReduced2DCell();
+		structure = structure.getCellWithAllAtomsInCell().getNiggliReduced2DCell();
 		reduced = true;
 	}
 	
@@ -101,6 +104,22 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	
 	public Boolean isReduced() {
 		return reduced;
+	}
+	
+	public void setLocation(Vect loc) {
+		location = loc;
+	}
+	
+	public Vect getLocation() {
+		return location;
+	}
+	
+	public void setInterlayerDist(double dist) {
+		interlayerDist = dist;
+	}
+	
+	public double getInterlayerDist() {
+		return interlayerDist;
 	}
 	
 	// to test niggliReduceStructure

@@ -39,18 +39,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-/*import org.openbabel.OBAtom;
-import org.openbabel.OBBase;
-import org.openbabel.OBConversion;
-import org.openbabel.OBMol;
-import org.openbabel.OBUnitCell;
-import org.openbabel.openbabel_java;
-import org.openbabel.openbabel_javaConstants;
-import org.openbabel.vector3;
-import org.openbabel.vectorVector3;*/
-
 import Jama.Matrix;
-
 import utility.*;
 import vasp.VaspOut;
 import vasp.VaspIn;
@@ -467,13 +456,27 @@ public class Cell implements Serializable {
     	return result;
     }
 
+ 
+    // returns a bounding box for the atoms (minz, maxz)
+ 	public double[] getAtomBox() {
+ 		double minz = Double.MAX_VALUE;
+ 		double maxz = Double.MIN_VALUE;
+ 		for (Site s : getSites()) {
+ 			List<Double> cartComps = s.getCoords().getCartesianComponents();
+ 			minz = Math.min(minz, cartComps.get(2));
+ 			maxz = Math.max(maxz, cartComps.get(2));
+ 		}
+ 		return new double [] {minz, maxz};
+ 	}
+    
+    
     /**
      * method returning the Niggli reduced cell representation for a given structure.
      * this code is adapted from convasp 5.6.
      * Warning: this code doesn't check if the cell is actually primitive
      */
     private Cell niggliReducedCell;
-    public Cell getNigliReducedCell() {
+    public Cell getNiggliReducedCell() {
     	if (niggliReducedCell != null)
     		return niggliReducedCell;
 
@@ -488,7 +491,7 @@ public class Cell implements Serializable {
      * perpendicular to ab plane
      */
     private Cell niggliReduced2DCell;
-    public Cell getNigliReduced2DCell() {
+    public Cell getNiggliReduced2DCell() {
     	if (niggliReduced2DCell != null)
     		return niggliReduced2DCell;
     
@@ -1651,12 +1654,12 @@ public class Cell implements Serializable {
 		
 //		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/GA/MIDfailures/fake_fails_for_testing/bigcell.POSCAR");
 //		System.out.println(f.satisfiesPerSpeciesMIDs(perSpeciesMIDs));
-		Cell f = VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/2D_Niggli.POSCAR");
-		Cell r = f.getNigliReduced2DCell();
+		Cell f = VaspOut.getPOSCAR("/n/srv/brevard/testing/2D_Niggli_test.POSCAR");
+		Cell r = f.getNiggliReduced2DCell();
 		
-		r.writeCIF("/Users/benjaminrevard/Desktop/new_reduced.cif");
+		r.writeCIF("/n/srv/brevard/testing/new_reduced.cif");
 		
-		(new VaspIn(Cell.parseCif(new File("/Users/benjaminrevard/Desktop/new_reduced.cif")), null, null, null)).writePoscar("/Users/benjaminrevard/Desktop/new_reduced.vasp", false);
+		(new VaspIn(Cell.parseCif(new File("/n/srv/brevard/testing/new_reduced.cif")), null, null, null)).writePoscar("/n/srv/brevard/testing/new_reduced.vasp", false);
 
 
 

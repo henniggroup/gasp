@@ -97,7 +97,8 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 			mid = GAParameters.getParams().getMinInteratomicDistance();
 		}
 
-		double [] bounds = getAtomBox(oldCell);
+		// get the vertical bounds
+		double [] bounds = oldCell.getAtomBox();
 		double zlen = bounds[1] - bounds[0];
 		
 		// make new list of sites where we subtract (0,0,minz-mid/2) off all the old ones
@@ -115,18 +116,6 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		Cell newCell = new Cell(newBasis, newSites, oldCell.getLabel());
 		org.setCell(newCell, false);
 		
-	}
-	
-	// returns a bounding box for the atoms (minz, maxz)
-	double[] getAtomBox(Cell cell) {
-		double minz = Double.MAX_VALUE;
-		double maxz = Double.MIN_VALUE;
-		for (Site s : cell.getSites()) {
-			List<Double> cartComps = s.getCoords().getCartesianComponents();
-			minz = Math.min(minz, cartComps.get(2));
-			maxz = Math.max(maxz, cartComps.get(2));
-		}
-		return new double [] {minz, maxz};
 	}
 
 	/**

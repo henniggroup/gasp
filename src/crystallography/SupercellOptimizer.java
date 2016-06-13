@@ -271,7 +271,7 @@ public class SupercellOptimizer {
 		
 		// maybe 
 		if (niggliReduce)
-			outputCell = outputCell.getNigliReducedCell();
+			outputCell = outputCell.getNiggliReducedCell();
 		
 		// Print output
 		if (cellCombos != null) {
