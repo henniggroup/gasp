@@ -106,7 +106,7 @@ public class GAParameters implements Serializable {
 	private Boolean dryRun = false;
 	private String runTitle = "default";
 	// - hard constraints (in Angstroms and degrees):
-	private double minInteratomicDistance = -1; 
+	private double minInteratomicDistance = -1;  
 	private List<Triplet<Element,Element,Double>> perSpeciesMIDs;
 	private double maxLatticeLength = -1;
 	private double minLatticeLength = -1;

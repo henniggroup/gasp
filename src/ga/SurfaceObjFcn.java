@@ -98,7 +98,7 @@ public class SurfaceObjFcn extends ObjectiveFunction {
 		}
 
 		// get the vertical bounds
-		double [] bounds = oldCell.getAtomBox();
+		double [] bounds = oldCell.getAtomBoxZ();
 		double zlen = bounds[1] - bounds[0];
 		
 		// make new list of sites where we subtract (0,0,minz-mid/2) off all the old ones

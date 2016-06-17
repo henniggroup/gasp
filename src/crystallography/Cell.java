@@ -457,8 +457,33 @@ public class Cell implements Serializable {
     }
 
  
+    // returns a bounding box for the atoms (minx, maxx)
+    // TODO: combine these three into one method since there's almost identical
+ 	public double[] getAtomBoxX() {
+ 		double minx = Double.MAX_VALUE;
+ 		double maxx = Double.MIN_VALUE;
+ 		for (Site s : getSites()) {
+ 			List<Double> cartComps = s.getCoords().getCartesianComponents();
+ 			minx = Math.min(minx, cartComps.get(0));
+ 			maxx = Math.max(maxx, cartComps.get(0));
+ 		}
+ 		return new double [] {minx, maxx};
+ 	}
+ 	
+ 	 // returns a bounding box for the atoms (minz, maxz)
+ 	public double[] getAtomBoxY() {
+ 		double miny = Double.MAX_VALUE;
+ 		double maxy = Double.MIN_VALUE;
+ 		for (Site s : getSites()) {
+ 			List<Double> cartComps = s.getCoords().getCartesianComponents();
+ 			miny = Math.min(miny, cartComps.get(1));
+ 			maxy = Math.max(maxy, cartComps.get(1));
+ 		}
+ 		return new double [] {miny, maxy};
+ 	}
+    
     // returns a bounding box for the atoms (minz, maxz)
- 	public double[] getAtomBox() {
+ 	public double[] getAtomBoxZ() {
  		double minz = Double.MAX_VALUE;
  		double maxz = Double.MIN_VALUE;
  		for (Site s : getSites()) {

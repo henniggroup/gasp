@@ -50,7 +50,7 @@ public class SubstrateObjFcn extends SurfaceObjFcn {
 
 	public Cell removeWhiteSpace(Cell oldCell) {
 		
-		double [] bounds = super.getAtomBox(oldCell);
+		double [] bounds = oldCell.getAtomBoxZ();
 		double zlen = bounds[1] - bounds[0];
 		
 		// make a new box
@@ -71,7 +71,7 @@ public class SubstrateObjFcn extends SurfaceObjFcn {
 	@Override
 	public void unpadOrg() {
 		Cell oldCell = org.getCell();
-		double [] bounds = super.getAtomBox(oldCell);
+		double [] bounds = oldCell.getAtomBoxZ();
 		List<Site> newSites = new ArrayList<Site>();
 		for (Site s : oldCell.getSites()) {
 			if (s.getCoords().getCartesianComponents().get(2) > bounds[0] + substrate.getCellLengths()[2] + substrateDistance / 2)
