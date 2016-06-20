@@ -76,7 +76,8 @@ public class Permutation implements Variation {
 			pairs = GAUtils.parsePairs(pairStrings);
 		
 		// get a parent and its basis
-		Cell pStruct = ((StructureOrg)(sel.doSelection(parents, 1)[0])).getCell();
+		StructureOrg p = (StructureOrg)(sel.doSelection(parents, 1)[0]);
+		Cell pStruct = p.getCell();
 		
 		// copy the parent's vectors and sites
 		List<Site> newSites = new ArrayList<Site>();
@@ -120,6 +121,15 @@ public class Permutation implements Variation {
 			GAOut.out().stdout("Permuting " + newSites.get(indexA).getElement() + " and " + newSites.get(indexB).getElement(), GAOut.INFO);
 
 		}
-		return new StructureOrg(new Cell(newVects, newSites));	
+		
+		StructureOrg newOrg = new StructureOrg(new Cell(newVects, newSites));
+		
+		// if we're using the island objective function, preserve the parent's location and interlayer distance
+		if (params.getObjFcnArgs().get(0) == "island") {
+			newOrg.setLocation(p.getLocation());
+			newOrg.setInterlayerDist(p.getInterlayerDist());
+		}
+		
+		return newOrg;	
 	}
 }

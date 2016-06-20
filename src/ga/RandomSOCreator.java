@@ -24,6 +24,7 @@ package ga;
 import java.util.*;
 
 import utility.Vect;
+import vasp.VaspOut;
 import crystallography.*;
 import chemistry.*;
 
@@ -126,7 +127,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 		
 		//TODO: FIXME: maximum z lattice length
 		// should be correctly constrained by maxCellHeight
-		double maxZll = Math.min(maxll,2*maxh);
+		double maxZll = Math.min(maxll, 2*maxh);
 		
 		double lc = rand.nextDouble()*(maxZll-minll)+minll;
 		
@@ -200,7 +201,34 @@ public class RandomSOCreator implements StructureOrgCreator {
 		if (newGenType.equalsIgnoreCase("givenVol"))
 			newStructure = newStructure.scaleTo(givenVolPerAtom * newStructure.getBasisSize());
 
-		return new StructureOrg(newStructure);
+		StructureOrg org = new StructureOrg(newStructure);
+		
+		// If the island objective function is being used, need to assign random location and interlayer distance values within the constraints
+		if (params.getObjFcnArgs().get(0) == "island") {
+			// the constraints
+			double maxloc = params.getMaxLocation();
+			double minloc = params.getMinLocation();
+			double maxinterlayer = params.getMaxInterlayerDist();
+			double mininterlayer = params.getMinInterlayerDist();
+			
+			// get random values within the constraints
+			double aloc = (rand.nextDouble()*(maxloc - minloc) + minloc);
+			double bloc = (rand.nextDouble()*(maxloc - minloc) + minloc);
+			double intelayer = (rand.nextDouble()*(maxinterlayer - mininterlayer) + mininterlayer);
+			
+			// get the sandwich slab from the poscar file and make sure it's lying in the x-y plane
+			// TODO: this is also done every time IslandObjFcn is instantiated. Maybe reading it in from the poscar every time isn't the best approach...
+			StructureOrg sandwich = new StructureOrg(VaspOut.getPOSCAR(params.getObjFcnArgs().get(1))); 
+			sandwich.getCell().getCellWithAllAtomsInCell().rotatedIntoPrincDirs(); 
+			
+			// set the org's location using the random fractional coordinates and the basis of the sandwich sheet
+			org.setLocation(new Vect(aloc, bloc, 0.0, sandwich.getCell().getLatticeVectors()));
+			
+			// set the org's interlayer distance to the randomly generated one
+			org.setInterlayerDist(intelayer);
+		}
+		
+		return org;
 	}
 
 	public StructureOrg makeOrganism(Generation g) {

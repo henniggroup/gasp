@@ -47,6 +47,7 @@ public final class StructureMut implements Variation {
 	private double mutRate;
 	private double sigmaAtoms;
 	private double sigmaLattice;
+	private double sigmaLoc = 2.0; // TODO: might want to make this an input file option at some point...
 	
 	public StructureMut(List<String> args) {
 		if (args == null || args.size() < 3)
@@ -123,6 +124,14 @@ public final class StructureMut implements Variation {
 				
 		// make the new offspring
 		StructureOrg result = new StructureOrg(new Cell(newVects, newSites));
+		
+		// if using the island objective function, perturb the location of the new structure
+		if (params.getObjFcnArgs().get(0) == "island") {
+			double newx = p.getLocation().getCartesianComponents().get(0) + rand.nextGaussian() * sigmaLoc;
+			double newy = p.getLocation().getCartesianComponents().get(1) + rand.nextGaussian() * sigmaLoc;
+			result.setLocation(new Vect(newx, newy, 0.0));
+			result.setInterlayerDist(p.getInterlayerDist());
+		}
 		
 		GAOut.out().stdout("StructureMut created new StructureOrg:", GAOut.DEBUG, result.getID());
 		GAOut.out().stdout(result.toString(), GAOut.DEBUG, result.getID());		

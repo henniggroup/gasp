@@ -113,6 +113,13 @@ public class GAParameters implements Serializable {
 	private double maxLatticeAngle = -1;
 	private double minLatticeAngle = -1;
 	private double maxCellHeight = Double.POSITIVE_INFINITY;
+	
+	// These four constraints are for when using IslandObjFcn
+	private double maxInterlayerDist = Double.POSITIVE_INFINITY; // Ben added this 
+	private double minInterlayerDist = Double.NEGATIVE_INFINITY; // Ben  added this
+	private double maxLocation = Double.POSITIVE_INFINITY; // fractional (of sandwich slab's a and b vectors) x and y coordinate of location of island
+	private double minLocation = Double.NEGATIVE_INFINITY; // same as above
+	
 	private int maxNumAtoms = 1;
 	private int minNumAtoms = 1;
 	private int minNumSpecies = 1;
@@ -251,6 +258,7 @@ public class GAParameters implements Serializable {
 		System.out.println("Objective Functions");
 		System.out.println("   --objectiveFunction cluster <padding length> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction surface <padding length> <other obj fcn args from below...>");
+		System.out.println("   --objectiveFunction island <sandwich poscar> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction substrate <padding length> <other obj fcn args from below...>");
 		System.out.println("   --objectiveFunction <epa/pd> gulp <gulp header file> <gulp potential file> <cautious?> <species needing a shell>");
 		System.out.println("   --objectiveFunction <epa/pd> vasp <cautious?> <kpoints> <incar> <element potcar>+ ");
@@ -285,6 +293,10 @@ public class GAParameters implements Serializable {
 		System.out.println("   --maxLatticeAngle d : maximum lattice angle (Degrees)");
 		System.out.println("   --minLatticeAngle d : minimum lattice angle (Degrees)");
 		System.out.println("   --maxCellHeight d : maximum height of cell in z-direction");
+		System.out.println("   --maxInterlayerDist d : maximum vertical distance between island and sandwich sheet");
+		System.out.println("   --minInterlayerDist d : minimum vertical distance between island and sandwich sheet");
+		System.out.println("   --maxLocation d : maximum location of island on sandwich sheet, in fractional coordinates of the sandwich sheet's a and b lattice vectors");
+		System.out.println("   --minLocation d : minimum location of island on sandwich sheet, in fractional coordinates of the sandwich sheet's a and b lattice vectors");
 		System.out.println("   --maxNumAtoms n");
 		System.out.println("   --minNumAtoms n");
 		System.out.println("   --minNumSpecies n");
@@ -351,6 +363,14 @@ public class GAParameters implements Serializable {
 				minLatticeAngle = Double.parseDouble(arguments.get(0));
 			else if (flag.equalsIgnoreCase("maxCellHeight"))
 				maxCellHeight = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxInterlayerDist"))
+				maxInterlayerDist = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minInterlayerDist"))
+				minInterlayerDist = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("maxLocation"))
+				maxLocation = Double.parseDouble(arguments.get(0));
+			else if (flag.equalsIgnoreCase("minLocation"))
+				minLocation = Double.parseDouble(arguments.get(0));
 			else if (flag.equalsIgnoreCase("maxNumAtoms"))
 				maxNumAtoms = Integer.parseInt(arguments.get(0));
 			else if (flag.equalsIgnoreCase("minNumAtoms"))
@@ -660,6 +680,10 @@ public class GAParameters implements Serializable {
 	public Development getDevelopment() {
 		return dev;
 	}
+	
+	public List<String> getObjFcnArgs() {
+		return objFcnArgs;
+	}
 
 	public double getMaxLatticeAngleDegrees() {
 		return maxLatticeAngle;
@@ -671,6 +695,22 @@ public class GAParameters implements Serializable {
 	
 	public double getMaxCellHeight() {
 		return maxCellHeight;
+	}
+	
+	public double getMaxInterlayerDist() {
+		return maxInterlayerDist;
+	}
+	
+	public double getMinInterlayerDist() {
+		return minInterlayerDist;
+	}
+	
+	public double getMaxLocation() {
+		return maxLocation;
+	}
+	
+	public double getMinLocation() {
+		return minLocation;
 	}
 
 	public double getMinInteratomicDistance() {

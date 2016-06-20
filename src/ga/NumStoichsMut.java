@@ -118,7 +118,15 @@ public class NumStoichsMut implements Variation {
 		else
 			removeAtoms(Math.abs(n), newSites);	
 		
-		return new StructureOrg(new Cell(newVects, newSites));
+		StructureOrg newOrg = new StructureOrg(new Cell(newVects, newSites));
+		
+		// if we're using the island objective function, preserve the parent's location and interlayer distance
+		if (params.getObjFcnArgs().get(0) == "island") {
+			newOrg.setLocation(p.getLocation());
+			newOrg.setInterlayerDist(p.getInterlayerDist());
+		}
+		
+		return newOrg;
 	}
 
 	// just for testing

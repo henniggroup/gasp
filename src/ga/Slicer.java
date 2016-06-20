@@ -211,7 +211,7 @@ public final class Slicer implements Variation {
 			}
 		}
 				
-		//average parents' bases to create a new basis
+		// average parents' bases to create a new basis
 		double[] aAngles = a.getCellAnglesDegrees();
 		double[] bAngles = b.getCellAnglesDegrees();
 		double[] aLengths = a.getCellLengths();
@@ -239,7 +239,7 @@ public final class Slicer implements Variation {
 			shiftB[(axis+2)%3] = rand.nextDouble();
 		}
 		
-		//get points/species from parent a above the split and from b below
+		// get points/species from parent a above the split and from b below
 		List<Vect> basis = (new Cell(newLengths[0], newLengths[1], newLengths[2], newAngles[0], newAngles[1], newAngles[2], null, null)).getLatticeVectors();
 		ArrayList<Site> newSites = new ArrayList<Site>();
 		// parent a's contribution 
@@ -257,6 +257,16 @@ public final class Slicer implements Variation {
 	
 		// make the new organism
 		StructureOrg newOrganism = new StructureOrg(new Cell(newLengths[0], newLengths[1], newLengths[2], newAngles[0], newAngles[1], newAngles[2], newSites, null));
+		
+		// if using the island objective function, take the average of the parents' locations and interlayer distances
+		if (params.getObjFcnArgs().get(0) == "island") {
+			// set the interlayer distance to the average
+			newOrganism.setInterlayerDist((ps[0].getInterlayerDist() + ps[1].getInterlayerDist())/2);
+			// compute the average location of the two parents
+			Vect newLocation = ps[0].getLocation().plus(ps[1].getLocation());
+			newLocation.scalarMult(0.5);
+			newOrganism.setLocation(newLocation);
+		}
 			
 		// some status info
 		GAOut.out().stdout("("+ newOrganism.getCell().getNumSites() +" atoms)", GAOut.NOTICE, newOrganism.getID());
