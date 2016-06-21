@@ -259,7 +259,7 @@ public final class Slicer implements Variation {
 		StructureOrg newOrganism = new StructureOrg(new Cell(newLengths[0], newLengths[1], newLengths[2], newAngles[0], newAngles[1], newAngles[2], newSites, null));
 		
 		// if using the island objective function, take the average of the parents' locations and interlayer distances
-		if (params.getObjFcnArgs().get(0) == "island") {
+		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
 			// set the interlayer distance to the average
 			newOrganism.setInterlayerDist((ps[0].getInterlayerDist() + ps[1].getInterlayerDist())/2);
 			// compute the average location of the two parents

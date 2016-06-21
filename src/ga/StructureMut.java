@@ -126,7 +126,7 @@ public final class StructureMut implements Variation {
 		StructureOrg result = new StructureOrg(new Cell(newVects, newSites));
 		
 		// if using the island objective function, perturb the location of the new structure
-		if (params.getObjFcnArgs().get(0) == "island") {
+		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
 			double newx = p.getLocation().getCartesianComponents().get(0) + rand.nextGaussian() * sigmaLoc;
 			double newy = p.getLocation().getCartesianComponents().get(1) + rand.nextGaussian() * sigmaLoc;
 			result.setLocation(new Vect(newx, newy, 0.0));

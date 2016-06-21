@@ -125,7 +125,7 @@ public class Permutation implements Variation {
 		StructureOrg newOrg = new StructureOrg(new Cell(newVects, newSites));
 		
 		// if we're using the island objective function, preserve the parent's location and interlayer distance
-		if (params.getObjFcnArgs().get(0) == "island") {
+		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
 			newOrg.setLocation(p.getLocation());
 			newOrg.setInterlayerDist(p.getInterlayerDist());
 		}

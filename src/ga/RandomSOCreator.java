@@ -204,7 +204,7 @@ public class RandomSOCreator implements StructureOrgCreator {
 		StructureOrg org = new StructureOrg(newStructure);
 		
 		// If the island objective function is being used, need to assign random location and interlayer distance values within the constraints
-		if (params.getObjFcnArgs().get(0) == "island") {
+		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
 			// the constraints
 			double maxloc = params.getMaxLocation();
 			double minloc = params.getMinLocation();
@@ -240,21 +240,32 @@ public class RandomSOCreator implements StructureOrgCreator {
 	
 	// for testing
 	public static void main(String args[]) {
-		GAParameters params = GAParameters.getParams();
+	//	GAParameters params = GAParameters.getParams();
 		
-		Generation g = GAParameters.getParams().makeEmptyGeneration();
+	//	Generation g = GAParameters.getParams().makeEmptyGeneration();
 		
-		String arg[] = {"--f", "/home/wtipton/test"};
-		GAParameters.getParams().setArgs(arg);
+	//	String arg[] = {"--f", "/home/wtipton/test"};
+	//	GAParameters.getParams().setArgs(arg);
+		
+	//	String arg[] = {"--f", "/n/srv/brevard/testing/GA_islands_input"};
+	//	params.setArgs(arg);
 
-	//	String socArgs[] = {"givenVol", "4", "40"};
+	//	System.out.println(params.getMaxInterlayerDist());
 		
-	//	RandomSOCreator soc = new RandomSOCreator(socArgs);
+		// TODO: figure out how to initialize a RandomSOCreator (either get it from params or make it here), and then try running the makeRandomOrg() method
+		
+	//	String socArgs[] = {"givenVol", "28", "30"};
+		
+		List<String> socArgs = Arrays.asList("givenVol", "28");	
+		RandomSOCreator soc = new RandomSOCreator(socArgs);
+		
+		StructureOrg randOrg = soc.makeRandomOrg();
+		System.out.println(randOrg.getLocation());
 		
 	//	System.out.println(soc.makeOrganism(g));
 		
-		Composition comp = GAParameters.getParams().getCompSpace().getRandomIntegerCompInSpace(params.getMinNumAtoms(), params.getMaxNumAtoms());
-		System.out.println(comp);
+	//	Composition comp = GAParameters.getParams().getCompSpace().getRandomIntegerCompInSpace(params.getMinNumAtoms(), params.getMaxNumAtoms());
+	//	System.out.println(comp);
 	}
 
 }
