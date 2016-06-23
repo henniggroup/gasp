@@ -103,11 +103,12 @@ public class VaspIn {
 			for (Element e : elements)
 				writer.write(cell.getNumSitesWithElement(e) + " ");
 			writer.write("\n");
+			writer.write("Selective Dynamics\n"); // For specifying which atoms to allow to move
 			if (useCartesianCoords)
 				writer.write("Cartesian\n");
 			else
 				writer.write("Direct\n");
-			/* Make sure w're printing these out in the right order */
+			/* Make sure we're printing these out in the right order */
 			List<Site> basis = cell.getSites();	
 			for (Element e : elements)
 				for (Site s : basis) {
@@ -121,6 +122,13 @@ public class VaspIn {
 							String coordStr = nf.format(coords.get(i));
 							writer.write(coordStr + " ");
 						}
+						
+						// check to see if we should let this atom move or not
+						if (s.getRelax())  
+							writer.write("T T T");
+						else
+							writer.write("F F F");
+						
 						writer.write("\n");
 					}
 				}

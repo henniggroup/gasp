@@ -38,10 +38,18 @@ public class Site implements Serializable{
 	
 	private Vect coords;
 	private Element element;
+	private boolean relax; // indicated whether this site should be allowed to relax in the energy calculation
 	
 	public Site(Element _element, Vect _v) {
 		element = _element;
 		coords = _v;
+		relax = true; // default to true - we generally want to allow atoms to relax
+	}
+	
+	public Site(Element _element, Vect _v, boolean _relax) {
+		element = _element;
+		coords = _v;
+		relax = _relax;
 	}
 	
 	public Vect getCoords() {
@@ -62,5 +70,9 @@ public class Site implements Serializable{
 	/* TODO: revise this if Sites ever support partial occupancies or non-element decorations */
 	public Element getElement() {
 		return element;
+	}
+	
+	public boolean getRelax() {
+		return relax;
 	}
 }

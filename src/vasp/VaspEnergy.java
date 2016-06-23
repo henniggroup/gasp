@@ -73,7 +73,7 @@ public class VaspEnergy implements Energy {
 			// run the vasp command. in order to avoid hard-coding things which are
 			// probably system-dependent, we call a wrapper script which is probably
 			// just "cd $1; vasp" for simple set ups
-			p = Runtime.getRuntime().exec("callvasp " + inputDir);
+			p = Runtime.getRuntime().exec("callvasp_islands " + inputDir);
 
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(
 					p.getInputStream()));

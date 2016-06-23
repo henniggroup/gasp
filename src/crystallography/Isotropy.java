@@ -27,6 +27,7 @@ import ga.StructureOrg;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -183,21 +184,26 @@ public class Isotropy {
 
 		List<Integer> types = new LinkedList<Integer>();
 		for (String line : output.split("\n")) {
-		//	System.out.print (line);
+		//	System.out.print (line + "\n");
 			if (nextLineIsLatticeParams)
 				latticeParms = line;
 			nextLineIsLatticeParams = line.startsWith("Values of a,b,c,alpha,beta,gamma");
 			if (line.startsWith("Position of each atom"))
 				nextLineIsTypes = false;
 			if (nextLineIsTypes) {
-				String typeStrs[] = line.split("  *");
-				for (int i = 0; i < typeStrs.length; i++) {								
-					String typeGroup[] = typeStrs[i].split("\\*"); 						
+				String typeStrs[] = line.split(" +");
+				// remove the first element of the list if it's an empty string (sometimes happens with older versions of findsym)
+				if (typeStrs[0].equalsIgnoreCase("")) {
+					String trimmedTypeStrs[] = Arrays.copyOfRange(typeStrs, 1, typeStrs.length); 
+					typeStrs = trimmedTypeStrs;
+				}
+				for (int i = 0; i < typeStrs.length; i++) {	
+					String typeGroup[] = typeStrs[i].split("\\*"); 	
 					if (typeGroup.length == 2) {								
 						for (int j = 1; j <= Integer.parseInt(typeGroup[0]); j++) { 	
 							types.add(Integer.parseInt(typeGroup[1]));					
 						}																
-					} else {															
+					} else {	
 						types.add(Integer.parseInt(typeGroup[0]));						
 					}																				
 				}
@@ -270,7 +276,14 @@ public class Isotropy {
 	
 	public static void main(String args[]) {
 		//Cell c = VaspOut.getPOSCAR(args[0]);
-	//	Cell c = VaspOut.getPOSCAR("/home/brevard/testing/S2Mo.POSCAR");
+	//	Cell c = VaspOut.getPOSCAR("/n/srv/brevard/testing/findsym/1T.POSCAR");
+	//	System.out.println(getFindsymOut(c));
+	//	try {
+	//		System.out.println(parseWyckoffCell(getFindsymOut(c), c));
+	//	} catch (Exception x) {
+	//		System.out.println(x);
+	//	}
+		
 	//	Cell d = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/34257.POSCAR");
 	//	Cell e = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/35690.POSCAR");
 	//	Cell f = VaspOut.getPOSCAR("/home/bcr48/GA/2D/garun_C11/40495.POSCAR");
