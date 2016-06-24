@@ -27,6 +27,7 @@ import ga.StructureOrg;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -190,7 +191,12 @@ public class Isotropy {
 			if (line.startsWith("Position of each atom"))
 				nextLineIsTypes = false;
 			if (nextLineIsTypes) {
-				String typeStrs[] = line.split("  *");
+				String typeStrs[] = line.split(" +");
+                // remove the first element of the list if it's an empty string (sometimes happens with older versions of findsym)
+                if (typeStrs[0].equalsIgnoreCase("")) {
+                    String trimmedTypeStrs[] = Arrays.copyOfRange(typeStrs, 1, typeStrs.length); 
+                    typeStrs = trimmedTypeStrs;
+                }
 				for (int i = 0; i < typeStrs.length; i++) {								
 					String typeGroup[] = typeStrs[i].split("\\*"); 						
 					if (typeGroup.length == 2) {								
