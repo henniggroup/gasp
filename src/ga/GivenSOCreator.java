@@ -22,11 +22,13 @@ This file is part of the Genetic Algorithm for Structure and Phase Prediction (G
 package ga;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import vasp.VaspOut;
-
 import crystallography.Cell;
+import utility.Vect;
 
 // FromCifsSOCreator implements StructureOrgCreator.  It is given a directory, and it
 // creates StructureOrgs from all POSCAR files in the directory.
@@ -68,6 +70,21 @@ public class GivenSOCreator implements StructureOrgCreator {
 				StructureOrg result = new StructureOrg(null);
 				GAOut.out().stdout("Making new StructureOrg from " + poscarFiles[i].getPath(), GAOut.NOTICE, result.getID());
 				result.setCell(VaspOut.getPOSCAR(poscarFiles[i].getPath()));
+				
+				// if the island objective function is used 
+				// This assumes the poscars include the sandwich sheet, and the sandwich sheet is the same as in the this search
+				if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
+					// the path to the sandwich poscar
+					String arg[] = {params.getObjFcnArgs().get(1)};
+					List<String> larg = Arrays.asList(arg);
+					
+					// create an island objective function with the organism from the poscar file
+					IslandObjFcn iof = new IslandObjFcn(larg, result);
+					
+					// unsandwich the organism - this assigns location and interlayer distance variables
+					iof.unsandwichOrg();
+				}
+				
 				poscarFiles[i] = null;
 				return result;
 			}
