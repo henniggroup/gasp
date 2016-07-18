@@ -84,7 +84,7 @@ public class GivenSOCreator implements StructureOrgCreator {
 					// unsandwich the organism - this assigns location and interlayer distance variables
 					iof.unsandwichOrg();
 				}
-				
+					
 				poscarFiles[i] = null;
 				return result;
 			}
@@ -98,4 +98,25 @@ public class GivenSOCreator implements StructureOrgCreator {
 			return name.endsWith("POSCAR");
 		}
 	}
+	
+	
+	// just for testing
+	public static void main(String args[]) {
+		
+		//  arguments for the creator
+		String arg[] = {"/n/srv/brevard/structures/2_trial_run/use_in_next_search/sandiwiched", "16"};
+		
+		// Convert array of strings to list of strings for the constructor
+		List<String> larg = Arrays.asList(arg);
+		
+		// make a creator
+		GivenSOCreator gso = new GivenSOCreator(larg);
+		
+		for (int i = 1; i <= 16; i++){
+			// make an organism
+			gso.makeOrganism(null);
+		}
+		
+	}
+	
 }

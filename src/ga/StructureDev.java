@@ -166,11 +166,8 @@ public final class StructureDev implements Development, Serializable {
 		
 		// if we're using the island objective function and it's the 0'th generation, need to rotate the structure into the principal directions
 		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island") && params.getRecord().getGenNum() == 0) {
-			Cell newCell = s.getCell().getCellWithAllAtomsInCell();
-			newCell.rotatedIntoPrincDirs();
-			s.setCell(newCell);
+			s.getCell().getCellWithAllAtomsInCell().rotatedIntoPrincDirs();
 		}
-		
 		
 		
 		Cell structure = s.getCell();
@@ -253,10 +250,11 @@ public final class StructureDev implements Development, Serializable {
 		}
 		
 		// if using the island objective function, check the interlayer distance and location
-		// TODO: this is also done in IslandObjFcn and RandomSOCreator...reading it in from the poscar every time isn't the best approach...
-		StructureOrg sandwich = new StructureOrg(VaspOut.getPOSCAR(params.getObjFcnArgs().get(1))); 
-		sandwich.getCell().getCellWithAllAtomsInCell().rotatedIntoPrincDirs();
 		if (params.getObjFcnArgs().get(0).equalsIgnoreCase("island")) {
+			// TODO: this is also done in IslandObjFcn and RandomSOCreator...reading it in from the poscar every time isn't the best approach...
+			StructureOrg sandwich = new StructureOrg(VaspOut.getPOSCAR(params.getObjFcnArgs().get(1))); 
+			sandwich.getCell().getCellWithAllAtomsInCell().rotatedIntoPrincDirs();
+			
 			if (s.getInterlayerDist() > params.getMaxInterlayerDist()) {
 				GAOut.out().stdout("Organism " + s.getID() + " failed max interlayer distance constraint", GAOut.NOTICE, s.getID());
 				return false;

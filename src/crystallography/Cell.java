@@ -458,7 +458,7 @@ public class Cell implements Serializable {
 
  
     // returns a bounding box for the atoms (minx, maxx)
-    // TODO: combine these three into one method since there's almost identical
+    // TODO: combine these three into one method since they're almost identical
  	public double[] getAtomBoxX() {
  		double minx = Double.MAX_VALUE;
  		double maxx = Double.MIN_VALUE;
