@@ -46,7 +46,7 @@ public final class StructureOrg extends Organism implements IComputedEntry, Seri
 	private Boolean reduced = false;
 	private StructureOrgCreator SOCreator = null;
 	
-	private Vect location = null; // the location of the centroid of the cell in fractional coordinates of the sandwich lattice vectors. Used by IslandObjFcn
+	private Vect location = null; // the location of the centroid of the cell in Cartesian coordinates. Used by IslandObjFcn
 	private double interlayerDist = 0; // the vertical distance between the atoms in the island and in the sandwiching layers. Used by IslandObjFcn 
 	
 	private double totalEnergy = Double.NaN;

@@ -264,7 +264,7 @@ public final class Slicer implements Variation {
 			newOrganism.setInterlayerDist((ps[0].getInterlayerDist() + ps[1].getInterlayerDist())/2);
 			// compute the average location of the two parents
 			Vect newLocation = ps[0].getLocation().plus(ps[1].getLocation());
-			newLocation.scalarMult(0.5);
+			newLocation = newLocation.scalarMult(0.5);
 			newOrganism.setLocation(newLocation);
 		}
 			
@@ -317,10 +317,24 @@ public final class Slicer implements Variation {
 	//	StructureOrg s1 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/143.cif")));
 	//	StructureOrg s2 = new StructureOrg(Cell.parseCif(new File("/home/wtipton/cifs/44.cif")));
 		
-		StructureOrg s1 = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/Mo.POSCAR"));
-		StructureOrg s2 = new StructureOrg(VaspOut.getPOSCAR("/Users/benjaminrevard/Desktop/W.POSCAR"));
+		StructureOrg s1 = new StructureOrg(VaspOut.getPOSCAR("/n/srv/brevard/structures/Ni.POSCAR"));
+		StructureOrg s2 = new StructureOrg(VaspOut.getPOSCAR("/n/srv/brevard/structures/Cu.POSCAR"));
 		s1.setFitness(-1);
 		s2.setFitness(-1);
+		
+		// Set the parents interlayer distances and locations
+		s1.setInterlayerDist(3.0);
+		s2.setInterlayerDist(4.0);
+		List<Double> loc1 = new ArrayList<Double>();
+		loc1.add(1.0);
+		loc1.add(1.0);
+		loc1.add(0.0);
+		List<Double> loc2 = new ArrayList<Double>();
+		loc2.add(2.0);
+		loc2.add(2.0);
+		loc2.add(0.0);
+		s1.setLocation(new Vect(loc1));
+		s2.setLocation(new Vect(loc2));
 		
 		Generation parents = params.makeEmptyGeneration();
 		parents.addOrganism(s1);
@@ -343,8 +357,10 @@ public final class Slicer implements Variation {
 		Selection sel = new ProbDistSelection(selArgs);
 		
 		StructureOrg o = (StructureOrg)p.doVariation(parents, null, sel);
-		Cell child = o.getCell();
-		VaspIn.writePoscar(child, "/Users/benjaminrevard/Desktop/child.vasp", false);
+		System.out.println(o.getInterlayerDist());
+		System.out.println(o.getLocation());
+	//	Cell child = o.getCell();
+	//	VaspIn.writePoscar(child, "/Users/benjaminrevard/Desktop/child.vasp", false);
 		
 	//	System.out.println(o);
 	//	GAUtils.writeStringToFile(o.getCIF(), new File("offspring.cif"), false); 

@@ -263,6 +263,7 @@ public final class StructureDev implements Development, Serializable {
 				GAOut.out().stdout("Organism " + s.getID() + " failed min interlayer distance constraint", GAOut.NOTICE, s.getID());
 				return false;
 			}
+			// get the location components with respect to the lattice vectors of the island
 			List<Double> location = s.getLocation().getComponentsWRTBasis(sandwich.getCell().getLatticeVectors());
 			if (location.get(0) > params.getMaxLocation() || location.get(1) > params.getMaxLocation()) {
 				GAOut.out().stdout("Organism " + s.getID() + " failed max location constraint", GAOut.NOTICE, s.getID());
